@@ -1,0 +1,38 @@
+{
+  "name": "Palavreco",
+  "version": "0.1.0",
+  "description": "Um bot de Discord que simula o Wordle",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node src/atualizar-comandos.js && node src/bot.js"
+  },
+  "keywords": [
+    "discord",
+    "wordle",
+    "bot"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vitorlops/Palavreco"
+  },
+  "bugs": {
+    "url": "https://github.com/vitorlops/Palavreco/issues"
+  },
+  "engines": {
+    "node": ">=16.9.0"
+  },
+  "contributors": [
+    "ADMVicli <admvicli@gmail.com>",
+    "vitorlops <milagre.vitor@gmail.com>"
+  ],
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@discordjs/builders": "^0.12.0",
+    "@discordjs/rest": "^0.3.0",
+    "discord-api-types": "^0.26.1",
+    "discord.js": "^13.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.7.0"
+  }
+}
