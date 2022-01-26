@@ -2,7 +2,7 @@
 const fs = require('fs');
 // Importa as classes do discord.js
 const { Client, Collection, Intents } = require('discord.js');
-// Importa as informações frageis do bot 
+// Importa as informações frageis do bot
 const { token } = require('./secrets.json');
 
 // Cria uma nova instância do Client
@@ -11,17 +11,18 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 // Cria uma Collection dos comandos do bot
 client.commands = new Collection();
 // Cria uma constante que recebe um array com todos os nomes dos arquivos terminados em .js na pasta comandos
-const commandFiles = fs.readdirSync('./src/comandos').filter(file => file.endsWith('.js'));
+const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
 
 // Seta dinamicamente todos os comandos da pasta para o client.commands
 for (const file of commandFiles) {
-	const command = require(`./comandos/${file}`);
+	const command = require(`./commands/${file}`);
 	client.commands.set(command.data.name, command);
 }
 
 // Quando o Client estiver pronto, esse evento será disparado
 client.once('ready', () => {
 	console.log('O bot está pronto!');
+	client.user.setPresence({ activities: [{ name: 'Wordle', type: 'PLAYING' }] });
 });
 
 // Quando houver um evento de interação, o bot irá executar o comando correspondente
@@ -35,7 +36,8 @@ client.on('interactionCreate', async interaction => {
 	try {
 		// Executa o comando
 		await command.execute(interaction);
-	} catch (error) {
+	}
+	catch (error) {
 		// Caso ocorra algum erro, o bot irá enviar uma mensagem de erro
 		console.error(error);
 		await interaction.reply('Minhas engrenagens estão um pouco lentas, tente novamente!');

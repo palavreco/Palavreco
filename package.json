@@ -1,10 +1,10 @@
 {
-  "name": "Palavreco",
+  "name": "palavreco",
   "version": "0.1.0",
   "description": "Um bot de Discord que simula o Wordle",
   "main": "bot.js",
   "scripts": {
-    "start": "node src/atualizar-comandos.js && node src/bot.js"
+    "start": "node src/update-commands.js && node src/bot.js"
   },
   "keywords": [
     "discord",

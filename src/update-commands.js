@@ -9,7 +9,7 @@ const { clientId, guildId, token } = require('./secrets.json');
 
 // Array de comandos do bot, que depois é passado para JSON
 const commands = [
-	new SlashCommandBuilder().setName('advinhar').setDescription('Tente advinhar a palavra do dia!'),
+	new SlashCommandBuilder().setName('adivinhar').setDescription('Tente advinhar a palavra do dia!'),
 	new SlashCommandBuilder().setName('ajuda').setDescription('Mostra como o jogo funciona'),
 ]
 	.map(command => command.toJSON());
