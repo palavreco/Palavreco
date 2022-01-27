@@ -6,7 +6,7 @@ const { Client, Collection, Intents } = require('discord.js');
 const { token } = require('./secrets.json');
 
 // Cria uma nova instância do Client
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
 // Cria uma Collection dos comandos do bot
 client.commands = new Collection();
@@ -21,8 +21,9 @@ for (const file of commandFiles) {
 
 // Quando o Client estiver pronto, esse evento será disparado
 client.once('ready', () => {
-	console.log('O bot está pronto!');
+	// Seta a atividade do bot
 	client.user.setPresence({ activities: [{ name: 'Wordle', type: 'PLAYING' }] });
+	console.log('O bot está pronto!');
 });
 
 // Quando houver um evento de interação, o bot irá executar o comando correspondente

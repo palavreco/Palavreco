@@ -4,7 +4,8 @@
   "description": "Um bot de Discord que simula o Wordle",
   "main": "bot.js",
   "scripts": {
-    "start": "node src/update-commands.js && node src/bot.js"
+    "deploy": "node src/update-commands.js",
+    "start": "nodemon src/bot.js"
   },
   "keywords": [
     "discord",
@@ -19,10 +20,11 @@
     "url": "https://github.com/vitorlops/Palavreco/issues"
   },
   "engines": {
-    "node": ">=16.9.0"
+    "node": ">=16.13.2"
   },
   "contributors": [
     "ADMVicli <admvicli@gmail.com>",
+    "eduraio <eduardorodrigues011@icloud.com>",
     "vitorlops <milagre.vitor@gmail.com>"
   ],
   "license": "Apache-2.0",
@@ -30,7 +32,8 @@
     "@discordjs/builders": "^0.12.0",
     "@discordjs/rest": "^0.3.0",
     "discord-api-types": "^0.26.1",
-    "discord.js": "^13.6.0"
+    "discord.js": "^13.6.0",
+    "nodemon": "^2.0.15"
   },
   "devDependencies": {
     "eslint": "^8.7.0"
