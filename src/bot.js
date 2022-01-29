@@ -41,7 +41,14 @@ client.on('interactionCreate', async interaction => {
 	catch (error) {
 		// Caso ocorra algum erro, o bot irá enviar uma mensagem de erro
 		console.error(error);
-		await interaction.reply('Minhas engrenagens estão um pouco lentas, tente novamente!');
+		if (interaction.replied) {
+			// Caso o bot já tenha respondido ao usuário, o reply será editado
+			await interaction.editReply('Minhas engrenagens estão um pouco lentas, tente novamente!');
+		}
+		else {
+			// Caso o bot ainda não tenha respondido ao usuário, o reply será enviado
+			await interaction.reply('Minhas engrenagens estão um pouco lentas, tente novamente!');
+		}
 	}
 });
 

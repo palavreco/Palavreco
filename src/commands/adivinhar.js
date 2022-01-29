@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { letter } = require('../utils/emotes.json');
+const { returnDayWord } = require('./novapalavra.js');
 
 async function awaitMessage(interaction) {
 	const filter = (msg) => interaction.user.id === msg.author.id;
@@ -53,8 +54,7 @@ async function convertMessageContentToEmojis(interaction, content, correctWord) 
 		}
 	}
 
-
-	const finalReply = `${finalMessage['1']} ${finalMessage['2']} ${finalMessage['3']} ${finalMessage['4']} ${finalMessage['5']}`;
+	const finalReply = Object.values(finalMessage).map(emoji => emoji).join(' ');
 
 	await interaction.editReply(finalReply);
 }
@@ -64,15 +64,19 @@ module.exports = {
 		.setName('adivinhar')
 		.setDescription('Tente adivinhar a palavra do dia'),
 	async execute(interaction) {
-		await interaction.reply('Adivinhe o **WORDLE** de hoje! :eyes:');
+		await interaction.reply('Adivinhe o **PALAVRECO** de hoje! :eyes:');
 
-		const correctWord = 'vasco'; // Apenas para teste, futuramente será retirado
-
+		const correctWord = returnDayWord();
 		const receivedMessage = await awaitMessage(interaction);
 
 		if (receivedMessage.content.length != 5) {
 			await interaction.editReply('A palavra tem que ter 5 letras!');
 			await receivedMessage.message.delete();
+		}
+		else if (correctWord == '') {
+			await interaction.editReply('Não há palavra do dia, use o comando `/novapalavra` para setar uma.');
+			await receivedMessage.message.delete();
+			return;
 		}
 		else {
 			await convertMessageContentToEmojis(interaction, receivedMessage.content.toLowerCase(), correctWord.toLowerCase());
