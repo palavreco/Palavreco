@@ -3,7 +3,7 @@ const fs = require('fs');
 // Importa as classes do discord.js
 const { Client, Collection, Intents } = require('discord.js');
 // Importa as informações frageis do bot
-// const { token } = require('./secrets.json');
+const { token } = require('./secrets.json');
 
 // Cria uma nova instância do Client
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
@@ -46,4 +46,4 @@ client.on('interactionCreate', async interaction => {
 });
 
 // O Client loga no Discord pelo token
-client.login('OTM1MjkxNTY3MDM4NjcyOTA2.Ye8gJg.XeaEl2Gk17I2KuBTXhWdWDsY8ns');
+client.login(token);
