@@ -6,7 +6,7 @@ const { Client, Collection, Intents } = require('discord.js');
 const { token } = require('./secrets.json');
 
 // Cria uma nova instância do Client
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
 
 // Cria uma Collection dos comandos do bot
 client.commands = new Collection();
