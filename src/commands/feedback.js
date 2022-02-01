@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
+const { suggestionChannelId, bugReportChannelId } = require('../secrets.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -16,44 +17,28 @@ module.exports = {
 				.setDescription('Reporte um bug do bot!')
 				.addStringOption(option => option.setName('texto').setDescription('Descreva o bug').setRequired(true))),
 	async execute(interaction) {
+		const operationEmbed = new MessageEmbed()
+			.setColor('#2f3136')
+			.setTitle(interaction.options.getSubcommand() === 'sugestão' ? 'Confirmar sugestão=' : 'Confirmar reporte?');
 
 		const finalEmbed = new MessageEmbed()
-			.setTitle(interaction.options.getSubcommand() === 'sugestão' ? 'Nova Sugestão' : 'Report Bug')
-			.setFooter(interaction.options.getSubcommand() === 'sugestão' ? { text: `Sugerido por: ${interaction.user.tag} (${interaction.user.id})`, iconURL: interaction.user.avatarURL() } : { text: `Reportado por: ${interaction.user.tag} (${interaction.user.id})`, iconURL: interaction.user.avatarURL() });
+			.setTitle(interaction.options.getSubcommand() === 'sugestão' ? 'Nova sugestão' : 'Reporte de bug')
+			.setFooter(interaction.options.getSubcommand() === 'sugestão' ? { text: `Sugerido por ${interaction.user.username} (${interaction.user.id})`, iconURL: interaction.user.avatarURL() } : { text: `Reportado por ${interaction.user.username} (${interaction.user.id})`, iconURL: interaction.user.avatarURL() });
 
-		if (interaction.options.getSubcommand() === 'sugestão') {
+		const row = new MessageActionRow()
+			.addComponents(
+				new MessageButton()
+					.setCustomId('confirm')
+					.setLabel('✔')
+					.setStyle('SUCCESS'),
+				new MessageButton()
+					.setCustomId('cancel')
+					.setLabel('✖')
+					.setStyle('DANGER'),
+			);
 
-			const suggestion = await interaction.options.getString('texto');
-			finalEmbed.setDescription('```' + suggestion + '```');
-
-			const row = new MessageActionRow()
-				.addComponents(
-					new MessageButton()
-						.setCustomId('confirm')
-						.setLabel('✔')
-						.setStyle('SUCCESS'),
-					new MessageButton()
-						.setCustomId('cancel')
-						.setLabel('✖')
-						.setStyle('DANGER'),
-				);
-
-			const suggestionEmbed = new MessageEmbed()
-				.setColor('#2f3136')
-				.setTitle('Confirmar sugestão?')
-				.setDescription('```' + suggestion + '```');
-
-			const interactionMessage = await interaction.reply({
-				embeds: [suggestionEmbed],
-				components: [row],
-				fetchReply: true,
-				ephemeral: true,
-			});
-
-			const channel = interactionMessage.guild.channels.cache.get('937127255082160230');
-
+		async function checkTheCollectorResponse() {
 			const filter = (button) => button.user.id === interaction.user.id && button.message.interaction.id === interaction.id;
-
 			const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 90_000 })
 				.then(int => {
 					if (int.isButton()) {
@@ -63,77 +48,59 @@ module.exports = {
 
 			if (!confirmation) {
 				await interaction.editReply({
-					content: 'Sugestão cancelada.',
+					content: 'Operação cancelada.',
 					embeds: [],
 					components: [],
 				});
 				return;
 			}
+		}
+
+		if (interaction.options.getSubcommand() === 'sugestão') {
+			const suggestion = await interaction.options.getString('texto');
+			operationEmbed.setDescription(suggestion);
+
+			const interactionMessage = await interaction.reply({
+				embeds: [operationEmbed],
+				components: [row],
+				fetchReply: true,
+				ephemeral: true,
+			});
+
+			await checkTheCollectorResponse();
+
 			await interaction.editReply({
 				content: 'Sugestão enviada. Obrigado!',
 				embeds: [],
 				components: [],
 			});
-			await channel.send({
-				embeds: [finalEmbed],
-			});
+
+			finalEmbed.setDescription('```' + suggestion + '```');
+			const suggestionChannel = interactionMessage.guild.channels.cache.get(suggestionChannelId);
+			await suggestionChannel.send({ embeds: [finalEmbed] });
 		}
-		else if (interaction.options.getSubcommand() === 'bug') {
-
+		else {
 			const bug = await interaction.options.getString('texto');
-			finalEmbed.setDescription('```' + bug + '```');
-
-			const row = new MessageActionRow()
-				.addComponents(
-					new MessageButton()
-						.setCustomId('confirm')
-						.setLabel('✔')
-						.setStyle('SUCCESS'),
-					new MessageButton()
-						.setCustomId('cancel')
-						.setLabel('✖')
-						.setStyle('DANGER'),
-				);
-
-			const bugReportEmbed = new MessageEmbed()
-				.setColor('#2f3136')
-				.setTitle('Confirmar report?')
-				.setDescription('```' + bug + '```');
+			operationEmbed.setDescription(bug);
 
 			const interactionMessage = await interaction.reply({
-				embeds: [bugReportEmbed],
+				embeds: [operationEmbed],
 				components: [row],
 				fetchReply: true,
 				ephemeral: true,
 			});
 
-			const channel = interactionMessage.guild.channels.cache.get('937553197378179193');
+			await checkTheCollectorResponse();
 
-			const filter = (button) => button.user.id === interaction.user.id && button.message.interaction.id === interaction.id;
-
-			const confirmation = await interaction.channel.awaitMessageComponent({ filter, time: 90_000 })
-				.then(int => {
-					if (int.isButton()) {
-						return int.customId === 'confirm';
-					}
-				});
-
-			if (!confirmation) {
-				await interaction.editReply({
-					content: 'Report cancelado.',
-					embeds: [],
-					components: [],
-				});
-				return;
-			}
 			await interaction.editReply({
 				content: 'Reporte enviado. Obrigado!',
 				embeds: [],
 				components: [],
 			});
-			await channel.send({
-				embeds: [finalEmbed],
-			});
+
+			finalEmbed.setDescription('```' + bug + '```');
+			const bugReportChannel = interactionMessage.guild.channels.cache.get(bugReportChannelId);
+			await bugReportChannel.send({ embeds: [finalEmbed] });
 		}
 	},
 };

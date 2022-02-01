@@ -24,7 +24,6 @@ A letra **I** está na palavra mas no lugar errado.
 A letra **V** não está na palavra.
         
 Uma palavra nova estará disponível todos os dias!
-
         `);
 	},
 };
