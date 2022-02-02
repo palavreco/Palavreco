@@ -15,7 +15,8 @@ module.exports = {
 		}
 		else {
 			dayWord = wordGetted;
-			await interaction.reply(`A palavra do dia foi setada para \`${dayWord}\`, vamos ver se eles conseguem descobrir. <:muhaha:838625876098678784>`);
+			dayWord = dayWord.toLowerCase();
+			await interaction.reply(`A palavra do dia foi setada para \`${dayWord}\`.`);
 		}
 	},
 	returnDayWord() {
