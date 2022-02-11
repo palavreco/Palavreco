@@ -1,6 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { square, letter } = require('../utils/emotes.json');
 const { returnDayWord } = require('./novapalavra.js');
+const fs = require('fs');
+const readline = require('readline');
 
 async function checkAttemptsAndSendResults(interaction) {
 	// A mensagem principal do jogo
@@ -35,6 +37,11 @@ async function checkAttemptsAndSendResults(interaction) {
 			await collectedMessage.message.delete();
 			i--;
 		}
+		else if (await checkWordIsValid(collectedMessage.content) === false) {
+			await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}\n**Atenção:** A palavra não é válida! Se caso ela for uma palavra, reporte dando /feedback bug :heart:`);
+			await collectedMessage.message.delete();
+			i--;
+		}
 		else {
 			await collectedMessage.message.delete();
 
@@ -60,9 +67,11 @@ function awaitMessage(interaction) {
 	const filter = (msg) => interaction.user.id === msg.author.id;
 	const sendedMessage = interaction.channel.awaitMessages({ max: 1, filter }).then((msg) => {
 		const response = { content: '', message: msg.first() };
-
 		const content = msg.first().content;
-		if (content) response.content.trim().toLowerCase();
+		if (content) {
+			response.content.trim().toLowerCase();
+			response.content = content;
+		}
 
 		return response;
 	});
@@ -110,6 +119,23 @@ async function convertContentToEmojis(content, correctWord) {
 	}
 
 	return Object.values(wordInEmojis).map(emoji => emoji).join('');
+}
+
+async function checkWordIsValid(word) {
+	const readLine = readline.createInterface({
+		input: fs.createReadStream('src/utils/palavras.txt'),
+		output: process.stdout,
+		terminal: false,
+	});
+
+	let isValid = false;
+	for await (const line of readLine) {
+		if (line === word) {
+			isValid = true;
+			break;
+		}
+	}
+	return isValid;
 }
 
 module.exports = {
