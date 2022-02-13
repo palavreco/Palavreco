@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { square, letter } = require('../utils/emotes.json');
-const { returnDayWord } = require('./novapalavra.js');
 const fs = require('fs');
 const readline = require('readline');
+const { checkWordDatabase } = require('../utils/database');
 
 async function checkAttemptsAndSendResults(interaction) {
 	// A mensagem principal do jogo
@@ -21,12 +21,7 @@ async function checkAttemptsAndSendResults(interaction) {
 
 	await interaction.reply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}`);
 
-	const correctWord = returnDayWord();
-	// Vefifica se a palavra já foi setada
-	if (correctWord === '') {
-		await interaction.editReply('Não há palavra do dia, use o comando `/novapalavra` para setar uma.');
-		return;
-	}
+	const correctWord = await checkWordDatabase();
 
 	for (let i = 0; i < 6; i++) {
 		const collectedMessage = await awaitMessage(interaction);
@@ -44,7 +39,6 @@ async function checkAttemptsAndSendResults(interaction) {
 		}
 		else {
 			await collectedMessage.message.delete();
-
 			// Verifica se a tentativa esta correta ou não
 			if (collectedMessage.content === correctWord) {
 				gameMessage[`line${i + 1}`] = await convertContentToEmojis(collectedMessage.content, correctWord);
@@ -83,6 +77,8 @@ function awaitMessage(interaction) {
 async function convertContentToEmojis(content, correctWord) {
 	const contentArray = content.split('');
 	const correctWordArray = correctWord.split('');
+	console.log(correctWordArray);
+	console.log(contentArray);
 
 	const usedLetters = [];
 

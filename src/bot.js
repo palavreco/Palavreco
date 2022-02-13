@@ -7,7 +7,9 @@ const { token } = require('./secrets.json');
 
 // Cria uma nova instância do Client
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
-
+// importa as funções de database
+const { checkDatabase } = require('./utils/database.js');
+const { loopUtilMidnight } = require('./utils/reset');
 // Cria uma Collection dos comandos do bot
 client.commands = new Collection();
 // Cria uma constante que recebe um array com todos os nomes dos arquivos terminados em .js na pasta comandos
@@ -18,12 +20,12 @@ for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.data.name, command);
 }
-
 // Quando o Client estiver pronto, esse evento será disparado
 client.once('ready', () => {
 	// Seta a atividade do bot
 	client.user.setPresence({ activities: [{ name: 'Wordle', type: 'PLAYING' }] });
 	console.log('O bot está pronto!');
+	loopUtilMidnight();
 });
 
 // Quando houver um evento de interação, o bot irá executar o comando correspondente
@@ -53,4 +55,5 @@ client.on('interactionCreate', async interaction => {
 });
 
 // O Client loga no Discord pelo token
+checkDatabase();
 client.login(token);
