@@ -1,25 +1,12 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-
-let dayWord = '';
+const { newWord } = require('../utils/database.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('novapalavra')
-		.setDescription('Seta a palavra do dia')
-		.addStringOption(option => option.setName('palavra').setDescription('A palavra do dia').setRequired(true)),
+		.setDescription('Muda a palavra do dia'),
 	async execute(interaction) {
-		const wordGetted = await interaction.options.getString('palavra');
-
-		if (wordGetted.length != 5) {
-			interaction.reply('A palavra precisa ser de 5 letras.');
-		}
-		else {
-			dayWord = wordGetted;
-			dayWord = dayWord.toLowerCase();
-			await interaction.reply(`A palavra do dia foi setada para \`${dayWord}\`.`);
-		}
-	},
-	returnDayWord() {
-		return dayWord;
+		newWord();
+		interaction.reply('Palavra do dia mudada com sucesso!');
 	},
 };
