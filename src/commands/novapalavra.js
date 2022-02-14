@@ -6,7 +6,7 @@ module.exports = {
 		.setName('novapalavra')
 		.setDescription('Muda a palavra do dia'),
 	async execute(interaction) {
-		newWord();
-		interaction.reply('Palavra do dia mudada com sucesso!');
+		await newWord();
+		await interaction.reply('Palavra do dia alterada com sucesso!');
 	},
 };

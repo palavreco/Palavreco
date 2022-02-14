@@ -16,22 +16,34 @@ module.exports = {
 		else {
 			const data = fs.readFileSync('src/utils/palavras.txt', 'utf8');
 			const words = data.split('\n');
-			const wordRandom = words[Math.floor(Math.random() * words.length)].replace('\r', '');
-			client.query(`INSERT into words(word, status) VALUES ('${wordRandom}', true)`);
-			return wordRandom;
+			const randomWord = words[Math.floor(Math.random() * words.length)].replace('\r', '');
+			client.query(`INSERT into words(word, status) VALUES ('${randomWord}', true)`);
+			return randomWord;
+		}
+	},
+	async checkUserDatabase(userId) {
+		const userDatabase = await client.query(`SELECT id, status FROM users WHERE id = '${userId}'`);
+		if (userDatabase.rows.length === 0) {
+			await client.query(`INSERT into users(id, status) VALUES ('${userId}', true)`);
+			return 'notRegistered';
+		}
+		else if (userDatabase.rows[0]['status'] === true) {
+			return 'alreadyPlayed';
+		}
+		else {
+			await client.query(`UPDATE users SET status = true WHERE id = '${userId}'`);
+			return 'userUpdated';
 		}
 	},
 	async newWord() {
 		const data = fs.readFileSync('src/utils/palavras.txt', 'utf8');
 		const words = data.split('\n');
-		const wordRandom = words[Math.floor(Math.random() * words.length)].replace('\r', '');
+		const randomWord = words[Math.floor(Math.random() * words.length)].replace('\r', '');
+		await client.query(`INSERT into words(word, status) VALUES ('${randomWord}', true)`);
+
 		await client.query('UPDATE words SET status = false WHERE status = true');
-		await client.query('UPDATE users SET status = true WHERE status = false');
-
-		await client.query('UPDATE users SET status = true WHERE status = false');
-		await client.query(`INSERT into words(word, status) VALUES ('${wordRandom}', true)`);
+		await client.query('UPDATE users SET status = false WHERE status = true');
 	},
-
 	async checkDatabase() {
 		client.connect();
 
@@ -40,8 +52,5 @@ module.exports = {
 
 		await client.query(tableUsers).then(console.log('Tabela users criada/verificada!'));
 		await client.query(tableWords).then(console.log('Tabela words criada/verificada!'));
-	},
-	async insertUser(user) {
-		await client.query(`INSERT into users (id, status) VALUES ('${user}', status = true) ON CONFLICT (user) DO UPDATE SET status = `);
 	},
 };

@@ -19,7 +19,7 @@ module.exports = {
 	async execute(interaction) {
 		const operationEmbed = new MessageEmbed()
 			.setColor('#2f3136')
-			.setTitle(interaction.options.getSubcommand() === 'sugestão' ? 'Confirmar sugestão=' : 'Confirmar reporte?');
+			.setTitle(interaction.options.getSubcommand() === 'sugestão' ? 'Confirmar sugestão?' : 'Confirmar reporte?');
 
 		const finalEmbed = new MessageEmbed()
 			.setTitle(interaction.options.getSubcommand() === 'sugestão' ? 'Nova sugestão' : 'Reporte de bug')

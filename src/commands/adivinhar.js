@@ -1,10 +1,11 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { square, letter } = require('../utils/emotes.json');
 const fs = require('fs');
 const readline = require('readline');
-const { checkWordDatabase } = require('../utils/database');
+const dayjs = require('dayjs');
+const { checkWordDatabase, checkUserDatabase } = require('../utils/database.js');
+const { square, letter } = require('../utils/emotes.json');
 
-async function checkAttemptsAndSendResults(interaction) {
+async function sendGameMessageAndResults(interaction) {
 	// A mensagem principal do jogo
 	const gameMessage = {
 		'line1': `${square['gray'].repeat(5)}`,
@@ -48,12 +49,14 @@ async function checkAttemptsAndSendResults(interaction) {
 			else {
 				gameMessage[`line${i + 1}`] = await convertContentToEmojis(collectedMessage.content, correctWord);
 				await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}`);
+				if (i === 5) {
+					await interaction.editReply(`Você perdeu, a palavra era **${correctWord}**. :frowning:\nQuem sabe na próxima você consegue!\n\n${returnGameTable()}`);
+					return;
+				}
 				continue;
 			}
 		}
 	}
-
-	Object.values(gameMessage).forEach(line => line.replace(line, `${square['gray'].repeat(5)}`));
 }
 
 // Função que retorna a mensagem do usuário
@@ -137,6 +140,15 @@ module.exports = {
 		.setName('adivinhar')
 		.setDescription('Tente adivinhar a palavra do dia'),
 	async execute(interaction) {
-		await checkAttemptsAndSendResults(interaction);
+		if (await checkUserDatabase(interaction.user.id) === 'alreadyPlayed') {
+			const timestamp = dayjs().endOf('day').unix();
+			await interaction.reply({
+				content: `Você já jogou hoje!\nTempo restante até a próxima palavra: <t:${timestamp}:R>`,
+				ephemeral: true,
+			});
+			return;
+		}
+
+		await sendGameMessageAndResults(interaction);
 	},
 };

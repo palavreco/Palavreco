@@ -1,11 +1,16 @@
 const { newWord } = require('./database.js');
-const moment = require('moment-timezone');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 module.exports = {
 	loopUtilMidnight() {
 		setInterval(() => {
-			const braziliamTime = moment().tz('America/Sao_Paulo').format('HH:mm');
-			if (braziliamTime === '23:45') {
+			const braziliamTime = dayjs().tz('America/Sao_Paulo').format('HH:mm');
+			if (braziliamTime === '00:00') {
 				newWord();
 				console.log('Meia noite! Palavra trocada!');
 			}
