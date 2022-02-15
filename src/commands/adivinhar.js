@@ -4,11 +4,51 @@ const readline = require('readline');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
-const { checkWordDatabase, checkUserDatabase, itPlayed } = require('../utils/database.js');
+const { checkWordDatabase, checkUserDatabase, itPlayed, getDayNumber } = require('../utils/database.js');
 const { square, letter } = require('../utils/emotes.json');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
+async function convertToDefaultEmojis(content) {
+	content = await content.replaceAll('\n', '');
+	content = await content.replace(/>/g, '> ');
+
+	const contentArray = await content.split(' ');
+	contentArray.splice(-1);
+
+	const shareMessage = {
+		'line1': '',
+		'line2': '',
+		'line3': '',
+		'line4': '',
+		'line5': '',
+		'line6': '',
+	};
+
+	let convertedLetters = '';
+	contentArray.forEach(emoji => {
+		if (Object.values(letter['yellow']).includes(emoji)) {
+			convertedLetters += ':yellow_square: ';
+		}
+		else if (Object.values(letter['green']).includes(emoji)) {
+			convertedLetters += ':green_square: ';
+		}
+		else if (Object.values(letter['gray']).includes(emoji)) {
+			convertedLetters += ':black_large_square: ';
+		}
+	});
+
+	const shareMessageArray = convertedLetters.split(' ');
+	shareMessageArray.splice(-1);
+
+	const lineLength = shareMessageArray.length / 5;
+	for (let i = 0; i < lineLength; i++) {
+		shareMessage[`line${i + 1}`] = shareMessageArray.splice(0, 5).join('');
+	}
+
+	return Object.values(shareMessage).map(line => line).join('\n');
+}
 
 async function sendGameMessageAndResults(interaction) {
 	// A mensagem principal do jogo
@@ -25,7 +65,10 @@ async function sendGameMessageAndResults(interaction) {
 		return Object.values(gameMessage).map(line => line).join('\n');
 	}
 
-	await interaction.reply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}`);
+	await interaction.reply({
+		content: `Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}`,
+		ephemeral: true,
+	});
 
 	const correctWord = await checkWordDatabase();
 
@@ -50,6 +93,10 @@ async function sendGameMessageAndResults(interaction) {
 				gameMessage[`line${i + 1}`] = await convertContentToEmojis(collectedMessage.content, correctWord);
 				await interaction.editReply(`Parabéns, você acertou em ${i + 1} tentativas! :tada:\n\n${returnGameTable()}`);
 				await itPlayed(interaction.user.id);
+
+				await interaction.channel.send(`<@${interaction.user.id}> Copie a mensagem abaixo e compartilhe com seus amigos!`);
+				await interaction.channel.send(`Palavreco #${await getDayNumber()} ${i + 1}/6\n\n${await convertToDefaultEmojis(returnGameTable())}`);
+
 				i = 7;
 			}
 			else {
@@ -58,6 +105,10 @@ async function sendGameMessageAndResults(interaction) {
 				if (i === 5) {
 					await interaction.editReply(`Você perdeu, a palavra era **${correctWord}**. :frowning:\nQuem sabe na próxima você consegue!\n\n${returnGameTable()}`);
 					await itPlayed(interaction.user.id);
+
+					await interaction.channel.send(`<@${interaction.user.id}> Copie a mensagem abaixo e compartilhe com seus amigos!`);
+					await interaction.channel.send(`Palavreco #${await getDayNumber()} 6/6\n\n${await convertToDefaultEmojis(returnGameTable())}`);
+
 					return;
 				}
 				continue;
