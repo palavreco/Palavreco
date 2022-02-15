@@ -2,8 +2,13 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const fs = require('fs');
 const readline = require('readline');
 const dayjs = require('dayjs');
-const { checkWordDatabase, checkUserDatabase } = require('../utils/database.js');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+const { checkWordDatabase, checkUserDatabase, itPlayed } = require('../utils/database.js');
 const { square, letter } = require('../utils/emotes.json');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 async function sendGameMessageAndResults(interaction) {
 	// A mensagem principal do jogo
@@ -34,7 +39,7 @@ async function sendGameMessageAndResults(interaction) {
 			i--;
 		}
 		else if (await checkWordIsValid(collectedMessage.content) === false) {
-			await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}\n**Atenção:** A palavra não é válida! Se caso ela for uma palavra, reporte dando /feedback bug :heart:`);
+			await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}\n**Atenção:** A palavra não é válida!`);
 			await collectedMessage.message.delete();
 			i--;
 		}
@@ -44,6 +49,7 @@ async function sendGameMessageAndResults(interaction) {
 			if (collectedMessage.content === correctWord) {
 				gameMessage[`line${i + 1}`] = await convertContentToEmojis(collectedMessage.content, correctWord);
 				await interaction.editReply(`Parabéns, você acertou em ${i + 1} tentativas! :tada:\n\n${returnGameTable()}`);
+				await itPlayed(interaction.user.id);
 				i = 7;
 			}
 			else {
@@ -51,6 +57,7 @@ async function sendGameMessageAndResults(interaction) {
 				await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}`);
 				if (i === 5) {
 					await interaction.editReply(`Você perdeu, a palavra era **${correctWord}**. :frowning:\nQuem sabe na próxima você consegue!\n\n${returnGameTable()}`);
+					await itPlayed(interaction.user.id);
 					return;
 				}
 				continue;
@@ -141,7 +148,7 @@ module.exports = {
 		.setDescription('Tente adivinhar a palavra do dia'),
 	async execute(interaction) {
 		if (await checkUserDatabase(interaction.user.id) === 'alreadyPlayed') {
-			const timestamp = dayjs().endOf('day').unix();
+			const timestamp = dayjs().tz('America/Sao_Paulo').endOf('day').unix();
 			await interaction.reply({
 				content: `Você já jogou hoje!\nTempo restante até a próxima palavra: <t:${timestamp}:R>`,
 				ephemeral: true,
