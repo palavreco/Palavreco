@@ -1,14 +1,16 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const fs = require('fs');
 const readline = require('readline');
-const dayjs = require('dayjs');
-const utc = require('dayjs/plugin/utc');
-const timezone = require('dayjs/plugin/timezone');
+
 const { checkWordDatabase, checkUserDatabase, itPlayed, getDayNumber } = require('../utils/database.js');
 const { square, letter } = require('../utils/emotes.json');
 
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
 
 async function convertToDefaultEmojis(content) {
 	content = await content.replaceAll('\n', '');
@@ -66,7 +68,7 @@ async function sendGameMessageAndResults(interaction) {
 	}
 
 	await interaction.reply({
-		content: `Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}`,
+		content: `Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}\n\nPara cancelar o jogo, digite \`cancelar\``,
 		ephemeral: true,
 	});
 
@@ -76,7 +78,12 @@ async function sendGameMessageAndResults(interaction) {
 		const collectedMessage = await awaitMessage(interaction);
 
 		// Verifica se a mensagem pode ser realmente considerada como uma tentativa
-		if (collectedMessage.content.length != 5) {
+			if (collectedMessage.message.content === 'cancelar') {
+			await interaction.editReply(`Você encerrou o jogo :(`);
+			await collectedMessage.message.delete();
+			i = 7;
+		}
+		else if (collectedMessage.content.length != 5) {
 			await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}\n**Atenção:** A palavra deve ter 5 letras!`);
 			await collectedMessage.message.delete();
 			i--;
@@ -86,6 +93,7 @@ async function sendGameMessageAndResults(interaction) {
 			await collectedMessage.message.delete();
 			i--;
 		}
+
 		else {
 			await collectedMessage.message.delete();
 			// Verifica se a tentativa esta correta ou não

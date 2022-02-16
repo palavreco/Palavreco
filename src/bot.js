@@ -3,8 +3,7 @@ const fs = require('fs');
 // Importa as classes do discord.js
 const { Client, Collection, Intents } = require('discord.js');
 // Importa as informações frageis do bot
-const { token } = require('./secrets.json');
-
+require('dotenv').config();
 // Cria uma nova instância do Client
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
 // importa as funções de database
@@ -23,8 +22,17 @@ for (const file of commandFiles) {
 }
 // Quando o Client estiver pronto, esse evento será disparado
 client.once('ready', () => {
-	// Seta a atividade do bot e roda a função de loop para checar o horário
-	client.user.setPresence({ activities: [{ name: 'Wordle', type: 'PLAYING' }] });
+	const activities = [
+		'Jogando Palavreco!',
+		'/adivinhar',
+		'Tentando acertar a palavra...',
+	];
+	// Seta a atividade do bot
+	setInterval(() => {
+		const random = Math.floor(Math.random() * (activities.length - 1) + 1);
+		client.user.setActivity(activities[random], { type: 'PLAYING' });
+	}, 300_000);
+	// roda a função de loop para checar o horário
 	console.log('O bot está pronto!');
 	loopUtilMidnight();
 });
@@ -57,4 +65,4 @@ client.on('interactionCreate', async interaction => {
 
 // O Client loga no Discord pelo token e checa a database
 checkDatabase();
-client.login(token);
+client.login(process.env.TOKEN);

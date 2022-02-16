@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
-const { suggestionChannelId, bugReportChannelId } = require('../secrets.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -76,7 +75,7 @@ module.exports = {
 			});
 
 			finalEmbed.setDescription('```' + suggestion + '```');
-			const suggestionChannel = interactionMessage.guild.channels.cache.get(suggestionChannelId);
+			const suggestionChannel = interactionMessage.guild.channels.cache.get(process.env.SUGGESTION_CHANNEL_ID);
 			await suggestionChannel.send({ embeds: [finalEmbed] });
 		}
 		else {
@@ -99,7 +98,7 @@ module.exports = {
 			});
 
 			finalEmbed.setDescription('```' + bug + '```');
-			const bugReportChannel = interactionMessage.guild.channels.cache.get(bugReportChannelId);
+			const bugReportChannel = interactionMessage.guild.channels.cache.get(process.env.BUG_REPORT_CHANNEL_ID);
 			await bugReportChannel.send({ embeds: [finalEmbed] });
 		}
 	},
