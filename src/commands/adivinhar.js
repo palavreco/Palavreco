@@ -101,7 +101,7 @@ async function sendGameMessageAndResults(interaction) {
 				await itPlayed(interaction.user.id);
 
 				await interaction.channel.send(`<@${interaction.user.id}> Copie a mensagem abaixo e compartilhe com seus amigos!`);
-				await interaction.channel.send(`Palavreco #${await getDayNumber()} ${i + 1}/6\n\n${await convertToDefaultEmojis(returnGameTable())}`);
+				await interaction.channel.send(`Joguei **palavreco.com** #${await getDayNumber()} ${i + 1}/6\n\n${await convertToDefaultEmojis(returnGameTable())}`);
 
 				i = 7;
 			}
@@ -113,7 +113,7 @@ async function sendGameMessageAndResults(interaction) {
 					await itPlayed(interaction.user.id);
 
 					await interaction.channel.send(`<@${interaction.user.id}> Copie a mensagem abaixo e compartilhe com seus amigos!`);
-					await interaction.channel.send(`Palavreco #${await getDayNumber()} 6/6\n\n${await convertToDefaultEmojis(returnGameTable())}`);
+					await interaction.channel.send(`Joguei **palavreco.com** #${await getDayNumber()} 6/6\n\n${await convertToDefaultEmojis(returnGameTable())}`);
 
 					return;
 				}
