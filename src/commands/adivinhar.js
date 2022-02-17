@@ -126,12 +126,11 @@ async function sendGameMessageAndResults(interaction) {
 // Função que retorna a mensagem do usuário
 function awaitMessage(interaction) {
 	const filter = (msg) => interaction.user.id === msg.author.id;
-	const sendedMessage = interaction.channel.awaitMessages({ max: 1, filter }).then((msg) => {
+	const sendedMessage = interaction.channel.awaitMessages({ max: 1, filter }).then(async (msg) => {
 		const response = { content: '', message: msg.first() };
-		const content = msg.first().content;
+		const content = await msg.first().content;
 		if (content) {
-			response.content.trim().toLowerCase();
-			response.content = content;
+			response.content = content.trim().toLowerCase();
 		}
 
 		return response;

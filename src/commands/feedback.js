@@ -59,7 +59,7 @@ module.exports = {
 			const suggestion = await interaction.options.getString('texto');
 			operationEmbed.setDescription(suggestion);
 
-			const interactionMessage = await interaction.reply({
+			await interaction.reply({
 				embeds: [operationEmbed],
 				components: [row],
 				fetchReply: true,
@@ -75,14 +75,14 @@ module.exports = {
 			});
 
 			finalEmbed.setDescription('```' + suggestion + '```');
-			const suggestionChannel = interactionMessage.guild.channels.cache.get(process.env.SUGGESTION_CHANNEL_ID);
+			const suggestionChannel = interaction.client.channels.cache.get(process.env.SUGGESTION_CHANNEL_ID);
 			await suggestionChannel.send({ embeds: [finalEmbed] });
 		}
 		else {
 			const bug = await interaction.options.getString('texto');
 			operationEmbed.setDescription(bug);
 
-			const interactionMessage = await interaction.reply({
+			await interaction.reply({
 				embeds: [operationEmbed],
 				components: [row],
 				fetchReply: true,
@@ -98,7 +98,7 @@ module.exports = {
 			});
 
 			finalEmbed.setDescription('```' + bug + '```');
-			const bugReportChannel = interactionMessage.guild.channels.cache.get(process.env.BUG_REPORT_CHANNEL_ID);
+			const bugReportChannel = interaction.client.channels.cache.get(process.env.BUG_REPORT_CHANNEL_ID);
 			await bugReportChannel.send({ embeds: [finalEmbed] });
 		}
 	},

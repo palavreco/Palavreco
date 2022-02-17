@@ -27,6 +27,11 @@ client.once('ready', () => {
 	loopUtilMidnight();
 });
 
+// Quando o bot entrar em algum servidor, esse console.log será disparado
+client.on('guildCreate', guild => {
+	console.log(`O bot entrou no servidor ${guild.name} (${guild.id})\nTotal de membros: ${guild.memberCount}\nDono: ${guild.ownerId}`);
+});
+
 // Quando houver um evento de interação, o bot irá executar o comando correspondente
 client.on('interactionCreate', async interaction => {
 	// Checa se a interação é um comando, se não for, apenas não retorna nada
