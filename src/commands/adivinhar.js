@@ -11,7 +11,6 @@ const timezone = require('dayjs/plugin/timezone');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-
 async function convertToDefaultEmojis(content) {
 	content = await content.replaceAll('\n', '');
 	content = await content.replace(/>/g, '> ');
@@ -78,8 +77,8 @@ async function sendGameMessageAndResults(interaction) {
 		const collectedMessage = await awaitMessage(interaction);
 
 		// Verifica se a mensagem pode ser realmente considerada como uma tentativa
-			if (collectedMessage.message.content === 'cancelar') {
-			await interaction.editReply(`Você encerrou o jogo :(`);
+		if (collectedMessage.message.content === 'cancelar') {
+			await interaction.editReply('Você encerrou o jogo :(');
 			await collectedMessage.message.delete();
 			i = 7;
 		}
@@ -93,7 +92,6 @@ async function sendGameMessageAndResults(interaction) {
 			await collectedMessage.message.delete();
 			i--;
 		}
-
 		else {
 			await collectedMessage.message.delete();
 			// Verifica se a tentativa esta correta ou não

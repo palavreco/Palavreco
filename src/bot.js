@@ -22,17 +22,7 @@ for (const file of commandFiles) {
 }
 // Quando o Client estiver pronto, esse evento será disparado
 client.once('ready', () => {
-	const activities = [
-		'Jogando Palavreco!',
-		'/adivinhar',
-		'Tentando acertar a palavra...',
-	];
-	// Seta a atividade do bot
-	setInterval(() => {
-		const random = Math.floor(Math.random() * (activities.length - 1) + 1);
-		client.user.setActivity(activities[random], { type: 'PLAYING' });
-	}, 300_000);
-	// roda a função de loop para checar o horário
+	client.user.setActivity('/adivinhar', { type: 'PLAYING' });
 	console.log('O bot está pronto!');
 	loopUtilMidnight();
 });
