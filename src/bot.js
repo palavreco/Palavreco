@@ -22,6 +22,12 @@ for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.data.name, command);
 }
+
+
+client.once('ready', () => {
+	client.user.setActivity({ type: 'PLAYING', name: '/adivinhar' });
+});
+
 // Quando o Client estiver pronto, esse evento será disparado
 client.once('ready', () => {
 	// loop de status
@@ -53,6 +59,7 @@ client.on('guildCreate', async guild => {
 			{ name: 'Membros', value: `${guild.memberCount}`, inline: true },
 			{ name: 'Criado em', value: `${createAtGuild}`, inline: true },
 		)
+		.setFooter({ text: `Agora estou em ${client.guilds.cache.size} servidores!` })
 		.setColor('#383c3c');
 	guildsChannel.send({ embeds: [embed] });
 });
@@ -66,6 +73,7 @@ client.on('guildDelete', async guild => {
 		.addFields(
 			{ name: 'Dono', value: `\`${ownerGuild}\` (${guild.ownerId})`, inline: true },
 		)
+		.setFooter({ text: `Agora estou em ${client.guilds.cache.size} servidores!` })
 		.setColor('#383c3c');
 	guildsChannel.send({ embeds: [embed] });
 
