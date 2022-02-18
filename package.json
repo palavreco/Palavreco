@@ -5,7 +5,8 @@
   "main": "bot.js",
   "scripts": {
     "deploy": "node src/update-commands.js",
-    "start": "nodemon src/bot.js"
+    "dev": "nodemon src/bot.js",
+    "start": "node src/bot.js"
   },
   "keywords": [
     "discord",
