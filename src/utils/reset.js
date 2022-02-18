@@ -14,6 +14,6 @@ module.exports = {
 				newWord();
 				console.log('Meia noite! Palavra trocada!');
 			}
-		}, 50_000);
+		}, 60_000);
 	},
 };

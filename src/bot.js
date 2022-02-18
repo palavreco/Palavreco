@@ -14,15 +14,12 @@ const { loopUtilMidnight } = require('./utils/reset.js');
 client.commands = new Collection();
 // Cria uma constante que recebe um array com todos os nomes dos arquivos terminados em .js na pasta comandos
 const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
-// Importa o dayjs para formatar datas
-const dayjs = require('dayjs');
 
 // Seta dinamicamente todos os comandos da pasta para o client.commands
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.data.name, command);
 }
-
 
 client.once('ready', () => {
 	client.user.setActivity({ type: 'PLAYING', name: '/adivinhar' });
@@ -49,7 +46,7 @@ client.once('ready', () => {
 // manda mensagem se foi adicionado em algum servidor
 client.on('guildCreate', async guild => {
 	const guildsChannel = client.channels.cache.get(process.env.GUILDS_CHANNEL);
-	const createAtGuild = dayjs(guild.createdAt).format('DD/MM/YYYY HH:mm');
+	const guildCreateTimestamp = guild.createdTimestamp;
 	const ownerGuild = await guild.fetchOwner().then(owner => owner.user.tag);
 	const embed = new MessageEmbed()
 		.setAuthor({ name: `${guild.name} (${guild.id})` })
@@ -57,12 +54,13 @@ client.on('guildCreate', async guild => {
 		.addFields(
 			{ name: 'Dono', value: `\`${ownerGuild}\` (${guild.ownerId})`, inline: true },
 			{ name: 'Membros', value: `${guild.memberCount}`, inline: true },
-			{ name: 'Criado em', value: `${createAtGuild}`, inline: true },
+			{ name: 'Criado em', value: `<t:${Math.floor(guildCreateTimestamp / 1000)}>`, inline: true },
 		)
 		.setFooter({ text: `Agora estou em ${client.guilds.cache.size} servidores!` })
-		.setColor('#383c3c');
+		.setColor('#2f3136');
 	guildsChannel.send({ embeds: [embed] });
 });
+
 // Manda mensagem se foi tirado de algum servidor
 client.on('guildDelete', async guild => {
 	const guildsChannel = client.channels.cache.get(process.env.GUILDS_CHANNEL);
@@ -74,10 +72,10 @@ client.on('guildDelete', async guild => {
 			{ name: 'Dono', value: `\`${ownerGuild}\` (${guild.ownerId})`, inline: true },
 		)
 		.setFooter({ text: `Agora estou em ${client.guilds.cache.size} servidores!` })
-		.setColor('#383c3c');
+		.setColor('#2f3136');
 	guildsChannel.send({ embeds: [embed] });
-
 });
+
 // Quando houver um evento de interação, o bot irá executar o comando correspondente
 client.on('interactionCreate', async interaction => {
 	// Checa se a interação é um comando, se não for, apenas não retorna nada

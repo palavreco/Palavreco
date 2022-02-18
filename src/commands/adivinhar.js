@@ -75,25 +75,22 @@ async function sendGameMessageAndResults(interaction) {
 
 	for (let i = 0; i < 6; i++) {
 		const collectedMessage = await awaitMessage(interaction);
+		await collectedMessage.message.delete();
 
 		// Verifica se a mensagem pode ser realmente considerada como uma tentativa
 		if (collectedMessage.message.content === 'cancelar') {
 			await interaction.editReply('Você encerrou o jogo :(');
-			await collectedMessage.message.delete();
 			i = 7;
 		}
 		else if (collectedMessage.content.length != 5) {
 			await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}\n**Atenção:** A palavra deve ter 5 letras!`);
-			await collectedMessage.message.delete();
 			i--;
 		}
 		else if (await checkWordIsValid(collectedMessage.content) === false) {
 			await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}\n**Atenção:** A palavra não é válida!`);
-			await collectedMessage.message.delete();
 			i--;
 		}
 		else {
-			await collectedMessage.message.delete();
 			// Verifica se a tentativa esta correta ou não
 			if (collectedMessage.content === correctWord) {
 				gameMessage[`line${i + 1}`] = await convertContentToEmojis(collectedMessage.content, correctWord);

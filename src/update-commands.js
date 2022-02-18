@@ -14,7 +14,7 @@ readdirSync(commandsPath).forEach(file => {
 });
 
 // Cria uma nova instância de REST
-const rest = new REST({ version: '9' }).setToken(process.env.BOT_TOKEN);
+const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 
 // Envia o array de comandos para o Discord, tornando os comandos disponíveis para uso
 rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID), { body: commands })
