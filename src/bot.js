@@ -1,7 +1,7 @@
 // Importa a classe Fyle System do Node.js
 const fs = require('fs');
 // Importa as classes do discord.js
-const { Client, Collection, Intents } = require('discord.js');
+const { Client, Collection, Intents, MessageEmbed } = require('discord.js');
 // Importa as informações frageis do bot
 require('dotenv').config();
 // Cria uma nova instância do Client
@@ -14,6 +14,8 @@ const { loopUtilMidnight } = require('./utils/reset.js');
 client.commands = new Collection();
 // Cria uma constante que recebe um array com todos os nomes dos arquivos terminados em .js na pasta comandos
 const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
+// Importa o dayjs para formatar datas
+const dayjs = require('dayjs');
 
 // Seta dinamicamente todos os comandos da pasta para o client.commands
 for (const file of commandFiles) {
@@ -22,16 +24,52 @@ for (const file of commandFiles) {
 }
 // Quando o Client estiver pronto, esse evento será disparado
 client.once('ready', () => {
-	client.user.setActivity('/adivinhar', { type: 'PLAYING' });
-	console.log('O bot está pronto!');
+	// loop de status
+	setInterval(() => {
+		const activities = [
+			{ type: 'PLAYING', name: `em ${client.guilds.cache.size} servidores` },
+			{ type: 'PLAYING', name: '/adivinhar' },
+			{ type: 'WATCHING', name: 'suas tentativas...' },
+		];
+		const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+		client.user.setActivity(randomActivity.name, { type: randomActivity.type });
+	}, 900_000);
+	// console log para informar que o bot está online
+	console.log('Bot pronto!');
+	// loop de reset
 	loopUtilMidnight();
 });
 
-// Quando o bot entrar em algum servidor, esse console.log será disparado
-client.on('guildCreate', guild => {
-	console.log(`O bot entrou no servidor ${guild.name} (${guild.id})\nTotal de membros: ${guild.memberCount}\nDono: ${guild.ownerId}`);
+// manda mensagem se foi adicionado em algum servidor
+client.on('guildCreate', async guild => {
+	const guildsChannel = client.channels.cache.get(process.env.GUILDS_CHANNEL);
+	const createAtGuild = dayjs(guild.createdAt).format('DD/MM/YYYY HH:mm');
+	const ownerGuild = await guild.fetchOwner().then(owner => owner.user.tag);
+	const embed = new MessageEmbed()
+		.setAuthor({ name: `${guild.name} (${guild.id})` })
+		.setTitle('Novo servidor!')
+		.addFields(
+			{ name: 'Dono', value: `\`${ownerGuild}\` (${guild.ownerId})`, inline: true },
+			{ name: 'Membros', value: `${guild.memberCount}`, inline: true },
+			{ name: 'Criado em', value: `${createAtGuild}`, inline: true },
+		)
+		.setColor('#383c3c');
+	guildsChannel.send({ embeds: [embed] });
 });
+// Manda mensagem se foi tirado de algum servidor
+client.on('guildDelete', async guild => {
+	const guildsChannel = client.channels.cache.get(process.env.GUILDS_CHANNEL);
+	const ownerGuild = await guild.fetchOwner().then(owner => owner.user.tag);
+	const embed = new MessageEmbed()
+		.setAuthor({ name: `${guild.name} (${guild.id})` })
+		.setTitle('Saí de um servidor :(')
+		.addFields(
+			{ name: 'Dono', value: `\`${ownerGuild}\` (${guild.ownerId})`, inline: true },
+		)
+		.setColor('#383c3c');
+	guildsChannel.send({ embeds: [embed] });
 
+});
 // Quando houver um evento de interação, o bot irá executar o comando correspondente
 client.on('interactionCreate', async interaction => {
 	// Checa se a interação é um comando, se não for, apenas não retorna nada
