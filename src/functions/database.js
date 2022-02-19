@@ -13,7 +13,7 @@ module.exports = {
 			return wordDatabase.rows[0]['word'];
 		}
 		else {
-			const data = fs.readFileSync('src/utils/palavras.txt', 'utf8');
+			const data = fs.readFileSync('src/utils/wordsList.txt', 'utf8');
 			const words = data.split('\n');
 			const randomWord = words[Math.floor(Math.random() * words.length)].replace('\r', '');
 			client.query(`INSERT into words(word, status) VALUES ('${randomWord}', true)`);
@@ -34,7 +34,7 @@ module.exports = {
 		await client.query(`UPDATE users SET status = true WHERE id = '${userId}'`);
 	},
 	async newWord() {
-		const data = fs.readFileSync('src/utils/palavras.txt', 'utf8');
+		const data = fs.readFileSync('src/utils/wordsList.txt', 'utf8');
 		const words = data.split('\n');
 		const randomWord = words[Math.floor(Math.random() * words.length)].replace('\r', '');
 		await client.query('UPDATE words SET status = false WHERE status = true');

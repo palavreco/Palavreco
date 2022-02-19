@@ -7,9 +7,9 @@ require('dotenv').config();
 // Cria uma nova instância do Client
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
 // importa as funções de database
-const { checkDatabase } = require('./utils/database.js');
+const { checkDatabase } = require('./functions/database.js');
 // importa o loop para checar o horário
-const { loopUtilMidnight } = require('./utils/reset.js');
+const { loopUtilMidnight } = require('./functions/reset.js');
 // Cria uma Collection dos comandos do bot
 client.commands = new Collection();
 // Cria uma constante que recebe um array com todos os nomes dos arquivos terminados em .js na pasta comandos

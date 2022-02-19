@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const fs = require('fs');
 const readline = require('readline');
 
-const { checkWordDatabase, checkUserDatabase, itPlayed, getDayNumber } = require('../utils/database.js');
+const { checkWordDatabase, checkUserDatabase, itPlayed, getDayNumber } = require('../functions/database.js');
 const { square, letter } = require('../utils/emotes.json');
 
 const dayjs = require('dayjs');
@@ -180,7 +180,7 @@ async function convertContentToEmojis(content, correctWord) {
 
 async function checkWordIsValid(word) {
 	const readLine = readline.createInterface({
-		input: fs.createReadStream('src/utils/palavras.txt'),
+		input: fs.createReadStream('src/utils/validGuess.txt'),
 		output: process.stdout,
 		terminal: false,
 	});
