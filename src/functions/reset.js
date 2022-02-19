@@ -9,8 +9,8 @@ dayjs.extend(timezone);
 module.exports = {
 	loopUtilMidnight() {
 		setInterval(() => {
-			const brazilianTime = dayjs().tz('America/Sao_Paulo').format('HH:mm');
-			if (brazilianTime === '00:00') {
+			const braziliamTime = dayjs().tz('America/Sao_Paulo').format('HH:mm');
+			if (braziliamTime === '00:00') {
 				newWord();
 				console.log('Meia noite! Palavra trocada!');
 			}
