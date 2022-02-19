@@ -75,7 +75,9 @@ async function sendGameMessageAndResults(interaction) {
 
 	for (let i = 0; i < 6; i++) {
 		const collectedMessage = await awaitMessage(interaction);
-		await collectedMessage.message.delete();
+		setTimeout(async () => {
+			await collectedMessage.message.delete();
+		}, 300);
 
 		// Verifica se a mensagem pode ser realmente considerada como uma tentativa
 		if (collectedMessage.message.content === 'cancelar') {
