@@ -52,6 +52,12 @@ async function convertToDefaultEmojis(content) {
 }
 
 async function sendGameMessageAndResults(interaction) {
+	const channel = interaction.client.channels.cache.get(interaction.channel.id);
+	if (!channel.permissionsFor(interaction.client.user).has('MANAGE_MESSAGES')) {
+		await interaction.reply('Ops! Parece que eu não tenho permissão para executar esse comando.\nPor favor, me dê um cargo que tenha permissão de `Gerenciar mensagens`.');
+		return;
+	}
+
 	// A mensagem principal do jogo
 	const gameMessage = {
 		'line1': `${square['gray'].repeat(5)}`,
