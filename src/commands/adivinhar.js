@@ -85,7 +85,7 @@ async function sendGameMessageAndResults(interaction) {
 			await collectedMessage.message.delete();
 		}, 300);
 
-		const word = collectedMessage.message.content.normalize('NFKD').replace(/\p{Diacritic}/gu, '');
+		const word = collectedMessage.content.normalize('NFKD').replace(/\p{Diacritic}/gu, '');
 
 		// Verifica se a mensagem pode ser realmente considerada como uma tentativa
 		if (word === 'cancelar') {
