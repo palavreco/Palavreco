@@ -33,6 +33,11 @@ module.exports = {
 	async itPlayed(userId) {
 		await client.query(`UPDATE users SET status = true WHERE id = '${userId}'`);
 	},
+	async resetPlayedUser(userId) {
+		const userDatabase = await client.query(`SELECT id, status FROM users WHERE id = '${userId}'`);
+		if (userDatabase.rows[0]['status'] === false) return 'alreadyFalse';
+		await client.query(`UPDATE users SET status = false WHERE id = '${userId}'`);
+	},
 	async newWord() {
 		const data = fs.readFileSync('src/utils/wordsList.txt', 'utf8');
 		const words = data.split('\n');

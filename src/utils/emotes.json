@@ -89,5 +89,9 @@
         "yellow": "<a:bloco_amarelo:935874057407168562>",
         "green": "<a:bloco_verde:935873796018147369>",
         "gray": "<a:bloco_cinza:935687336208007168>"
+    },
+    "check": {
+        "green": "<:greenTick:893584062084681768>",
+        "red": "<:redTick:893584062076305418>"
     }
 }
