@@ -85,23 +85,25 @@ async function sendGameMessageAndResults(interaction) {
 			await collectedMessage.message.delete();
 		}, 300);
 
+		const word = collectedMessage.message.content.normalize('NFKD').replace(/\p{Diacritic}/gu, '');
+
 		// Verifica se a mensagem pode ser realmente considerada como uma tentativa
-		if (collectedMessage.message.content === 'cancelar') {
+		if (word === 'cancelar') {
 			await interaction.editReply('Você encerrou o jogo :(');
 			i = 7;
 		}
-		else if (collectedMessage.content.length != 5) {
+		else if (word.length != 5) {
 			await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}\n**Atenção:** A palavra deve ter 5 letras!`);
 			i--;
 		}
-		else if (await checkWordIsValid(collectedMessage.content) === false) {
+		else if (await checkWordIsValid(word) === false) {
 			await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}\n**Atenção:** A palavra não é válida!`);
 			i--;
 		}
 		else {
 			// Verifica se a tentativa esta correta ou não
-			if (collectedMessage.content === correctWord) {
-				gameMessage[`line${i + 1}`] = await convertContentToEmojis(collectedMessage.content, correctWord);
+			if (word === correctWord) {
+				gameMessage[`line${i + 1}`] = await convertContentToEmojis(word, correctWord);
 				await interaction.editReply(`Parabéns, você acertou em ${i + 1} tentativas! :tada:\n\n${returnGameTable()}`);
 				await itPlayed(interaction.user.id);
 
@@ -111,7 +113,7 @@ async function sendGameMessageAndResults(interaction) {
 				i = 7;
 			}
 			else {
-				gameMessage[`line${i + 1}`] = await convertContentToEmojis(collectedMessage.content, correctWord);
+				gameMessage[`line${i + 1}`] = await convertContentToEmojis(word, correctWord);
 				await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}`);
 				if (i === 5) {
 					await interaction.editReply(`Você perdeu, a palavra era **${correctWord}**. :frowning:\nQuem sabe na próxima você consegue!\n\n${returnGameTable()}`);
