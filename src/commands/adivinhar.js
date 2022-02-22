@@ -1,4 +1,5 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageButton } = require('discord.js');
+const { SlashCommandBuilder, ActionRow } = require('@discordjs/builders');
 const fs = require('fs');
 const readline = require('readline');
 
@@ -30,13 +31,13 @@ async function convertToDefaultEmojis(content) {
 	let convertedLetters = '';
 	contentArray.forEach(emoji => {
 		if (Object.values(letter['yellow']).includes(emoji)) {
-			convertedLetters += ':yellow_square: ';
+			convertedLetters += '🟨 ';
 		}
 		else if (Object.values(letter['green']).includes(emoji)) {
-			convertedLetters += ':green_square: ';
+			convertedLetters += '🟩 ';
 		}
 		else if (Object.values(letter['gray']).includes(emoji)) {
-			convertedLetters += ':black_large_square: ';
+			convertedLetters += '⬛ ';
 		}
 	});
 
@@ -49,6 +50,19 @@ async function convertToDefaultEmojis(content) {
 	}
 
 	return Object.values(shareMessage).map(line => line).join('\n');
+}
+
+async function iosOrAndroidPc(interaction) {
+	const filter = (button) => button.user.id === interaction.user.id;
+
+	let plataform = '';
+	await interaction.channel.awaitMessageComponent({ filter })
+		.then(int => {
+			if (int.customId === 'pc-ios') plataform = 'pc-ios';
+			else plataform = 'android';
+		});
+
+	return plataform;
 }
 
 async function sendGameMessageAndResults(interaction) {
@@ -101,14 +115,42 @@ async function sendGameMessageAndResults(interaction) {
 			i--;
 		}
 		else {
+			const row = new ActionRow()
+				.addComponents(
+					new MessageButton()
+						.setCustomId('pc-ios')
+						.setLabel('PC ou iOS')
+						.setStyle('SUCCESS'),
+					new MessageButton()
+						.setCustomId('android')
+						.setLabel('Android')
+						.setStyle('SUCCESS'),
+				);
+
 			// Verifica se a tentativa esta correta ou não
 			if (word === correctWord) {
 				gameMessage[`line${i + 1}`] = await convertContentToEmojis(word, correctWord);
 				await interaction.editReply(`Parabéns, você acertou em ${i + 1} tentativas! :tada:\n\n${returnGameTable()}`);
 				await itPlayed(interaction.user.id);
 
-				await interaction.channel.send(`<@${interaction.user.id}> Copie a mensagem abaixo e compartilhe com seus amigos!`);
-				await interaction.channel.send(`Joguei **palavreco.com** #${await getDayNumber()} ${i + 1}/6\n\n${await convertToDefaultEmojis(returnGameTable())}`);
+				await interaction.channel.send(`<@${interaction.user.id}> Precione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`);
+				const msg = await interaction.channel.send({
+					content: `Joguei **palavreco.com** #${await getDayNumber()} ${i + 1}/6\n\n${await convertToDefaultEmojis(returnGameTable())}`,
+					components: [row],
+				});
+
+				if (await iosOrAndroidPc(interaction) === 'pc-ios') {
+					await msg.edit({
+						content: `Joguei **palavreco.com** #${await getDayNumber()} ${i + 1}/6\n\n${await convertToDefaultEmojis(returnGameTable())}`,
+						components: [],
+					});
+				}
+				else {
+					await msg.edit({
+						content: `\`\`\`\nJoguei **palavreco.com** #${await getDayNumber()} ${i + 1}/6\n\n${await convertToDefaultEmojis(returnGameTable())}\n\`\`\``,
+						components: [],
+					});
+				}
 
 				i = 7;
 			}
@@ -119,8 +161,24 @@ async function sendGameMessageAndResults(interaction) {
 					await interaction.editReply(`Você perdeu, a palavra era **${correctWord}**. :frowning:\nQuem sabe na próxima você consegue!\n\n${returnGameTable()}`);
 					await itPlayed(interaction.user.id);
 
-					await interaction.channel.send(`<@${interaction.user.id}> Copie a mensagem abaixo e compartilhe com seus amigos!`);
-					await interaction.channel.send(`Joguei **palavreco.com** #${await getDayNumber()} 6/6\n\n${await convertToDefaultEmojis(returnGameTable())}`);
+					await interaction.channel.send(`<@${interaction.user.id}> Precione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`);
+					const msg = await interaction.channel.send({
+						content: `Joguei **palavreco.com** #${await getDayNumber()} ${i + 1}/6\n\n${await convertToDefaultEmojis(returnGameTable())}`,
+						components: [row],
+					});
+
+					if (await iosOrAndroidPc(interaction) === 'pc-ios') {
+						await msg.edit({
+							content: `Joguei **palavreco.com** #${await getDayNumber()} X/6\n\n${await convertToDefaultEmojis(returnGameTable())}`,
+							components: [],
+						});
+					}
+					else {
+						await msg.edit({
+							content: `\`\`\`\nJoguei **palavreco.com** #${await getDayNumber()} X/6\n\n${await convertToDefaultEmojis(returnGameTable())}\n\`\`\``,
+							components: [],
+						});
+					}
 
 					return;
 				}
