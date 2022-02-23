@@ -5071,6 +5071,7 @@ mesao
 metal
 metam
 meter
+metas
 metil
 metim
 metie
@@ -9700,6 +9701,7 @@ tenra
 algum
 ajuda
 anuir
+retas
 ficar
 velar
 apoio
