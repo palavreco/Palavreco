@@ -135,19 +135,19 @@ async function sendGameMessageAndResults(interaction) {
 
 				await interaction.channel.send(`<@${interaction.user.id}> Precione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`);
 				const msg = await interaction.channel.send({
-					content: `Joguei **palavreco.com** #${await getDayNumber()} ${i + 1}/6\n\n${await convertToDefaultEmojis(returnGameTable())}`,
+					content: 'ㅤ',
 					components: [row],
 				});
 
 				if (await iosOrAndroidPc(interaction) === 'pc-ios') {
 					await msg.edit({
-						content: `Joguei **palavreco.com** #${await getDayNumber()} ${i + 1}/6\n\n${await convertToDefaultEmojis(returnGameTable())}`,
+						content: `Joguei palavreco.com #${await getDayNumber()} ${i + 1}/6\n\n${await convertToDefaultEmojis(returnGameTable())}`,
 						components: [],
 					});
 				}
 				else {
 					await msg.edit({
-						content: `\`\`\`\nJoguei **palavreco.com** #${await getDayNumber()} ${i + 1}/6\n\n${await convertToDefaultEmojis(returnGameTable())}\n\`\`\``,
+						content: `\`\`\`\nJoguei palavreco.com #${await getDayNumber()} ${i + 1}/6\n\n${await convertToDefaultEmojis(returnGameTable())}\n\`\`\``,
 						components: [],
 					});
 				}
@@ -158,24 +158,24 @@ async function sendGameMessageAndResults(interaction) {
 				gameMessage[`line${i + 1}`] = await convertContentToEmojis(word, correctWord);
 				await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}`);
 				if (i === 5) {
-					await interaction.editReply(`Você perdeu, a palavra era **${correctWord}**. :frowning:\nQuem sabe na próxima você consegue!\n\n${returnGameTable()}`);
+					await interaction.editReply(`${returnGameTable()}\n\nVocê perdeu, a palavra era **${correctWord}**. :frowning:\nQuem sabe na próxima você consegue!`);
 					await itPlayed(interaction.user.id);
 
 					await interaction.channel.send(`<@${interaction.user.id}> Precione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`);
 					const msg = await interaction.channel.send({
-						content: `Joguei **palavreco.com** #${await getDayNumber()} ${i + 1}/6\n\n${await convertToDefaultEmojis(returnGameTable())}`,
+						content: 'ㅤ',
 						components: [row],
 					});
 
 					if (await iosOrAndroidPc(interaction) === 'pc-ios') {
 						await msg.edit({
-							content: `Joguei **palavreco.com** #${await getDayNumber()} X/6\n\n${await convertToDefaultEmojis(returnGameTable())}`,
+							content: `Joguei palavreco.com #${await getDayNumber()} X/6\n\n${await convertToDefaultEmojis(returnGameTable())}`,
 							components: [],
 						});
 					}
 					else {
 						await msg.edit({
-							content: `\`\`\`\nJoguei **palavreco.com** #${await getDayNumber()} X/6\n\n${await convertToDefaultEmojis(returnGameTable())}\n\`\`\``,
+							content: `\`\`\`\nJoguei palavreco.com #${await getDayNumber()} X/6\n\n${await convertToDefaultEmojis(returnGameTable())}\n\`\`\``,
 							components: [],
 						});
 					}
