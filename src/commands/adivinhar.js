@@ -65,14 +65,14 @@ async function iosOrAndroidPc(interaction) {
 	return plataform;
 }
 
-const usersTries = [];
-const activeGames = [];
+const usersTries = {};
+const activeGames = {};
 
 setInterval(() => {
 	const brazilianTime = dayjs().tz('America/Sao_Paulo').format('HH:mm');
 	if (brazilianTime === '00:00') {
-		usersTries = [];
-		activeGames = [];
+		usersTries = {};
+		activeGames = {};
 	}
 }, 60_000);
 
@@ -96,7 +96,7 @@ async function sendGameMessageAndResults(interaction) {
 	};
 
 	function returnGameTable() {
-		const userTries = usersTries.find(user => user.id === interaction.user.id);
+		const userTries = usersTries[interaction.user.id];
 
 		if (!userTries) {
 			return Object.values(gameMessage).map(line => line).join('\n');
@@ -115,25 +115,25 @@ async function sendGameMessageAndResults(interaction) {
 	}
 
 	let i = 0;
-	if (activeGames.find(player => player === interaction.user.id)) {
+	if (activeGames[interaction.user.id]) {
 		await interaction.reply('Você já está jogando!\nSe a mensagem não aparece mais, mande `cancelar` no canal e tente novamente.');
 		return;
 	}
 	else {
-		activeGames.push(interaction.user.id);
+		activeGames[interaction.user.id] = { id: interaction.user.id };
 
 		await interaction.reply({
 			content: `Adivinhe o **PALAVRECO** de hoje! 👀\n\n${returnGameTable()}\n\nPara cancelar o jogo, digite \`cancelar\``,
 			ephemeral: true,
 		});
 
-		const userTries = usersTries.find(user => user.id === interaction.user.id);
+		const userTries = usersTries[interaction.user.id];
 		if (userTries) {
 			const triesLeft = userTries.attempts.length;
 			i = triesLeft;
 		}
 		else {
-			usersTries.push(playingUser);
+			usersTries[interaction.user.id] = playingUser;
 		}
 	}
 
@@ -147,7 +147,7 @@ async function sendGameMessageAndResults(interaction) {
 
 		if (word === 'cancelar') {
 			await interaction.editReply('Você encerrou o jogo :(');
-			activeGames.splice(activeGames.indexOf(interaction.user.id), 1);
+			activeGames[interaction.user.id] = null;			
 			i = 7;
 		}
 		else if (word.length != 5) {
@@ -171,13 +171,13 @@ async function sendGameMessageAndResults(interaction) {
 						.setStyle('SUCCESS'),
 				);
 
-			usersTries.find(player => player.id === interaction.user.id).attempts.push(await convertContentToEmojis(word, correctWord));
+			usersTries[interaction.user.id].attempts.push(await convertContentToEmojis(word, correctWord));
 
 			if (word === correctWord) {
 				await interaction.editReply(`Parabéns, você acertou em ${i + 1} tentativas! :tada:\n\n${returnGameTable()}`);
 				await itPlayed(interaction.user.id);
 
-				activeGames.splice(activeGames.findIndex(player => player === interaction.user.id), 1);
+				usersTries[interaction.user.id] = null;
 
 				await interaction.channel.send(`<@${interaction.user.id}> Precione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`);
 				const msg = await interaction.channel.send({
@@ -206,7 +206,7 @@ async function sendGameMessageAndResults(interaction) {
 					await interaction.editReply(`${returnGameTable()}\n\nVocê perdeu, a palavra era **${correctWord}**. :frowning:\nQuem sabe na próxima você consegue!`);
 					await itPlayed(interaction.user.id);
 
-					activeGames.splice(activeGames.findIndex(player => player === interaction.user.id), 1);
+					activeGames[interaction.user.id] = null;
 
 					await interaction.channel.send(`<@${interaction.user.id}> Pressione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`);
 					const msg = await interaction.channel.send({
