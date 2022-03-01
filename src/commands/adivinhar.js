@@ -65,14 +65,27 @@ async function iosOrAndroidPc(interaction) {
 	return plataform;
 }
 
+const usersTries = [];
+const activeGames = [];
+
+setInterval(() => {
+	const brazilianTime = dayjs().tz('America/Sao_Paulo').format('HH:mm');
+	if (brazilianTime === '00:00') {
+		usersTries = [];
+		activeGames = [];
+	}
+}, 60_000);
+
 async function sendGameMessageAndResults(interaction) {
 	const channel = interaction.client.channels.cache.get(interaction.channel.id);
 	if (!channel.permissionsFor(interaction.client.user).has('MANAGE_MESSAGES')) {
 		await interaction.reply('Ops! Parece que eu não tenho permissão para executar esse comando.\nPor favor, me dê um cargo que tenha permissão de `Gerenciar mensagens`.');
 		return;
 	}
+	
+	const playingUser = { id: interaction.user.id, attempts: [] };
+	const correctWord = await checkWordDatabase();
 
-	// A mensagem principal do jogo
 	const gameMessage = {
 		'line1': `${square['gray'].repeat(5)}`,
 		'line2': `${square['gray'].repeat(5)}`,
@@ -81,19 +94,48 @@ async function sendGameMessageAndResults(interaction) {
 		'line5': `${square['gray'].repeat(5)}`,
 		'line6': `${square['gray'].repeat(5)}`,
 	};
-	// A tabela do jogo, gerada dinamicamente
+
 	function returnGameTable() {
-		return Object.values(gameMessage).map(line => line).join('\n');
+		if (!usersTries.find(user => user.id === interaction.user.id)) {
+			return Object.values(gameMessage).map(line => line).join('\n');
+		}
+		else {
+			const userTries = usersTries.find(user => user.id === interaction.user.id).attempts;
+			for (let i = 0; i < 6; i++) {
+				if (userTries[i] === undefined) {
+					gameMessage[`line${i + 1}`] = `${square['gray'].repeat(5)}`;
+				}
+				else {
+					gameMessage[`line${i + 1}`] = userTries[i];
+				}
+			}
+			return Object.values(gameMessage).map(line => line).join('\n');
+		}
 	}
 
-	await interaction.reply({
-		content: `Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}\n\nPara cancelar o jogo, digite \`cancelar\``,
-		ephemeral: true,
-	});
+	let i = 0;
+	if (activeGames.find(player => player === interaction.user.id)) {
+		await interaction.reply('Você já está jogando!\nSe a mensagem não aparece mais, mande `cancelar` no canal e tente novamente.');
+		return;
+	}
+	else {
+		activeGames.push(interaction.user.id);
 
-	const correctWord = await checkWordDatabase();
+		await interaction.reply({
+			content: `Adivinhe o **PALAVRECO** de hoje! 👀\n\n${returnGameTable()}\n\nPara cancelar o jogo, digite \`cancelar\``,
+			ephemeral: true,
+		});
 
-	for (let i = 0; i < 6; i++) {
+		if (usersTries.find(user => user.id === playingUser.id)) {
+			const triesLeft = usersTries.find(user => user.id === playingUser.id).attempts.length;
+			i = triesLeft;
+		}
+		else {
+			usersTries.push(playingUser);
+		}
+	}
+
+	for (i; i < 6; i++) {
 		const collectedMessage = await awaitMessage(interaction);
 		setTimeout(async () => {
 			await collectedMessage.message.delete();
@@ -101,17 +143,17 @@ async function sendGameMessageAndResults(interaction) {
 
 		const word = collectedMessage.content.normalize('NFKD').replace(/\p{Diacritic}/gu, '');
 
-		// Verifica se a mensagem pode ser realmente considerada como uma tentativa
 		if (word === 'cancelar') {
 			await interaction.editReply('Você encerrou o jogo :(');
+			activeGames.splice(activeGames.indexOf(interaction.user.id), 1);
 			i = 7;
 		}
 		else if (word.length != 5) {
-			await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}\n**Atenção:** A palavra deve ter 5 letras!`);
+			await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! 👀\n\n${returnGameTable()}\n**Atenção:** A palavra deve ter 5 letras!`);
 			i--;
 		}
 		else if (await checkWordIsValid(word) === false) {
-			await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}\n**Atenção:** A palavra não é válida!`);
+			await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! 👀\n\n${returnGameTable()}\n**Atenção:** A palavra não é válida!`);
 			i--;
 		}
 		else {
@@ -127,11 +169,13 @@ async function sendGameMessageAndResults(interaction) {
 						.setStyle('SUCCESS'),
 				);
 
-			// Verifica se a tentativa esta correta ou não
+			usersTries.find(player => player.id === playingUser.id).attempts.push(await convertContentToEmojis(word, correctWord));
+
 			if (word === correctWord) {
-				gameMessage[`line${i + 1}`] = await convertContentToEmojis(word, correctWord);
 				await interaction.editReply(`Parabéns, você acertou em ${i + 1} tentativas! :tada:\n\n${returnGameTable()}`);
 				await itPlayed(interaction.user.id);
+
+				activeGames.splice(activeGames.findIndex(player => player === interaction.user.id), 1);
 
 				await interaction.channel.send(`<@${interaction.user.id}> Precione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`);
 				const msg = await interaction.channel.send({
@@ -155,13 +199,14 @@ async function sendGameMessageAndResults(interaction) {
 				i = 7;
 			}
 			else {
-				gameMessage[`line${i + 1}`] = await convertContentToEmojis(word, correctWord);
-				await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! :eyes:\n\n${returnGameTable()}`);
+				await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! 👀\n\n${returnGameTable()}`);
 				if (i === 5) {
 					await interaction.editReply(`${returnGameTable()}\n\nVocê perdeu, a palavra era **${correctWord}**. :frowning:\nQuem sabe na próxima você consegue!`);
 					await itPlayed(interaction.user.id);
 
-					await interaction.channel.send(`<@${interaction.user.id}> Precione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`);
+					activeGames.splice(activeGames.findIndex(player => player === interaction.user.id), 1);
+
+					await interaction.channel.send(`<@${interaction.user.id}> Pressione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`);
 					const msg = await interaction.channel.send({
 						content: 'ㅤ',
 						components: [row],
@@ -188,7 +233,6 @@ async function sendGameMessageAndResults(interaction) {
 	}
 }
 
-// Função que retorna a mensagem do usuário
 function awaitMessage(interaction) {
 	const filter = (msg) => interaction.user.id === msg.author.id;
 	const sendedMessage = interaction.channel.awaitMessages({ max: 1, filter }).then(async (msg) => {
@@ -204,7 +248,6 @@ function awaitMessage(interaction) {
 	return sendedMessage;
 }
 
-// Função que retorna a palavra escrita em emojis
 async function convertContentToEmojis(content, correctWord) {
 	const contentArray = content.split('');
 	const correctWordArray = correctWord.split('');
