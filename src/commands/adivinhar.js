@@ -65,8 +65,8 @@ async function iosOrAndroidPc(interaction) {
 	return plataform;
 }
 
-const usersTries = {};
-const activeGames = {};
+let usersTries = {};
+let activeGames = {};
 
 setInterval(() => {
 	const brazilianTime = dayjs().tz('America/Sao_Paulo').format('HH:mm');
@@ -82,7 +82,7 @@ async function sendGameMessageAndResults(interaction) {
 		await interaction.reply('Ops! Parece que eu não tenho permissão para executar esse comando.\nPor favor, me dê um cargo que tenha permissão de `Gerenciar mensagens`.');
 		return;
 	}
-	
+
 	const playingUser = { id: interaction.user.id, attempts: [] };
 	const correctWord = await checkWordDatabase();
 
@@ -147,7 +147,7 @@ async function sendGameMessageAndResults(interaction) {
 
 		if (word === 'cancelar') {
 			await interaction.editReply('Você encerrou o jogo :(');
-			activeGames[interaction.user.id] = null;			
+			activeGames[interaction.user.id] = null;
 			i = 7;
 		}
 		else if (word.length != 5) {
