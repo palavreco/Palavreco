@@ -96,17 +96,18 @@ async function sendGameMessageAndResults(interaction) {
 	};
 
 	function returnGameTable() {
-		if (!usersTries.find(user => user.id === interaction.user.id)) {
+		const userTries = usersTries.find(user => user.id === interaction.user.id);
+
+		if (!userTries) {
 			return Object.values(gameMessage).map(line => line).join('\n');
 		}
 		else {
-			const userTries = usersTries.find(user => user.id === interaction.user.id).attempts;
 			for (let i = 0; i < 6; i++) {
-				if (userTries[i] === undefined) {
+				if (!userTries.attempts[i]) {
 					gameMessage[`line${i + 1}`] = `${square['gray'].repeat(5)}`;
 				}
 				else {
-					gameMessage[`line${i + 1}`] = userTries[i];
+					gameMessage[`line${i + 1}`] = userTries.attempts[i];
 				}
 			}
 			return Object.values(gameMessage).map(line => line).join('\n');
@@ -126,8 +127,9 @@ async function sendGameMessageAndResults(interaction) {
 			ephemeral: true,
 		});
 
-		if (usersTries.find(user => user.id === interaction.user.id)) {
-			const triesLeft = usersTries.find(user => user.id === interaction.user.id).attempts.length;
+		const userTries = usersTries.find(user => user.id === interaction.user.id);
+		if (userTries) {
+			const triesLeft = userTries.attempts.length;
 			i = triesLeft;
 		}
 		else {
