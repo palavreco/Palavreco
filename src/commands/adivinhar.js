@@ -126,8 +126,8 @@ async function sendGameMessageAndResults(interaction) {
 			ephemeral: true,
 		});
 
-		if (usersTries.find(user => user.id === playingUser.id)) {
-			const triesLeft = usersTries.find(user => user.id === playingUser.id).attempts.length;
+		if (usersTries.find(user => user.id === interaction.user.id)) {
+			const triesLeft = usersTries.find(user => user.id === interaction.user.id).attempts.length;
 			i = triesLeft;
 		}
 		else {
@@ -169,7 +169,7 @@ async function sendGameMessageAndResults(interaction) {
 						.setStyle('SUCCESS'),
 				);
 
-			usersTries.find(player => player.id === playingUser.id).attempts.push(await convertContentToEmojis(word, correctWord));
+			usersTries.find(player => player.id === interaction.user.id).attempts.push(await convertContentToEmojis(word, correctWord));
 
 			if (word === correctWord) {
 				await interaction.editReply(`Parabéns, você acertou em ${i + 1} tentativas! :tada:\n\n${returnGameTable()}`);
