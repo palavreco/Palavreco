@@ -180,7 +180,7 @@ async function sendGameMessageAndResults(interaction) {
 				delete activeGames[interaction.user.id];
 				delete usersTries[interaction.user.id];
 
-				await interaction.channel.send(`<@${interaction.user.id}> Precione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`);
+				await interaction.channel.send(`<@${interaction.user.id}> Pressione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`);
 				const msg = await interaction.channel.send({
 					content: 'ㅤ',
 					components: [row],
