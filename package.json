@@ -6,7 +6,8 @@
   "scripts": {
     "deploy": "node src/update-commands.js",
     "dev": "nodemon src/bot.js",
-    "start": "node src/bot.js"
+    "start": "node src/bot.js",
+    "lint": "eslint src"
   },
   "keywords": [
     "discord",
