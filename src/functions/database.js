@@ -44,7 +44,7 @@ module.exports = {
 		const randomWord = words[Math.floor(Math.random() * words.length)].replace('\r', '');
 		await client.query('UPDATE words SET status = false WHERE status = true');
 		await client.query(`INSERT into words(word, status) VALUES ('${randomWord}', true)`);
-		await client.query('UPDATE users SET status = false WHERE status = true');
+		await client.query('DETETE FROM users');
 	},
 	async checkDatabase() {
 		client.connect();
