@@ -147,7 +147,7 @@ async function sendGameMessageAndResults(interaction) {
 
 		if (word === 'cancelar') {
 			await interaction.editReply('Você encerrou o jogo :(');
-			activeGames[interaction.user.id] = null;
+			delete activeGames[interaction.user.id];
 			i = 7;
 		}
 		else if (word.length != 5) {
@@ -177,7 +177,7 @@ async function sendGameMessageAndResults(interaction) {
 				await interaction.editReply(`Parabéns, você acertou em ${i + 1} tentativas! :tada:\n\n${returnGameTable()}`);
 				await itPlayed(interaction.user.id);
 
-				usersTries[interaction.user.id] = null;
+				delete usersTries[interaction.user.id];
 
 				await interaction.channel.send(`<@${interaction.user.id}> Precione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`);
 				const msg = await interaction.channel.send({
@@ -206,7 +206,7 @@ async function sendGameMessageAndResults(interaction) {
 					await interaction.editReply(`${returnGameTable()}\n\nVocê perdeu, a palavra era **${correctWord}**. :frowning:\nQuem sabe na próxima você consegue!`);
 					await itPlayed(interaction.user.id);
 
-					activeGames[interaction.user.id] = null;
+					delete activeGames[interaction.user.id];
 
 					await interaction.channel.send(`<@${interaction.user.id}> Pressione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`);
 					const msg = await interaction.channel.send({
