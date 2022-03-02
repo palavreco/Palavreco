@@ -176,7 +176,7 @@ async function sendGameMessageAndResults(interaction) {
 			if (word === correctWord) {
 				await interaction.editReply(`Parabéns, você acertou em ${i + 1} tentativas! :tada:\n\n${returnGameTable()}`);
 				await itPlayed(interaction.user.id);
-				
+
 				delete activeGames[interaction.user.id];
 				delete usersTries[interaction.user.id];
 
