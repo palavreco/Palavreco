@@ -176,7 +176,8 @@ async function sendGameMessageAndResults(interaction) {
 			if (word === correctWord) {
 				await interaction.editReply(`Parabéns, você acertou em ${i + 1} tentativas! :tada:\n\n${returnGameTable()}`);
 				await itPlayed(interaction.user.id);
-
+				
+				delete activeGames[interaction.user.id];
 				delete usersTries[interaction.user.id];
 
 				await interaction.channel.send(`<@${interaction.user.id}> Precione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`);
@@ -207,6 +208,7 @@ async function sendGameMessageAndResults(interaction) {
 					await itPlayed(interaction.user.id);
 
 					delete activeGames[interaction.user.id];
+					delete usersTries[interaction.user.id];
 
 					await interaction.channel.send(`<@${interaction.user.id}> Pressione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`);
 					const msg = await interaction.channel.send({
