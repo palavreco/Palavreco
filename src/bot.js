@@ -9,9 +9,9 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 // importa as funções de database
 const { checkDatabase } = require('./functions/database.js');
 // importa a função para trocar a palavra
-const { newWord } = require('./database.js');
+const { newWord } = require('./functions/database.js');
 // importa a função para iniciar o timer
-const { runAtMidnight } = require('./functions/runner');
+const { runAtMidnight } = require('./functions/runner.js');
 // Cria uma Collection dos comandos do bot
 client.commands = new Collection();
 // Cria uma constante que recebe um array com todos os nomes dos arquivos terminados em .js na pasta comandos

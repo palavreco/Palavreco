@@ -5,7 +5,7 @@ const readline = require('readline');
 
 const { checkWordDatabase, checkUserDatabase, itPlayed, getDayNumber } = require('../functions/database.js');
 const { square, letter } = require('../utils/emotes.json');
-const { runAtMidnight } = require('../functions/runner');
+const { runAtMidnight } = require('../functions/runner.js');
 
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
