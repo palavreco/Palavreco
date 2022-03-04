@@ -8,8 +8,10 @@ require('dotenv').config();
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
 // importa as funções de database
 const { checkDatabase } = require('./functions/database.js');
-// importa o loop para checar o horário
-const { loopUtilMidnight } = require('./functions/reset.js');
+// importa a função para trocar a palavra
+const { newWord } = require('./database.js');
+// importa a função para iniciar o timer
+const { runAtMidnight } = require('./functions/runner');
 // Cria uma Collection dos comandos do bot
 client.commands = new Collection();
 // Cria uma constante que recebe um array com todos os nomes dos arquivos terminados em .js na pasta comandos
@@ -40,7 +42,10 @@ client.once('ready', () => {
 	// console log para informar que o bot está online
 	console.log('Bot pronto!');
 	// loop de reset
-	loopUtilMidnight();
+	runAtMidnight(() => {
+		newWord();
+		console.log('Meia noite! Palavra trocada!');
+	});
 });
 
 // manda mensagem se foi adicionado em algum servidor
