@@ -5,6 +5,7 @@ const readline = require('readline');
 
 const { checkWordDatabase, checkUserDatabase, itPlayed, getDayNumber } = require('../functions/database.js');
 const { square, letter } = require('../utils/emotes.json');
+const { runAtMidnight } = require('../functions/runner.js');
 
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
@@ -68,13 +69,10 @@ async function iosOrAndroidPc(interaction) {
 let usersTries = {};
 let activeGames = {};
 
-setInterval(() => {
-	const brazilianTime = dayjs().tz('America/Sao_Paulo').format('HH:mm');
-	if (brazilianTime === '00:00') {
-		usersTries = {};
-		activeGames = {};
-	}
-}, 60_000);
+runAtMidnight(() => {
+	usersTries = {};
+	activeGames = {};
+});
 
 async function sendGameMessageAndResults(interaction) {
 	const channel = interaction.client.channels.cache.get(interaction.channel.id);
