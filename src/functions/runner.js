@@ -12,7 +12,7 @@ module.exports = {
 
 		setTimeout(() => {
 			callback();
-			this.runAtMidnight(callback);
+			module.exports.runAtMidnight(callback);
 		}, msUntilMidnight);
 	},
 };
