@@ -11,7 +11,6 @@ async function collector(interaction, message, embed) {
 
 	collectorReaction.on('collect', async (reaction, user) => {
 		await message.reactions.removeAll();
-		await message.reactions.removeAll();
 		if (reaction.emoji.name === '🟩') {
 			try {
 				interaction.options.getSubcommand() === 'sugestão' ? await interaction.user.send('Olá! Obrigado pela sugestão! A equipe de desenvolvedores agradece!') : await interaction.user.send('Olá! Obrigado por reportar o bug! A equipe de desenvolvedores já está ciente do mesmo e logo logo ele estará resolvido!');
