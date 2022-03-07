@@ -4,7 +4,7 @@ const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
 async function collector(interaction, message, embed) {
 
 	const filterReaction = (reaction, user) => {
-		return !user.bot && (reaction.emoji.name === '🟩' || reaction.emoji.name === '🟨');
+		return !user.bot && (reaction.emoji.name === '🟩' || reaction.emoji.name === '🟨' || reaction.emoji.name === '🟥');
 	};
 
 	const collectorReaction = message.createReactionCollector({ filter: filterReaction });
@@ -41,6 +41,12 @@ async function collector(interaction, message, embed) {
 			interaction.options.getSubcommand() === 'sugestão' ? embed.setFooter({ text: `Sugerido por ${interaction.user.username} (${interaction.user.id}) - Resposta por ${user.username}: "${sendedMessage.content}"`, iconURL: interaction.user.avatarURL() }) : embed.setFooter({ text: `Reportado por ${interaction.user.username} (${interaction.user.id}) - Resposta por ${user.username}: "${sendedMessage.content}"`, iconURL: interaction.user.avatarURL() });
 			embed.setColor('YELLOW');
 			await sendedMessage.delete();
+			await message.edit({ embeds: [embed] });
+		}
+		else if (reaction.emoji.name === '🟥') {
+			await message.reactions.removeAll();
+			embed.setColor('RED');
+			interaction.options.getSubcommand() === 'sugestão' ? embed.setFooter({ text: `Sugerido por ${interaction.user.username} (${interaction.user.id}) - Negado por ${user.username}`, iconURL: interaction.user.avatarURL() }) : embed.setFooter({ text: `Reportado por ${interaction.user.username} (${interaction.user.id}) - Negado por ${user.username}`, iconURL: interaction.user.avatarURL() });
 			await message.edit({ embeds: [embed] });
 		}
 	});
@@ -126,6 +132,7 @@ module.exports = {
 			const messageSuggestion = await suggestionChannel.send({ embeds: [finalEmbed] });
 			await messageSuggestion.react('🟩');
 			await messageSuggestion.react('🟨');
+			await messageSuggestion.react('🟥');
 
 			collector(interaction, messageSuggestion, finalEmbed);
 		}
@@ -155,6 +162,7 @@ module.exports = {
 			const messageBug = await bugReportChannel.send({ embeds: [finalEmbed] });
 			await messageBug.react('🟩');
 			await messageBug.react('🟨');
+			await messageBug.react('🟥');
 
 			collector(interaction, messageBug, finalEmbed);
 		}
