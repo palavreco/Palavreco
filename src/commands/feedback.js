@@ -10,6 +10,7 @@ async function collector(interaction, message, embed) {
 	const collectorReaction = message.createReactionCollector({ filter: filterReaction });
 
 	collectorReaction.on('collect', async (reaction, user) => {
+		await message.reactions.removeAll();
 		if (reaction.emoji.name === '🟩') {
 			await message.reactions.removeAll();
 			try {
