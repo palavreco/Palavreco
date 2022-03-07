@@ -1,6 +1,55 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
 
+async function collector(interaction, message, embed) {
+
+	const filterReaction = (user) => {
+		return !user.bot;
+	};
+
+	const collectorReaction = message.createReactionCollector({ filter: filterReaction });
+
+	collectorReaction.on('collect', async (reaction, user) => {
+		await message.reactions.removeAll();
+		if (reaction.emoji.name === '🟩') {
+			try {
+				interaction.options.getSubcommand() === 'sugestão' ? await interaction.user.send('Olá! Obrigado pela sugestão! A equipe de desenvolvedores agradece!') : await interaction.user.send('Olá! Obrigado por reportar o bug! A equipe de desenvolvedores já está ciente do mesmo e logo logo ele estará resolvido!');
+			}
+			catch {
+				await message.channel.send('Não foi possível enviar a mensagem na dm do usuário.');
+			}
+			embed.setColor('GREEN');
+			interaction.options.getSubcommand() === 'sugestão' ? embed.setFooter({ text: `Sugerido por ${interaction.user.username} (${interaction.user.id}) - Aprovado por ${user.username}`, iconURL: interaction.user.avatarURL() }) : embed.setFooter({ text: `Reportado por ${interaction.user.username} (${interaction.user.id}) - Aprovado por ${user.username}`, iconURL: interaction.user.avatarURL() });
+			await message.edit({ embeds: [embed] });
+			message.pin();
+		}
+		else if (reaction.emoji.name === '🟨') {
+			const messageAnswer = await message.channel.send('Escreva a resposta:');
+
+			const filter = (msg) => user.id === msg.author.id;
+			const sendedMessage = await message.channel.awaitMessages({ max: 1, filter }).then(msg => {
+				return msg.first();
+			});
+			await messageAnswer.delete();
+			try {
+				interaction.options.getSubcommand() === 'sugestão' ? await interaction.user.send(`Olá! Obrigado pela sugestão! A equipe de desenvolvedores te respondeu!\n\nResposta: ${sendedMessage.content}`) : await interaction.user.send(`Olá! Obrigado por reportar o bug! A equipe de desenvolvedores te respondeu!\n\nResposta: ${sendedMessage.content}`);
+			}
+			catch {
+				await message.channel.send('Não foi possível enviar a mensagem na dm do usuário.');
+			}
+			interaction.options.getSubcommand() === 'sugestão' ? embed.setFooter({ text: `Sugerido por ${interaction.user.username} (${interaction.user.id}) - Resposta por ${user.username}: "${sendedMessage.content}"`, iconURL: interaction.user.avatarURL() }) : embed.setFooter({ text: `Reportado por ${interaction.user.username} (${interaction.user.id}) - Resposta por ${user.username}: "${sendedMessage.content}"`, iconURL: interaction.user.avatarURL() });
+			embed.setColor('YELLOW');
+			await sendedMessage.delete();
+			await message.edit({ embeds: [embed] });
+		}
+		else if (reaction.emoji.name === '🟥') {
+			embed.setColor('RED');
+			interaction.options.getSubcommand() === 'sugestão' ? embed.setFooter({ text: `Sugerido por ${interaction.user.username} (${interaction.user.id}) - Negado por ${user.username}`, iconURL: interaction.user.avatarURL() }) : embed.setFooter({ text: `Reportado por ${interaction.user.username} (${interaction.user.id}) - Negado por ${user.username}`, iconURL: interaction.user.avatarURL() });
+			await message.edit({ embeds: [embed] });
+		}
+	});
+}
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('feedback')
@@ -51,7 +100,7 @@ module.exports = {
 					embeds: [],
 					components: [],
 				});
-				return;
+				return 'cancel';
 			}
 		}
 
@@ -66,7 +115,9 @@ module.exports = {
 				ephemeral: true,
 			});
 
-			await checkTheCollectorResponse();
+			const confirmation = await checkTheCollectorResponse();
+
+			if (confirmation === 'cancel') return;
 
 			await interaction.editReply({
 				content: 'Sugestão enviada. Obrigado!',
@@ -76,7 +127,12 @@ module.exports = {
 
 			finalEmbed.setDescription('```' + suggestion + '```');
 			const suggestionChannel = interaction.client.channels.cache.get(process.env.SUGGESTION_CHANNEL_ID);
-			await suggestionChannel.send({ embeds: [finalEmbed] });
+			const messageSuggestion = await suggestionChannel.send({ embeds: [finalEmbed] });
+			await messageSuggestion.react('🟩');
+			await messageSuggestion.react('🟨');
+			await messageSuggestion.react('🟥');
+
+			collector(interaction, messageSuggestion, finalEmbed);
 		}
 		else {
 			const bug = await interaction.options.getString('texto');
@@ -89,7 +145,9 @@ module.exports = {
 				ephemeral: true,
 			});
 
-			await checkTheCollectorResponse();
+			const confirmation = await checkTheCollectorResponse();
+
+			if (confirmation === 'cancel') return;
 
 			await interaction.editReply({
 				content: 'Reporte enviado. Obrigado!',
@@ -99,7 +157,12 @@ module.exports = {
 
 			finalEmbed.setDescription('```' + bug + '```');
 			const bugReportChannel = interaction.client.channels.cache.get(process.env.BUG_REPORT_CHANNEL_ID);
-			await bugReportChannel.send({ embeds: [finalEmbed] });
+			const messageBug = await bugReportChannel.send({ embeds: [finalEmbed] });
+			await messageBug.react('🟩');
+			await messageBug.react('🟨');
+			await messageBug.react('🟥');
+
+			collector(interaction, messageBug, finalEmbed);
 		}
 	},
 };
