@@ -3,16 +3,16 @@ const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
 
 async function collector(interaction, message, embed) {
 
-	const filterReaction = (reaction, user) => {
-		return !user.bot && (reaction.emoji.name === '🟩' || reaction.emoji.name === '🟨' || reaction.emoji.name === '🟥');
+	const filterReaction = (user) => {
+		return !user.bot;
 	};
 
 	const collectorReaction = message.createReactionCollector({ filter: filterReaction });
 
 	collectorReaction.on('collect', async (reaction, user) => {
 		await message.reactions.removeAll();
+		await message.reactions.removeAll();
 		if (reaction.emoji.name === '🟩') {
-			await message.reactions.removeAll();
 			try {
 				interaction.options.getSubcommand() === 'sugestão' ? await interaction.user.send('Olá! Obrigado pela sugestão! A equipe de desenvolvedores agradece!') : await interaction.user.send('Olá! Obrigado por reportar o bug! A equipe de desenvolvedores já está ciente do mesmo e logo logo ele estará resolvido!');
 			}
@@ -25,11 +25,10 @@ async function collector(interaction, message, embed) {
 			message.pin();
 		}
 		else if (reaction.emoji.name === '🟨') {
-			await message.reactions.removeAll();
 			const messageAnswer = await message.channel.send('Escreva a resposta:');
 
 			const filter = (msg) => user.id === msg.author.id;
-			const sendedMessage = await message.channel.awaitMessages({ max: 1, filter }).then(async (msg) => {
+			const sendedMessage = await message.channel.awaitMessages({ max: 1, filter }).then(msg => {
 				return msg.first();
 			});
 			await messageAnswer.delete();
@@ -45,7 +44,6 @@ async function collector(interaction, message, embed) {
 			await message.edit({ embeds: [embed] });
 		}
 		else if (reaction.emoji.name === '🟥') {
-			await message.reactions.removeAll();
 			embed.setColor('RED');
 			interaction.options.getSubcommand() === 'sugestão' ? embed.setFooter({ text: `Sugerido por ${interaction.user.username} (${interaction.user.id}) - Negado por ${user.username}`, iconURL: interaction.user.avatarURL() }) : embed.setFooter({ text: `Reportado por ${interaction.user.username} (${interaction.user.id}) - Negado por ${user.username}`, iconURL: interaction.user.avatarURL() });
 			await message.edit({ embeds: [embed] });
