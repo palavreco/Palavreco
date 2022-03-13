@@ -18,6 +18,7 @@
 		"handle-callback-err": "off",
 		"indent": ["error", "tab"],
 		"keyword-spacing": "error",
+		"max-len": ["error", { "code": 120 }],
 		"max-nested-callbacks": ["error", { "max": 4 }],
 		"max-statements-per-line": ["error", { "max": 2 }],
 		"no-console": "off",

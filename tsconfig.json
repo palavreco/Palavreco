@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "target": "ES6",
+        "module": "CommonJS",
+        "strictNullChecks": true,
+        "noImplicitAny": true,
+        "esModuleInterop": true,
+        "outDir": "./build",
+    },
+    "include": [
+        "./src/**/*.ts",
+        "*.ts",
+    ],
+}
