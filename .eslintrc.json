@@ -1,10 +1,13 @@
 {
-	"extends": "eslint:recommended",
+	"plugins": ["@typescript-eslint"],
+	"parser": "@typescript-eslint/parser",
+	"extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:@typescript-eslint/recommended-requiring-type-checking"],
 	"env": {
 		"node": true,
 		"es6": true
 	},
 	"parserOptions": {
+		"project": ["./tsconfig.json"],
 		"ecmaVersion": 2021
 	},
 	"rules": {

@@ -45,6 +45,8 @@
   },
   "devDependencies": {
     "@types/wrap-ansi": "^8.0.1",
-    "eslint": "^8.7.0"
+    "@typescript-eslint/eslint-plugin": "^5.14.0",
+    "@typescript-eslint/parser": "^5.14.0",
+    "eslint": "^8.11.0"
   }
 }
