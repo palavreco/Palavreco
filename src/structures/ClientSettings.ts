@@ -1,6 +1,5 @@
-import { Collection, IntentsString, PermissionString, Snowflake } from "discord.js";
-import { PalavrecoCommands } from "./BaseCommand";
-import { PalavrecoActivity } from "../utils/PalavrecoConfig";
+import { ActivityType, Collection, IntentsString, PermissionString, Snowflake } from 'discord.js';
+import { PalavrecoCommands } from './BaseCommand';
 
 export interface PalavrecoSettings {
     developers: Snowflake[];
@@ -10,9 +9,14 @@ export interface PalavrecoSettings {
     activities: PalavrecoActivity[];
     supportServer: string;
     botInvite: string;
-};
+}
 
 export interface PalavrecoFundamentals {
     commands: Collection<string, PalavrecoCommands>;
     token: string;
-};
+}
+
+export interface PalavrecoActivity {
+    name: string;
+    type: ActivityType;
+}

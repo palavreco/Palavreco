@@ -1,3 +1,3 @@
-export interface PalavrecoCommands {
-    config: Object;
+export interface PalavrecoCommand {
+    config: Record<string, PalavrecoCommand>;
 }
