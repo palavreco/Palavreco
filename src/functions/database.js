@@ -39,12 +39,23 @@ module.exports = {
 		await client.query(`UPDATE users SET status = false WHERE id = '${userId}'`);
 	},
 	async newWord() {
-		const data = fs.readFileSync('src/utils/wordsList.txt', 'utf8');
-		const words = data.split('\n');
-		const randomWord = words[Math.floor(Math.random() * words.length)].replace('\r', '');
-		await client.query('UPDATE words SET status = false WHERE status = true');
-		await client.query(`INSERT into words(word, status) VALUES ('${randomWord}', true)`);
-		await client.query('DELETE FROM users');
+		const words = fs.readFileSync('src/utils/wordsList.txt', 'utf8').split('\n');
+
+		for (let i = 0; i < words.length; i++) {
+			const randomWord = words[Math.floor(Math.random() * words.length)].replace('\r', '');
+
+			const isWordInDb = await client.query(`SELECT word, status FROM words WHERE word = '${randomWord}'`);
+			if (isWordInDb.rows.length === 0) {
+				await client.query('UPDATE words SET status = false WHERE status = true');
+				await client.query(`INSERT into words(word, status) VALUES ('${randomWord}', true)`);
+				await client.query('DELETE FROM users');
+				return;
+			}
+			else {
+				continue;
+			}
+		}
+
 	},
 	async checkDatabase() {
 		client.connect();
