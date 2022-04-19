@@ -7,6 +7,7 @@
     "deploy": "node src/update-commands.js",
     "dev": "nodemon build/bot.js",
     "watch": "tsc -w",
+    "commands": "node build/register.js",
     "start": "node src/bot.js",
     "lint": "eslint src"
   },
@@ -35,7 +36,7 @@
     "@discordjs/builders": "^0.12.0",
     "@discordjs/rest": "^0.3.0",
     "dayjs": "^1.10.7",
-    "discord-api-types": "^0.26.1",
+    "discord-api-types": "^0.31.2",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
     "nodemon": "^2.0.15",

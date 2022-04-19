@@ -9,42 +9,48 @@ import {
 	TextBasedChannel,
 	User,
 } from 'discord.js';
-import { APIApplicationCommandOption, ApplicationCommandOptionType } from 'discord-api-types';
+import {
+	ApplicationCommandOptionType,
+	RESTPostAPIChatInputApplicationCommandsJSONBody,
+} from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
 import { check, letter } from '../utils/emotes.json';
 
 export default class FeedBack implements Command {
-	name = 'feedback';
-	description = 'Dê um feedback para o Palavreco!';
+	commandStrucure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
+		'name': 'feedback',
+		'description': 'Dê um feedback para o Palavreco!',
+		'options': [
+			{
+				'name': 'sugestão',
+				'description': 'Sugira algo para o bot',
+				'type': ApplicationCommandOptionType.Subcommand,
+				'options': [
+					{
+						'name': 'texto',
+						'description': 'Coloque o conteúdo da sugestão',
+						'type': ApplicationCommandOptionType.String,
+						'required': true,
+					},
+				],
+			},
+			{
+				name: 'bug',
+				description: 'Reporte um bug do bot',
+				type: ApplicationCommandOptionType.Subcommand,
+				options: [
+					{
+						name: 'texto',
+						description: 'Coloque o conteúdo do reporte',
+						type: ApplicationCommandOptionType.String,
+						required: true,
+					},
+				],
+			},
+		],
+	};
+
 	dev = false;
-	subCommands: APIApplicationCommandOption[] = [
-		{
-			name: 'sugestão',
-			description: 'Sugira algo para o bot',
-			type: ApplicationCommandOptionType.Subcommand,
-			options: [
-				{
-					name: 'texto',
-					description: 'Coloque o conteúdo da sugestão',
-					type: ApplicationCommandOptionType.String,
-					required: true,
-				},
-			],
-		},
-		{
-			name: 'bug',
-			description: 'Reporte um bug do bot',
-			type: ApplicationCommandOptionType.Subcommand,
-			options: [
-				{
-					name: 'texto',
-					description: 'Coloque o conteúdo do reporte',
-					type: ApplicationCommandOptionType.String,
-					required: true,
-				},
-			],
-		},
-	];
 
 	async execute(interaction: CommandInteraction) {
 		const { channel, client, options, user } = interaction;

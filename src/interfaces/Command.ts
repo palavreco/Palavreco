@@ -1,10 +1,8 @@
 import { CommandInteraction } from 'discord.js';
-import { APIApplicationCommandOption } from 'discord-api-types';
+import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 
 export interface Command {
-	name: string;
-	description: string;
-    dev: boolean;
-	subCommands?: APIApplicationCommandOption[];
+	commandStrucure: RESTPostAPIChatInputApplicationCommandsJSONBody;
+	dev: boolean;
 	execute(interaction: CommandInteraction): void;
 }

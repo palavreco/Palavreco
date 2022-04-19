@@ -24,7 +24,7 @@ for (const file of cmdsFolder) {
 
 	cmd.then(command => {
 		const cmdInstance: Command = new command.default();
-		botCmds.set(cmdInstance.name, cmdInstance);
+		botCmds.set(cmdInstance.commandStrucure.name, cmdInstance);
 	});
 }
 

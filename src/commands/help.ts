@@ -1,10 +1,14 @@
 import { CommandInteraction } from 'discord.js';
+import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
 import { letter } from '../utils/emotes.json';
 
 export default class Help implements Command {
-	name = 'ajuda';
-	description = 'Mostra como o jogo funciona';
+	commandStrucure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
+		'name': 'ajuda',
+		'description': 'Mostra como o jogo funciona',
+	};
+
 	dev = false;
 
 	execute(interaction: CommandInteraction) {
