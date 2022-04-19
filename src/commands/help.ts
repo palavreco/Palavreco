@@ -6,9 +6,10 @@ export default class Help implements Command {
 	name = 'ajuda';
 	description = 'Mostra como o jogo funciona';
 	dev = false;
-	execute = (interaction: CommandInteraction) => {
+
+	execute(interaction: CommandInteraction) {
 		interaction.reply(helpText);
-	};
+	}
 }
 
 const helpText = `

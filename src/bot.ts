@@ -5,7 +5,7 @@ import { Command } from './interfaces/Command';
 import { log } from './utils/log';
 dotenv.config();
 
-const client = new Client({ intents: ['GUILDS', 'GUILD_MESSAGES'] });
+const client = new Client({ intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS'] });
 
 client.once('ready', () => {
 	log({
