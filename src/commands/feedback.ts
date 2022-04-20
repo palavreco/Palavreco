@@ -82,7 +82,7 @@ export default class FeedBack implements Command {
 			const emb = new MessageEmbed()
 				.setColor('#2f3136')
 				.setTitle(isSug ? 'Nova sugestão' : 'Reporte de bug')
-				.setDescription('```' + content! + '```')
+				.setDescription(content!)
 				.setFooter({ text: `Enviado por ${user.tag} (${user.id})`, iconURL: user.displayAvatarURL() });
 
 			const message = await c.send({ embeds: [emb] });
@@ -137,7 +137,7 @@ function handleOperation(msg: Message, embed: MessageEmbed, isSug: boolean) {
 			embed
 				.setTitle(isSug ? 'Sugestão respondida' : 'Reporte respondido')
 				.setColor('YELLOW')
-				.addField('Resposta', '```' + ans?.content + '```')
+				.addField('Resposta', ans!.content)
 				.setFooter({ text: `${embed.footer?.text} - Respondido por ${u.tag}`, iconURL: u.displayAvatarURL() });
 			await msg.edit({ embeds: [embed] });
 
