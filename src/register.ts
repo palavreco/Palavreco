@@ -8,7 +8,7 @@ const { CLIENT_ID, GUILD_ID, TOKEN } = process.env;
 
 fs.readdirSync('./src/commands').forEach(file => {
 	const name = file.split('.')[0];
-	const commandImport = import(`./commands/${name}.js`);
+	const commandImport = import(`./commands/${name}`);
 
 	commandImport.then(command => {
 		const cmdInstance: Command = new command.default();

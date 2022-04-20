@@ -5,8 +5,7 @@
   "main": "bot.js",
   "scripts": {
     "deploy": "node src/update-commands.js",
-    "dev": "nodemon build/bot.js",
-    "watch": "tsc -w",
+    "dev": "tsnd src/bot.ts",
     "commands": "node build/register.js",
     "start": "node src/bot.js",
     "lint": "eslint src"
@@ -50,6 +49,7 @@
     "@types/wrap-ansi": "^8.0.1",
     "@typescript-eslint/eslint-plugin": "^5.14.0",
     "@typescript-eslint/parser": "^5.14.0",
-    "eslint": "^8.11.0"
+    "eslint": "^8.11.0",
+    "ts-node-dev": "^1.1.8"
   }
 }
