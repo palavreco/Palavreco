@@ -4,7 +4,7 @@ import { Command } from '../interfaces/Command';
 import { letter } from '../utils/emotes.json';
 
 export default class Help implements Command {
-	commandStrucure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
+	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
 		'name': 'ajuda',
 		'description': 'Mostra como o jogo funciona',
 	};

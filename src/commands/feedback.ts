@@ -17,7 +17,7 @@ import { Command } from '../interfaces/Command';
 import { check, letter } from '../utils/emotes.json';
 
 export default class FeedBack implements Command {
-	commandStrucure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
+	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
 		'name': 'feedback',
 		'description': 'Dê um feedback para o Palavreco!',
 		'options': [
@@ -108,7 +108,8 @@ function handleOperation(msg: Message, embed: MessageEmbed, isSug: boolean) {
 	const reactionCollector = msg.createReactionCollector({ filter });
 
 	reactionCollector.on('collect', async (r, u) => {
-		if (r.emoji.name === '🟩') {
+		switch (r.emoji.name) {
+		case '🟩': {
 			embed
 				.setTitle(isSug ? 'Sugestão aceita' : 'Reporte aceito')
 				.setColor('GREEN')
@@ -122,11 +123,15 @@ function handleOperation(msg: Message, embed: MessageEmbed, isSug: boolean) {
 			].join(' ')).catch(() => {
 				msg.channel.send('Não foi possível enviar a mensagem na dm do usuário.');
 			});
-		} else if (r.emoji.name === '🟨') {
+
+			break;
+		}
+
+		case '🟨': {
 			const ask = await msg.channel.send('Escreva a resposta:');
 
 			const f = (m: Message) => m.author.id === u.id && m.channel.id === msg.channel.id;
-			const ans = await msg.channel.awaitMessages({ filter: f, max: 1	}).then(m => m.first());
+			const ans = await msg.channel.awaitMessages({ filter: f, max: 1 }).then(m => m.first());
 			ask.delete();
 
 			embed
@@ -144,12 +149,18 @@ function handleOperation(msg: Message, embed: MessageEmbed, isSug: boolean) {
 			});
 
 			ans?.delete();
-		} else if (r.emoji.name === '🟥') {
+
+			break;
+		}
+		case '🟥': {
 			embed
 				.setTitle(isSug ? 'Sugestão rejeitada' : 'Reporte rejeitado')
 				.setColor('RED')
 				.setFooter({ text: `${embed.footer?.text} - Rejeitado por ${u.tag}`, iconURL: u.displayAvatarURL() });
 			await msg.edit({ embeds: [embed] });
+
+			break;
+		}
 		}
 
 		await msg.reactions.removeAll();

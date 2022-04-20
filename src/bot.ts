@@ -15,7 +15,7 @@ client.once('ready', () => {
 	});
 });
 
-const botCmds = new Collection();
+const botCmds: Collection<string, Command> = new Collection();
 const cmdsFolder = fs.readdirSync('./src/commands');
 
 for (const file of cmdsFolder) {
@@ -24,15 +24,15 @@ for (const file of cmdsFolder) {
 
 	cmd.then(command => {
 		const cmdInstance: Command = new command.default();
-		botCmds.set(cmdInstance.commandStrucure.name, cmdInstance);
+		botCmds.set(cmdInstance.commandStructure.name, cmdInstance);
 	});
 }
 
 client.on('interactionCreate', i => {
 	if (!i.isCommand()) return;
 
-	const command = botCmds.get(i.commandName) as Command;
-	command.execute(i);
+	const command = botCmds.get(i.commandName);
+	if (command) command.execute(i);
 });
 
 client.login(process.env.TOKEN);

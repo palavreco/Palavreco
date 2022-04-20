@@ -6,8 +6,8 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 export function runAtMidnight(callback: () => void) {
-	const midnight = <number><unknown>dayjs().tz('America/Sao_Paulo').endOf('day') + 1;
-	const msUntilMidnight = midnight - <number><unknown>dayjs();
+	const midnight = +dayjs().tz('America/Sao_Paulo').endOf('day') + 1;
+	const msUntilMidnight = midnight - +dayjs();
 
 	setTimeout(() => {
 		callback();

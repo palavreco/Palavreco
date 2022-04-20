@@ -12,7 +12,7 @@ fs.readdirSync('./src/commands').forEach(file => {
 
 	commandImport.then(command => {
 		const cmdInstance: Command = new command.default();
-		const { commandStrucure, dev } = cmdInstance;
+		const { commandStructure, dev } = cmdInstance;
 
 		fetch(`https://discord.com/api/v10/applications/${CLIENT_ID}${dev ? '' : `/guilds/${GUILD_ID}`}/commands`, {
 			method: 'POST',
@@ -20,7 +20,7 @@ fs.readdirSync('./src/commands').forEach(file => {
 				Authorization: `Bot ${TOKEN}`,
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify(commandStrucure),
+			body: JSON.stringify(commandStructure),
 		}).then(res => console.log(res));
 	});
 });
