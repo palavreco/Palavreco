@@ -77,7 +77,7 @@ export default class FeedBack implements Command {
 
 		if (confirmed) {
 			const channelId = isSug ? process.env.SUG_CHANNEL : process.env.BUG_CHANNEL;
-			const c = client.channels.cache.get(channelId!) as TextBasedChannel;
+			const c = client.channels.cache.get(channelId) as TextBasedChannel;
 
 			const emb = new MessageEmbed()
 				.setColor('#2f3136')
