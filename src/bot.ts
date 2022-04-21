@@ -20,7 +20,7 @@ const cmdsFolder = fs.readdirSync('./src/commands');
 
 for (const file of cmdsFolder) {
 	const name = file.split('.')[0];
-	const cmd = import(`./commands/${name}.js`);
+	const cmd = import(`./commands/${name}`);
 
 	cmd.then(command => {
 		const cmdInstance: Command = new command.default();
