@@ -1,10 +1,8 @@
-export function log(options: {
-    message: string;
-    section: string;
-    color: 'red' | 'green' | 'blue' | 'yellow' | 'purple';
-}): void {
-	const { message, section, color } = options;
-
+export function log(
+	message: string,
+	section: string,
+	color: 'red' | 'green' | 'blue' | 'yellow' | 'purple',
+): void {
 	const d = new Date().toLocaleTimeString();
 	const c = resolveColor(color);
 

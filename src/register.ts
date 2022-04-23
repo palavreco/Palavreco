@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
 import { Command } from './interfaces/Command';
+import { log } from './utils/log';
 dotenv.config();
 
 const { CLIENT_ID, GUILD_ID, TOKEN } = process.env;
@@ -21,6 +22,8 @@ fs.readdirSync('./src/commands').forEach(file => {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify(commandStructure),
-		}).then(res => console.log(res));
+		}).then(res => {
+			if (res.status === 201) log(`${name} added!`, 'COMMANDS', 'blue');
+		});
 	});
 });

@@ -2,17 +2,15 @@ import fs from 'node:fs';
 import dotenv from 'dotenv';
 import { Client, Collection } from 'discord.js';
 import { Command } from './interfaces/Command';
+import { setUp } from './database';
 import { log } from './utils/log';
 dotenv.config();
 
 const client = new Client({ intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS'] });
 
 client.once('ready', () => {
-	log({
-		message: 'Bot is ready!',
-		section: 'BOT',
-		color: 'green',
-	});
+	log('Client is ready', 'BOT', 'green');
+	setUp();
 });
 
 const botCmds: Collection<string, Command> = new Collection();

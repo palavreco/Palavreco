@@ -5,8 +5,8 @@
   "main": "bot.js",
   "scripts": {
     "deploy": "node src/update-commands.js",
-    "dev": "tsnd src/bot.ts",
-    "commands": "node build/register.js",
+    "dev": "tsnd --transpile-only src/bot.ts",
+    "commands": "tsnd --transpile-only src/register.ts",
     "start": "node src/bot.js",
     "lint": "eslint src"
   },
