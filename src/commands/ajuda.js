@@ -8,7 +8,7 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.reply(`
 **Como jogar?**
-Tente acertar a palavra em *6 tentativas*!
+Use o comando **\`/adivinhar\`** e tente acertar a palavra em *6 tentativas*!
 Para cada uma das tentativas é preciso o envio de uma mensagem que contenha uma palavra válida de 5 letras.
 Após cada tentativa, a cor dos emojis mudará para mostrar o quão perto você estava.
         
@@ -23,7 +23,7 @@ A letra **I** está na palavra mas no lugar errado.
 :regional_indicator_a: :regional_indicator_t: :regional_indicator_i: ${letter['gray']['v']} :regional_indicator_o:
 A letra **V** não está na palavra.
         
-Uma palavra nova estará disponível todos os dias!
+A cada dia uma nova palavra será sorteada, use o comando **\`/adivinhar\`** e se divirta!
         `);
 	},
 };
