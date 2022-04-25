@@ -30,7 +30,7 @@ export async function setUp(): Promise<void> {
  * indicating if they can play or not
  * @param id The user's ID
  */
-export async function checkUser(id: string): Promise<boolean | void> {
+export async function checkOrRegisterUser(id: string): Promise<boolean | void> {
 	const userRow: QueryResult<UserRow> = await client.query(`SELECT id, status FROM users WHERE id = '${id}'`);
 
 	if (userRow.rowCount === 0) {
@@ -76,9 +76,28 @@ export async function newDay(): Promise<void> {
 
 		if (word.rowCount === 0) {
 			await client.query('UPDATE words SET status = false WHERE status = true');
-			await client.query(`INSERT into words(word, status) VALUES ('${rw}', true)`);
+			await client.query(`INSERT INTO words (word, status) VALUES ('${rw}', true)`);
 			await client.query('DELETE FROM users');
-			return;
+		} else {
+			continue;
+		}
+	}
+}
+
+/**
+ * Creates a new word that will be used in the game
+ */
+export async function newWord(): Promise<void> {
+	const words: string[] = fs.readFileSync('src/words/wordsList.txt', 'utf8').split('\n');
+	const rw: string = words[Math.floor(Math.random() * words.length)].replace('\r', '');
+
+	for (let i = 0; i < words.length; i++) {
+		const word: QueryResult<WordRow> = await client.query(`SELECT word, status FROM words WHERE word = '${rw}'`);
+
+		if (word.rowCount === 0) {
+			await client.query('DELETE FROM words WHERE status = true');
+			await client.query(`INSERT INTO words (word, status) VALUES ('${rw}', true)`);
+			await client.query('DELETE FROM users');
 		} else {
 			continue;
 		}

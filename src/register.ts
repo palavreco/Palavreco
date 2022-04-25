@@ -15,7 +15,7 @@ fs.readdirSync('./src/commands').forEach(file => {
 		const cmdInstance: Command = new command.default();
 		const { commandStructure, dev } = cmdInstance;
 
-		fetch(`https://discord.com/api/v10/applications/${CLIENT_ID}${dev ? '' : `/guilds/${GUILD_ID}`}/commands`, {
+		fetch(`https://discord.com/api/v10/applications/${CLIENT_ID}${dev ? `/guilds/${GUILD_ID}` : ''}/commands`, {
 			method: 'POST',
 			headers: {
 				Authorization: `Bot ${TOKEN}`,
