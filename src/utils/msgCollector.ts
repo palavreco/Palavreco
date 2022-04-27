@@ -5,7 +5,7 @@ export function awaitMessage(interaction: CommandInteraction) {
 
 	const sendedMessage = interaction.channel!.awaitMessages({ max: 1, filter }).then(msg => {
 		return {
-			content: msg.first()!.content.toLocaleLowerCase().trim() ?? '',
+			content: msg.first()?.content.toLocaleLowerCase().trim() ?? '',
 			message: msg.first(),
 		};
 	});

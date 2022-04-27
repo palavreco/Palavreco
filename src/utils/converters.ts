@@ -30,7 +30,7 @@ export function toDefault(content: string) {
 		table[i + 1] = tableArr.splice(0, 5).join('');
 	}
 
-	return Object.values(table).map(line => line).join('\n');
+	return Object.values(table).join('\n');
 }
 
 export function toEmoji(content: string, correct: string) {
@@ -44,25 +44,24 @@ export function toEmoji(content: string, correct: string) {
 		usedLetters.push(contentArr[i]);
 
 		if (contentArr[i] === correctArr[i]) {
-			emojiWord[i + 1] = letter.green[contentArr[i] as typeof alphabetType];
+			emojiWord[i + 1] = letter.green[contentArr[i] as alphabetType];
 		} else if (correctArr.includes(contentArr[i]) && contentArr[i] !== correctArr[i]) {
 			const caracterCountCorrect = correctArr.filter(car => car === contentArr[i]);
 			const caracterCountContent = usedLetters.filter(car => car === contentArr[i]);
 
 			if (caracterCountContent.length > caracterCountCorrect.length) {
-				emojiWord[i + 1] = letter.gray[contentArr[i] as typeof alphabetType];
+				emojiWord[i + 1] = letter.gray[contentArr[i] as alphabetType];
 			} else {
-				emojiWord[i + 1] = letter.yellow[contentArr[i] as typeof alphabetType];
+				emojiWord[i + 1] = letter.yellow[contentArr[i] as alphabetType];
 			}
 		} else if (contentArr[i] !== correctArr[i]) {
-			emojiWord[i + 1] = letter.gray[contentArr[i] as typeof alphabetType];
+			emojiWord[i + 1] = letter.gray[contentArr[i] as alphabetType];
 		}
 	}
 
-	return Object.values(emojiWord).map(emoji => emoji).join('');
+	return Object.values(emojiWord).join('');
 }
 
-// I need suggestions, it is 🤮 (this is needed because in the line 40, for example,
-// it gives an error that conrrectArr is a string, but it should be one of the below)
-// eslint-disable-next-line max-len
-let alphabetType: 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z';
+type alphabetType =
+	| 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm'
+	| 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z';

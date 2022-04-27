@@ -1,4 +1,3 @@
-/* eslint-disable no-trailing-spaces */
 import fs from 'node:fs';
 import dotenv from 'dotenv';
 import { ActivityOptions, Client, Collection, Guild, MessageEmbed, TextChannel } from 'discord.js';
@@ -9,6 +8,7 @@ import { runAtMidnight } from './utils/runner';
 dotenv.config();
 
 const client = new Client({ intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS'] });
+let cLog: TextChannel;
 
 client.once('ready', () => {
 	log('Client is ready', 'BOT', 'green');
@@ -24,24 +24,24 @@ client.once('ready', () => {
 		const activity = ac[Math.floor(Math.random() * ac.length)];
 		client.user!.setActivity({ name: activity.name, type: activity.type });
 	}, 900_000);
-});
 
-const cLog = client.channels.cache.get(process.env.GUILD_UPDATE_CHANNEL) as TextChannel;
+	cLog = client.channels.cache.get(process.env.GUILD_UPDATE_CHANNEL) as TextChannel;
+});
 
 client.on('guildCreate', async (guild: Guild) => {
 	const { createdTimestamp, ownerId, memberCount, name, id } = guild;
 
-	const owner = await guild.fetchOwner().then(o => o.user.tag);
+	const owner = await guild.fetchOwner();
 	const embed = new MessageEmbed()
 		.setAuthor({ name: `${name} (${id})` }).setTitle('Novo servidor!')
 		.addFields(
-			{ name: 'Dono', value: `\`${owner}\` (${ownerId})`, inline: true },
+			{ name: 'Dono', value: `\`${owner.user.tag}\` (${ownerId})`, inline: true },
 			{ name: 'Membros', value: `${memberCount}`, inline: true },
 			{ name: 'Criado em', value: `<t:${Math.floor(createdTimestamp / 1000)}>`, inline: true },
 		).setFooter({ text: `Agora estou em ${client.guilds.cache.size} servidores!` }).setColor('#2f3136');
 
 	cLog.send({ embeds: [embed] });
-	log(`Joined in ${name} (${id})`, 'BOT', 'blue');
+	log(`Joined ${name} (${id})`, 'BOT', 'blue');
 });
 
 client.on('guildDelete', async (guild: Guild) => {
@@ -55,7 +55,7 @@ client.on('guildDelete', async (guild: Guild) => {
 		).setFooter({ text: `Agora estou em ${client.guilds.cache.size} servidores!` }).setColor('#2f3136');
 
 	cLog.send({ embeds: [embed] });
-	log(`Leaved from ${name} (${id})`, 'BOT', 'red');
+	log(`Left ${name} (${id})`, 'BOT', 'red');
 });
 
 const botCmds: Collection<string, Command> = new Collection();

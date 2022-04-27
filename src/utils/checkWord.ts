@@ -10,7 +10,9 @@ export async function isValid(word: string) {
 
 	let valid = false;
 	for await (const line of readLine) {
-		line === word ? valid = true : null;
+		if (line === word) {
+			valid = true;
+		}
 	}
 
 	return valid;

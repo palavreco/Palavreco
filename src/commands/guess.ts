@@ -1,19 +1,18 @@
 /* eslint-disable max-len */
-// pls suggestions, i want make some kind of json file containing all the replies (it would make the translation easier)
 import dayjs from 'dayjs';
 import { CommandInteraction, MessageActionRow, MessageButton } from 'discord.js';
 import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
-import { checkOrRegisterUser, getDay, getWord, played } from '../database';
+import { isUserInDB, registerUser, getDay, getWord, setPlayed } from '../database';
 import { runAtMidnight } from '../utils/runner';
 import { awaitMessage } from '../utils/msgCollector';
 import { isValid } from '../utils/checkWord';
 import { toDefault, toEmoji } from '../utils/converters';
 import { plataform } from '../utils/plataform';
 import { hasPermissions } from '../utils/permissions';
-import { square } from '../utils/emotes.json';
+import { square, check } from '../utils/emotes.json';
 
-let usersTries: Record<string, Record<string, string | string[]>> = {};
+let usersTries: Record<string, { id: string, attempts: string[] }> = {};
 let activeGames: string[] = [];
 
 runAtMidnight(() => {
@@ -31,20 +30,27 @@ export default class Guess implements Command {
 
 	async execute(interaction: CommandInteraction) {
 		const { user, channel } = interaction;
+		const { has, missing } = hasPermissions(interaction, ['MANAGE_MESSAGES', 'USE_EXTERNAL_EMOJIS']);
 
-		if (!hasPermissions(interaction, ['MANAGE_MESSAGES', 'USE_EXTERNAL_EMOJIS'])) return;
+		if (!has) {
+			const perms = missing.map(p => `**\`${p}\`**`).join(' ');
+			interaction.reply(`${check.red} É preciso da permissão ${perms} para executar esse comando.`);
+		}
 
-		if (await checkOrRegisterUser(user.id)) {
+		if (await isUserInDB(user.id)) {
 			const t = dayjs().tz('America/Sao_Paulo').endOf('day').unix();
 			interaction.reply({
 				'content': `Você já jogou hoje!\nTempo restante até a próxima palavra: <t:${t}:R>`,
 				'ephemeral': true,
 			});
+
 			return;
+		} else {
+			registerUser(user.id);
 		}
 
 
-		const gameMessage: Record<number, string> = Object.create(null);
+		const gameMessage: Record<number, string> = Object.create({});
 		for (let i = 0; i < 6; i++) gameMessage[i + 1] = square.gray.repeat(5);
 
 		function table(): string {
@@ -55,16 +61,20 @@ export default class Guess implements Command {
 				}
 			}
 
-			return Object.values(gameMessage).map(line => line).join('\n');
+			return Object.values(gameMessage).join('\n');
 		}
 
 
-		const playingUser: Record<string, string | string[]> = { id: user.id, attempts: [] };
+		const playingUser: { id: string, attempts: string[] } = { id: user.id, attempts: [] };
 		const correctWord = await getWord();
 
 		let i = 0;
 		if (activeGames.includes(user.id)) {
-			await interaction.reply('Você já está jogando!\nSe a mensagem não aparece mais, mande `cancelar` no canal e tente novamente.');
+			await interaction.reply({
+				'content': 'Você já está jogando!\nSe a mensagem não aparece mais, mande `cancelar` no canal e tente novamente.',
+				'ephemeral': true,
+			});
+
 			return;
 		} else {
 			activeGames.push(user.id);
@@ -75,7 +85,11 @@ export default class Guess implements Command {
 			});
 
 			const u = usersTries[user.id];
-			u ? i = u.attempts.length : usersTries[user.id] = playingUser;
+			if (u) {
+				i = u.attempts.length;
+			} else {
+				usersTries[user.id] = playingUser;
+			}
 		}
 
 		for (i; i < 6; i++) {
@@ -94,7 +108,7 @@ export default class Guess implements Command {
 				await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! 👀\n\n${table()}\n**Atenção:** A palavra deve ter 5 letras!`);
 
 				i--;
-			} else if (await isValid(word) === false) {
+			} else if (!await isValid(word)) {
 				await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! 👀\n\n${table()}\n**Atenção:** A palavra não é válida!`);
 
 				i--;
@@ -109,7 +123,7 @@ export default class Guess implements Command {
 
 				if (word === correctWord) {
 					await interaction.editReply(`Parabéns, você acertou em ${i + 1} tentativas! :tada:\n\n${table()}`);
-					played(user.id);
+					setPlayed(user.id);
 
 					activeGames.splice(activeGames.indexOf(user.id), 1);
 					delete usersTries[user.id];
@@ -120,21 +134,27 @@ export default class Guess implements Command {
 					});
 
 					if (await plataform(interaction) === 'pc-ios') {
-						await msg.edit({ 'content': `Jogo de <@${user.id}>:`, 'components': [] });
-						await channel!.send(`Joguei palavreco.com #${await getDay()} ${i + 1}/6\n\n${toDefault(table())}`);
+						await msg.delete();
+
+						[`Jogo de <@${user.id}>:`, `Joguei palavreco.com #${await getDay()} ${i + 1}/6\n\n${toDefault(table())}`].map(reply => {
+							channel!.send(reply);
+						});
 					} else {
-						await msg.edit({ 'content': `Jogo de <@${user.id}>:`, 'components': [] });
-						await channel!.send(`\`\`\`\nJoguei palavreco.com #${await getDay()} ${i + 1}/6\n\n${toDefault(table())}\n\`\`\``);
+						await msg.delete();
+
+						[`Jogo de <@${user.id}>:`, `\`\`\`\nJoguei palavreco.com #${await getDay()} ${i + 1}/6\n\n${toDefault(table())}\n\`\`\``].map(reply => {
+							channel!.send(reply);
+						});
 					}
 
-					i = 7;
+					break;
 				} else {
 					await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! 👀\n\n${table()}`);
 
 					if (i === 5) {
 						await interaction.editReply(`${table()}\n\nVocê perdeu, a palavra era **${correctWord}**. :frowning:\nQuem sabe na próxima você consegue!`);
 
-						played(user.id);
+						setPlayed(user.id);
 
 						activeGames.splice(activeGames.indexOf(user.id), 1);
 						delete usersTries[user.id];
@@ -145,12 +165,17 @@ export default class Guess implements Command {
 						});
 
 						if (await plataform(interaction) === 'pc-ios') {
-							await msg.edit({ content: `Jogo de <@${user.id}>:`, components: [] });
-							await channel!.send(`Joguei palavreco.com #${await getDay()} X/6\n\n${toDefault(table())}`);
-						}
-						else {
-							await msg.edit({ content: `Jogo de <@${user.id}>:`, components: [] });
-							await channel!.send(`\`\`\`Joguei palavreco.com #${await getDay()} X/6\n\n${toDefault(table())}\`\`\``);
+							await msg.delete();
+
+							[`Jogo de <@${user.id}>:`, `Joguei palavreco.com #${await getDay()} X/6\n\n${toDefault(table())}`].map(reply => {
+								channel!.send(reply);
+							});
+						} else {
+							await msg.delete();
+
+							[`Jogo de <@${user.id}>:`, `\`\`\`\nJoguei palavreco.com #${await getDay()} X/6\n\n${toDefault(table())}\n\`\`\``].map(reply => {
+								channel!.send(reply);
+							});
 						}
 
 						return;
