@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { ActivityOptions, Client, Collection, Guild, MessageEmbed, TextChannel } from 'discord.js';
 import { Command } from './interfaces/Command';
 import { newDay, setUp } from './database';
+import { hasPermissions } from './utils/permissions';
 import { log } from './utils/log';
 import { runAtMidnight } from './utils/runner';
 dotenv.config();
@@ -75,7 +76,12 @@ client.on('interactionCreate', i => {
 	if (!i.isCommand()) return;
 
 	const command = botCmds.get(i.commandName);
-	if (command) command.execute(i);
+
+	if (command) {
+		if (!hasPermissions(command.permissions!, i)) return;
+
+		command.execute(i);
+	}
 });
 
 client.login(process.env.TOKEN);

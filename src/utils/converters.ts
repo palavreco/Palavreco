@@ -41,21 +41,22 @@ export function toEmoji(content: string, correct: string) {
 	for (let i = 0; i < 6; i++) emojiWord[i + 1] = '';
 
 	for (let i = 0; i < contentArr.length; i++) {
-		usedLetters.push(contentArr[i]);
+		const c = contentArr[i];
+		usedLetters.push(c);
 
-		if (contentArr[i] === correctArr[i]) {
-			emojiWord[i + 1] = letter.green[contentArr[i] as alphabetType];
-		} else if (correctArr.includes(contentArr[i]) && contentArr[i] !== correctArr[i]) {
-			const caracterCountCorrect = correctArr.filter(car => car === contentArr[i]);
-			const caracterCountContent = usedLetters.filter(car => car === contentArr[i]);
+		if (c === correctArr[i]) {
+			emojiWord[i + 1] = letter.green[c as alphabetType];
+		} else if (correctArr.includes(c) && c !== correctArr[i]) {
+			const caracterCountCorrect = correctArr.filter(car => car === c);
+			const caracterCountContent = usedLetters.filter(car => car === c);
 
 			if (caracterCountContent.length > caracterCountCorrect.length) {
-				emojiWord[i + 1] = letter.gray[contentArr[i] as alphabetType];
+				emojiWord[i + 1] = letter.gray[c as alphabetType];
 			} else {
-				emojiWord[i + 1] = letter.yellow[contentArr[i] as alphabetType];
+				emojiWord[i + 1] = letter.yellow[c as alphabetType];
 			}
-		} else if (contentArr[i] !== correctArr[i]) {
-			emojiWord[i + 1] = letter.gray[contentArr[i] as alphabetType];
+		} else if (c !== correctArr[i]) {
+			emojiWord[i + 1] = letter.gray[c as alphabetType];
 		}
 	}
 

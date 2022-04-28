@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import dayjs from 'dayjs';
-import { CommandInteraction, MessageActionRow, MessageButton } from 'discord.js';
+import { CommandInteraction, MessageActionRow, MessageButton, PermissionString } from 'discord.js';
 import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
 import { isUserInDB, registerUser, getDay, getWord, setPlayed } from '../database';
@@ -9,8 +9,7 @@ import { awaitMessage } from '../utils/msgCollector';
 import { isValid } from '../utils/checkWord';
 import { toDefault, toEmoji } from '../utils/converters';
 import { plataform } from '../utils/plataform';
-import { hasPermissions } from '../utils/permissions';
-import { square, check } from '../utils/emotes.json';
+import { square } from '../utils/emotes.json';
 
 let usersTries: Record<string, { id: string, attempts: string[] }> = {};
 let activeGames: string[] = [];
@@ -28,14 +27,10 @@ export default class Guess implements Command {
 
 	dev = true;
 
+	permissions: PermissionString[] = ['MANAGE_MESSAGES'];
+
 	async execute(interaction: CommandInteraction) {
 		const { user, channel } = interaction;
-		const { has, missing } = hasPermissions(interaction, ['MANAGE_MESSAGES', 'USE_EXTERNAL_EMOJIS']);
-
-		if (!has) {
-			const perms = missing.map(p => `**\`${p}\`**`).join(' ');
-			interaction.reply(`${check.red} É preciso da permissão ${perms} para executar esse comando.`);
-		}
 
 		if (await isUserInDB(user.id)) {
 			const t = dayjs().tz('America/Sao_Paulo').endOf('day').unix();
