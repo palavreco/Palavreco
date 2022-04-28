@@ -3,6 +3,7 @@ import { ApplicationCommandOptionType, RESTPostAPIChatInputApplicationCommandsJS
 import { Command } from '../interfaces/Command';
 import { check } from '../utils/emotes.json';
 import { resetUser } from '../database';
+import { share } from '../utils/shareReply';
 
 export default class Reset implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
@@ -22,12 +23,17 @@ export default class Reset implements Command {
 
 	async execute(interaction: CommandInteraction) {
 		const user = interaction.options.getUser('user');
-		const { id, tag } = user!;
 
-		if (await resetUser(id)) {
-			interaction.reply(`${check.green} **${tag}** (\`${id}\`) foi resetado!`);
+		if (await resetUser(user!.id)) {
+			interaction.reply(share('user_reseted', {
+				greenTick: check.green,
+				user: user!,
+			}));
 		} else {
-			interaction.reply(`${check.red} **${tag}** (\`${id}\`) já está resetado!`);
+			interaction.reply(share('user_already_reseted', {
+				redTick: check.red,
+				user: user!,
+			}));
 		}
 	}
 }

@@ -1,0 +1,6 @@
+{
+    "help": "**Como jogar?**\nTente acertar a palavra em *6 tentativas*!\nPara cada uma das tentativas é preciso o envio de uma mensagem que contenha uma palavra válida de 5 letras.\nApós cada tentativa, a cor dos emojis mudará para mostrar o quão perto você estava.\n\n**Exemplos:**\n🇹 {{e}} 🇲 🇴 🇷\nA letra **E** está na palavra e no lugar certo.\n🇨 🇴 {{i}} 🇸 🇦\nA letra **I** está na palavra mas no lugar errado.\n🇦 🇹 🇮 {{v}} 🇴\nA letra **V** não está na palavra.\n\nUma palavra nova estará disponível todos os dias!",
+    "word_changed": "{{greenTick}} Palavra do dia alterada com sucesso!",
+    "user_already_reseted": "{{redTick}} **{{user.tag}}** (`{{user.id}}`) já está resetado!",
+    "user_reseted": "{{greenTick}} **{{user.tag}}** (`{{user.id}}`) foi resetado!"
+}

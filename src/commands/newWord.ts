@@ -3,6 +3,7 @@ import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-typ
 import { Command } from '../interfaces/Command';
 import { newDay } from '../database';
 import { check } from '../utils/emotes.json';
+import { share } from '../utils/shareReply';
 
 export default class NewWord implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
@@ -14,6 +15,8 @@ export default class NewWord implements Command {
 
 	execute(interaction: CommandInteraction) {
 		newDay(true);
-		interaction.reply(`${check.green} Palavra do dia alterada com sucesso!`);
+		interaction.reply(share('word_changed', {
+			greenTick: check.green,
+		}));
 	}
 }
