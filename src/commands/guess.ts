@@ -1,15 +1,15 @@
-/* eslint-disable max-len */
 import dayjs from 'dayjs';
 import { CommandInteraction, MessageActionRow, MessageButton, PermissionString } from 'discord.js';
 import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
+import { t } from '../utils/replyHelper';
 import { isUserInDB, registerUser, getDay, getWord, setPlayed } from '../database';
 import { runAtMidnight } from '../utils/runner';
 import { awaitMessage } from '../utils/msgCollector';
 import { isValid } from '../utils/checkWord';
 import { toDefault, toEmoji } from '../utils/converters';
 import { plataform } from '../utils/plataform';
-import { square } from '../utils/emotes.json';
+import { check, square } from '../utils/emotes.json';
 
 let usersTries: Record<string, { id: string, attempts: string[] }> = {};
 let activeGames: string[] = [];
@@ -33,10 +33,10 @@ export default class Guess implements Command {
 		const { user, channel } = interaction;
 
 		if (await isUserInDB(user.id)) {
-			const t = dayjs().tz('America/Sao_Paulo').endOf('day').unix();
 			interaction.reply({
-				'content': `Você já jogou hoje!\nTempo restante até a próxima palavra: <t:${t}:R>`,
-				'ephemeral': true,
+				content: t('already_played', {
+					redTick: check.red, timestamp: dayjs().tz('America/Sao_Paulo').endOf('day').unix(),
+				}), ephemeral: true,
 			});
 
 			return;
@@ -45,14 +45,18 @@ export default class Guess implements Command {
 		}
 
 
-		const gameMessage: Record<number, string> = Object.create({});
+		const gameMessage: Record<number, string> = {};
 		for (let i = 0; i < 6; i++) gameMessage[i + 1] = square.gray.repeat(5);
 
 		function table(): string {
 			const u = usersTries[user.id];
 			if (u) {
 				for (let i = 0; i < 6; i++) {
-					u.attempts[i] ? gameMessage[i + 1] = u.attempts[i] : gameMessage[i + 1] = square.gray.repeat(5);
+					if (u.attempts[i]) {
+						gameMessage[i + 1] = u.attempts[i];
+					} else {
+						gameMessage[i + 1] = square.gray.repeat(5);
+					}
 				}
 			}
 
@@ -62,22 +66,17 @@ export default class Guess implements Command {
 
 		const playingUser: { id: string, attempts: string[] } = { id: user.id, attempts: [] };
 		const correctWord = await getWord();
+		const day = await getDay();
 
 		let i = 0;
 		if (activeGames.includes(user.id)) {
-			await interaction.reply({
-				'content': 'Você já está jogando!\nSe a mensagem não aparece mais, mande `cancelar` no canal e tente novamente.',
-				'ephemeral': true,
-			});
+			await interaction.reply({ content: t('already_playing', { redTick: check.red }), ephemeral: true });
 
 			return;
 		} else {
 			activeGames.push(user.id);
 
-			await interaction.reply({
-				'content': `Adivinhe o **PALAVRECO** de hoje! 👀\n\n${table()}\nPara cancelar o jogo, digite \`cancelar\``,
-				'ephemeral': true,
-			});
+			await interaction.reply({ content: t('game_message', { table: table() }), ephemeral: true });
 
 			const u = usersTries[user.id];
 			if (u) {
@@ -100,11 +99,11 @@ export default class Guess implements Command {
 
 				i = 7;
 			} else if (word.length != 5) {
-				await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! 👀\n\n${table()}\n**Atenção:** A palavra deve ter 5 letras!`);
+				await interaction.editReply(t('not_five_letters', { table: table() }));
 
 				i--;
 			} else if (!await isValid(word)) {
-				await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! 👀\n\n${table()}\n**Atenção:** A palavra não é válida!`);
+				await interaction.editReply(t('invalid_word', { table: table() }));
 
 				i--;
 			} else {
@@ -117,60 +116,58 @@ export default class Guess implements Command {
 				if (Array.isArray(attempts)) attempts.push(toEmoji(word, correctWord));
 
 				if (word === correctWord) {
-					await interaction.editReply(`Parabéns, você acertou em ${i + 1} tentativas! :tada:\n\n${table()}`);
+					await interaction.editReply(t('game_win', { attempts: i + 1, table: table() }));
 					setPlayed(user.id);
 
 					activeGames.splice(activeGames.indexOf(user.id), 1);
 					delete usersTries[user.id];
 
-					const msg = await channel!.send({
-						'content': `<@${user.id}> Pressione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`,
-						'components': [row],
-					});
+					const msg = await channel!.send({ content: t('plataform_ask', { user }), components: [row] });
 
 					if (await plataform(interaction) === 'pc-ios') {
 						await msg.delete();
 
-						[`Jogo de <@${user.id}>:`, `Joguei palavreco.com #${await getDay()} ${i + 1}/6\n\n${toDefault(table())}`].map(reply => {
-							channel!.send(reply);
-						});
+						await channel!.send(t('identifier', { user }));
+						await channel!.send(t('game_result_win', {
+							day, attempts: i + 1, finalTable: toDefault(table()),
+						}));
 					} else {
 						await msg.delete();
 
-						[`Jogo de <@${user.id}>:`, `\`\`\`\nJoguei palavreco.com #${await getDay()} ${i + 1}/6\n\n${toDefault(table())}\n\`\`\``].map(reply => {
-							channel!.send(reply);
-						});
+						await channel!.send(t('identifier', { user }));
+						await channel!.send('```' + t('game_result_win', {
+							day, attempts: i + 1, finalTable: toDefault(table()),
+						}) + '```');
 					}
 
 					break;
 				} else {
-					await interaction.editReply(`Adivinhe o **PALAVRECO** de hoje! 👀\n\n${table()}`);
+					await interaction.editReply(t('game_message', { table: table() }));
 
 					if (i === 5) {
-						await interaction.editReply(`${table()}\n\nVocê perdeu, a palavra era **${correctWord}**. :frowning:\nQuem sabe na próxima você consegue!`);
+						await interaction.editReply(t('game_lose', { table: table(), cw: correctWord.toUpperCase() }));
 
 						setPlayed(user.id);
 
 						activeGames.splice(activeGames.indexOf(user.id), 1);
 						delete usersTries[user.id];
 
-						const msg = await channel!.send({
-							'content': `<@${user.id}> Pressione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!`,
-							'components': [row],
-						});
+						const msg = await channel!.send({ content: t('plataform_ask', { user }), components: [row] });
 
 						if (await plataform(interaction) === 'pc-ios') {
 							await msg.delete();
 
-							[`Jogo de <@${user.id}>:`, `Joguei palavreco.com #${await getDay()} X/6\n\n${toDefault(table())}`].map(reply => {
-								channel!.send(reply);
-							});
+							await channel!.send(t('identifier', { user }));
+							await channel!.send(t('game_result_lose', {
+								day, attempts: i + 1, finalTable: toDefault(table()),
+							}));
 						} else {
 							await msg.delete();
 
-							[`Jogo de <@${user.id}>:`, `\`\`\`\nJoguei palavreco.com #${await getDay()} X/6\n\n${toDefault(table())}\n\`\`\``].map(reply => {
-								channel!.send(reply);
-							});
+							await channel!.send(t('identifier', { user }));
+							await channel!.send('```' + t('game_result_lose', {
+								day, attempts: i + 1, finalTable: toDefault(table()),
+							}) + '```');
 						}
 
 						return;

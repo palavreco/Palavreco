@@ -1,9 +1,9 @@
 import { CommandInteraction } from 'discord.js';
 import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
-import { newDay } from '../database';
+import { newWord } from '../database';
 import { check } from '../utils/emotes.json';
-import { share } from '../utils/shareReply';
+import { t } from '../utils/replyHelper';
 
 export default class NewWord implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
@@ -14,8 +14,8 @@ export default class NewWord implements Command {
 	dev = true;
 
 	execute(interaction: CommandInteraction) {
-		newDay(true);
-		interaction.reply(share('word_changed', {
+		newWord(true);
+		interaction.reply(t('word_changed', {
 			greenTick: check.green,
 		}));
 	}

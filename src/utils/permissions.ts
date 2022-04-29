@@ -1,4 +1,5 @@
 import { CommandInteraction, PermissionString, TextChannel } from 'discord.js';
+import { t } from './replyHelper';
 import { check } from './emotes.json';
 
 export function hasPermissions(
@@ -14,11 +15,10 @@ export function hasPermissions(
 	const missingPermissions = (permissions.filter((p, i) => !permissionsBooleans[i])).map(p => `\`${p}\``);
 
 	if (permissionsBooleans.includes(false)) {
-		interaction.reply([
-			`${check.red} Eu não tenho permissão para executar este comando, `,
-			'por favor edite meu cargo a partir das informações abaixo.\n',
-			`**Permissões necessárias: ${missingPermissions.join(' ')}**`,
-		].join(''));
+		interaction.reply(t('missing_permissions', {
+			redTick: check.red,
+			perms: missingPermissions.join(' '),
+		}));
 
 		return false;
 	} else {

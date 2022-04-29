@@ -76,7 +76,7 @@ export async function resetUser(id: string): Promise<boolean> {
  * Deletes/replaces the word in the database to a new one be used and resets all the users
  * @param replace Wheter to replace the word
  */
-export async function newDay(replace = false): Promise<void> {
+export async function newWord(replace = false): Promise<void> {
 	const words: string[] = fs.readFileSync('src/words/wordsList.txt', 'utf8').split('\n');
 	const rw: string = words[Math.floor(Math.random() * words.length)].replace('\r', '');
 

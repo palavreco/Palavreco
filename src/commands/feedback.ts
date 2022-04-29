@@ -14,6 +14,7 @@ import {
 	RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
+import { t } from '../utils/replyHelper';
 import { check, letter } from '../utils/emotes.json';
 
 export default class FeedBack implements Command {
@@ -70,9 +71,9 @@ export default class FeedBack implements Command {
 
 		const colResp = await collector(channel, interaction);
 		const confirmed = colResp === 'confirm';
-		await interaction.editReply({
-			content: confirmed ? `${check.green} Operação concluída. Obrigado!` : `${check.red} Operação cancelada.`,
-			embeds: [], components: [],
+		await interaction.editReply({ content: confirmed
+			? t('success_operation', { greenTick: check.green })
+			: t('canceled_operation', { redTick: check.red }), embeds: [], components: [],
 		});
 
 		if (confirmed) {
@@ -117,11 +118,11 @@ function handleOperation(msg: Message, embed: MessageEmbed, isSug: boolean) {
 			await msg.edit({ embeds: [embed] });
 			await msg.pin();
 
-			u.send([
-				`${letter.green.p} Olá! Obrigado ${isSug ? 'pela sugestão' : 'por reportar o bug'}.`,
-				'**A equipe de desenvolvedores agradece!**',
-			].join(' ')).catch(() => {
-				msg.channel.send('Não foi possível enviar a mensagem na dm do usuário.');
+			u.send(t('feedback_thanks', {
+				p: letter.green.p,
+				part: isSug ? 'pela sugestão' : 'pelo reporte',
+			})).catch(() => {
+				msg.channel.send(t('closed_dm', { redTick: check.red }));
 			});
 
 			break;
@@ -141,11 +142,12 @@ function handleOperation(msg: Message, embed: MessageEmbed, isSug: boolean) {
 				.setFooter({ text: `${embed.footer?.text} - Respondido por ${u.tag}`, iconURL: u.displayAvatarURL() });
 			await msg.edit({ embeds: [embed] });
 
-			u.send([
-				`${letter.green.p} Olá! Obrigado ${isSug ? 'pela sugestão' : 'por reportar o bug'}.`,
-				`A equipe de desenvolvedores te respondeu.\n\n**Resposta:** ${ans?.content}`,
-			].join(' ')).catch(() => {
-				msg.channel.send('Não foi possível enviar a mensagem na dm do usuário.');
+			u.send(t('feedback_thanks_answer', {
+				p: letter.green.p,
+				part: isSug ? 'pela sugestão' : 'pelo reporte',
+				answer: ans!.content,
+			})).catch(() => {
+				msg.channel.send(t('closed_dm', { redTick: check.red }));
 			});
 
 			ans?.delete();

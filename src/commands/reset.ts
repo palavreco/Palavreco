@@ -1,9 +1,9 @@
 import { CommandInteraction } from 'discord.js';
 import { ApplicationCommandOptionType, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
-import { check } from '../utils/emotes.json';
 import { resetUser } from '../database';
-import { share } from '../utils/shareReply';
+import { t } from '../utils/replyHelper';
+import { check } from '../utils/emotes.json';
 
 export default class Reset implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
@@ -25,12 +25,12 @@ export default class Reset implements Command {
 		const user = interaction.options.getUser('user');
 
 		if (await resetUser(user!.id)) {
-			interaction.reply(share('user_reseted', {
+			interaction.reply(t('user_reseted', {
 				greenTick: check.green,
 				user: user!,
 			}));
 		} else {
-			interaction.reply(share('user_already_reseted', {
+			interaction.reply(t('user_already_reseted', {
 				redTick: check.red,
 				user: user!,
 			}));

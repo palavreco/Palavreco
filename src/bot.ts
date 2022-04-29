@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import dotenv from 'dotenv';
 import { ActivityOptions, Client, Collection, Guild, MessageEmbed, TextChannel } from 'discord.js';
 import { Command } from './interfaces/Command';
-import { newDay, setUp } from './database';
+import { newWord, setUp } from './database';
 import { hasPermissions } from './utils/permissions';
 import { log } from './utils/log';
 import { runAtMidnight } from './utils/runner';
@@ -88,6 +88,6 @@ client.login(process.env.TOKEN);
 setUp();
 
 runAtMidnight(() => {
-	newDay();
+	newWord();
 	log('New word & users reseted!', 'DB', 'purple');
 });

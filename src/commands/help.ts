@@ -1,8 +1,8 @@
 import { CommandInteraction } from 'discord.js';
 import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
+import { t } from '../utils/replyHelper';
 import { letter } from '../utils/emotes.json';
-import { share } from '../utils/shareReply';
 
 export default class Help implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
@@ -13,7 +13,7 @@ export default class Help implements Command {
 	dev = false;
 
 	execute(interaction: CommandInteraction) {
-		interaction.reply(share('help', {
+		interaction.reply(t('help', {
 			e: letter.green.e,
 			i: letter.yellow.i,
 			v: letter.gray.v,
