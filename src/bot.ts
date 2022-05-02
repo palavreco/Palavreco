@@ -4,8 +4,10 @@ import { ActivityOptions, Client, Collection, Guild, MessageEmbed, TextChannel }
 import { Command } from './interfaces/Command';
 import { newWord, setUp } from './database';
 import { hasPermissions } from './utils/permissions';
-import { log } from './utils/log';
 import { runAtMidnight } from './utils/runner';
+import { log } from './utils/log';
+import { t } from './utils/replyHelper';
+import { check } from './utils/emotes.json';
 dotenv.config();
 
 const client = new Client({ intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS'] });
@@ -78,7 +80,16 @@ client.on('interactionCreate', i => {
 	const command = botCmds.get(i.commandName);
 
 	if (command) {
-		if (!hasPermissions(command.permissions!, i)) return;
+		const { success, message } = hasPermissions(command.permissions!, i);
+
+		if (!success) {
+			i.reply(t('missing_permissions', {
+				redTick: check.red,
+				perms: message,
+			}));
+
+			return;
+		}
 
 		command.execute(i);
 	}

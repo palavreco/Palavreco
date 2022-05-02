@@ -1,17 +1,13 @@
 {
     "help": "**Como jogar?**\nTente acertar a palavra em *6 tentativas*!\nPara cada uma das tentativas é preciso o envio de uma mensagem que contenha uma palavra válida de 5 letras.\nApós cada tentativa, a cor dos emojis mudará para mostrar o quão perto você estava.\n\n**Exemplos:**\n🇹 {{e}} 🇲 🇴 🇷\nA letra **E** está na palavra e no lugar certo.\n🇨 🇴 {{i}} 🇸 🇦\nA letra **I** está na palavra mas no lugar errado.\n🇦 🇹 🇮 {{v}} 🇴\nA letra **V** não está na palavra.\n\nUma palavra nova estará disponível todos os dias!",
 
-    "word_changed": "{{greenTick}} Palavra do dia alterada com sucesso!",
-
-    "user_already_reseted": "{{redTick}} **{{user.tag}}** (`{{user.id}}`) já está resetado!",
-    "user_reseted": "{{greenTick}} **{{user.tag}}** (`{{user.id}}`) foi resetado!",
-
     "success_operation": "{{greenTick}} Operação concluída. Obrigado!",
     "cancelled_operation": "{{redTick}} Operação cancelada.",
 
     "feedback_thanks": "{{p}} Olá! Obrigado {{part}}. **A equipe de desenvolvedores agradece!**",
     "feedback_thanks_answer": "{{p}} Olá! Obrigado {{part}}. A equipe de desenvolvedores te respondeu.\n\n**Resposta:** {{answer}}",
-    "closed_dm": "{{redTick}} Não foi possível enviar a mensagem na dm do usuário.",
+    "feedback_sug": "pela sugestão",
+    "feedback_bug": "pelo reporte",
 
     "already_played": "{{redTick}} Você já jogou hoje!\nTempo restante até a próxima palavra: <t:{{timestamp}}:R>",
     "already_playing": "{{redTick}} Você já está jogando!\nSe a mensagem não aparece mais, mande `cancelar` no canal onde o jogo foi iniciado e tente novamente.",
@@ -28,5 +24,5 @@
     "game_result_win": "Joguei palavreco.com #{{day}} {{attempts}}/6\n\n{{finalTable}}",
     "game_result_lose": "Joguei palavreco.com #{{day}} X/6\n\n{{finalTable}}",
 
-    "missing_permissions": "{{redTick}} Eu não tenho permissão para executar este comando, por favor edite meu cargo a partir das informações abaixo.\n**Permissões necessárias: {{perms}}**"
+    "missing_permissions": "{{redTick}} Eu não tenho permissão para executar este comando, por favor edite meu cargo a partir das informações abaixo.\nPermissões necessárias: **{{perms}}**"
 }

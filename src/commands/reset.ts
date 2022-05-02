@@ -2,17 +2,16 @@ import { CommandInteraction } from 'discord.js';
 import { ApplicationCommandOptionType, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
 import { resetUser } from '../database';
-import { t } from '../utils/replyHelper';
 import { check } from '../utils/emotes.json';
 
 export default class Reset implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
 		'name': 'reset',
-		'description': 'Seta o status do usuário para false, ou seja, ele pode jogar novamente',
+		'description': 'Set the user status to false, i.e. the user can play again',
 		'options': [
 			{
 				'name': 'user',
-				'description': 'Usuário que será resetado',
+				'description': 'The user to reset',
 				'required': true,
 				'type': ApplicationCommandOptionType.User,
 			},
@@ -25,15 +24,9 @@ export default class Reset implements Command {
 		const user = interaction.options.getUser('user');
 
 		if (await resetUser(user!.id)) {
-			interaction.reply(t('user_reseted', {
-				greenTick: check.green,
-				user: user!,
-			}));
+			interaction.reply(`${check.green} **${user!.tag}** (${user!.id}) resetado!`);
 		} else {
-			interaction.reply(t('user_already_reseted', {
-				redTick: check.red,
-				user: user!,
-			}));
+			interaction.reply(`${check.red} **${user!.tag}** (${user!.id}) já foi resetado!`);
 		}
 	}
 }

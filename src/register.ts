@@ -23,7 +23,7 @@ fs.readdirSync('./src/commands').forEach(file => {
 			},
 			body: JSON.stringify(commandStructure),
 		}).then(res => {
-			if (res.status === 201) log(`${name} added!`, 'COMMANDS', 'blue');
+			if (res.status === 201) log(`${name} added/modified!`, 'COMMANDS', 'blue');
 		});
 	});
 });

@@ -1,27 +1,19 @@
-import { CommandInteraction, PermissionString, TextChannel } from 'discord.js';
-import { t } from './replyHelper';
-import { check } from './emotes.json';
+import { CommandInteraction, PermissionString } from 'discord.js';
 
 export function hasPermissions(
 	permissions: PermissionString[],
 	interaction: CommandInteraction,
-): boolean {
-	if (!permissions) return true;
+): { success: boolean, message?: string } {
+	if (!permissions) return { success: true };
 
-	const { user, channel } = interaction;
-	const c = channel as TextChannel;
+	const { guild } = interaction;
 
-	const permissionsBooleans = permissions.map(p => !c.permissionsFor(user)!.has(p));
+	const permissionsBooleans = permissions.map(p => guild!.me!.permissions.has(p));
 	const missingPermissions = (permissions.filter((p, i) => !permissionsBooleans[i])).map(p => `\`${p}\``);
 
 	if (permissionsBooleans.includes(false)) {
-		interaction.reply(t('missing_permissions', {
-			redTick: check.red,
-			perms: missingPermissions.join(' '),
-		}));
-
-		return false;
+		return { success: false, message: missingPermissions.join(' ') };
 	} else {
-		return true;
+		return { success: true };
 	}
 }

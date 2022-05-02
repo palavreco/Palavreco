@@ -112,42 +112,42 @@ function handleOperation(msg: Message, embed: MessageEmbed, isSug: boolean) {
 		switch (r.emoji.name) {
 		case '🟩': {
 			embed
-				.setTitle(isSug ? 'Sugestão aceita' : 'Reporte aceito')
+				.setTitle(isSug ? 'Suggestion accepted' : 'Report accepted')
 				.setColor('GREEN')
-				.setFooter({ text: `${embed.footer?.text} - Aceito por ${u.tag}`, iconURL: u.displayAvatarURL() });
+				.setFooter({ text: `${embed.footer?.text} - Accepted by ${u.tag}`, iconURL: u.displayAvatarURL() });
 			await msg.edit({ embeds: [embed] });
 			await msg.pin();
 
 			u.send(t('feedback_thanks', {
 				p: letter.green.p,
-				part: isSug ? 'pela sugestão' : 'pelo reporte',
+				part: isSug ? t('feedback_sug') : t('feedback_bug'),
 			})).catch(() => {
-				msg.channel.send(t('closed_dm', { redTick: check.red }));
+				msg.channel.send(`${check.red} **${u.tag}** can't receive DMs.`);
 			});
 
 			break;
 		}
 
 		case '🟨': {
-			const ask = await msg.channel.send('Escreva a resposta:');
+			const ask = await msg.channel.send('Write your answer:');
 
 			const f = (m: Message) => m.author.id === u.id && m.channel.id === msg.channel.id;
 			const ans = await msg.channel.awaitMessages({ filter: f, max: 1 }).then(m => m.first());
 			ask.delete();
 
 			embed
-				.setTitle(isSug ? 'Sugestão respondida' : 'Reporte respondido')
+				.setTitle(isSug ? 'Suggestion answered' : 'Report answered')
 				.setColor('YELLOW')
 				.addField('Resposta', ans!.content)
-				.setFooter({ text: `${embed.footer?.text} - Respondido por ${u.tag}`, iconURL: u.displayAvatarURL() });
+				.setFooter({ text: `${embed.footer?.text} - Answered by ${u.tag}`, iconURL: u.displayAvatarURL() });
 			await msg.edit({ embeds: [embed] });
 
 			u.send(t('feedback_thanks_answer', {
 				p: letter.green.p,
-				part: isSug ? 'pela sugestão' : 'pelo reporte',
+				part: isSug ? t('feedback_sug') : t('feedback_bug'),
 				answer: ans!.content,
 			})).catch(() => {
-				msg.channel.send(t('closed_dm', { redTick: check.red }));
+				msg.channel.send(`${check.red} **${u.tag}** can't receive DMs.`);
 			});
 
 			ans?.delete();
@@ -156,9 +156,9 @@ function handleOperation(msg: Message, embed: MessageEmbed, isSug: boolean) {
 		}
 		case '🟥': {
 			embed
-				.setTitle(isSug ? 'Sugestão rejeitada' : 'Reporte rejeitado')
+				.setTitle(isSug ? 'Suggestion rejected' : 'Report rejected')
 				.setColor('RED')
-				.setFooter({ text: `${embed.footer?.text} - Rejeitado por ${u.tag}`, iconURL: u.displayAvatarURL() });
+				.setFooter({ text: `${embed.footer?.text} - Rejected by ${u.tag}`, iconURL: u.displayAvatarURL() });
 			await msg.edit({ embeds: [embed] });
 
 			break;

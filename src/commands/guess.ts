@@ -27,7 +27,7 @@ export default class Guess implements Command {
 
 	dev = true;
 
-	permissions: PermissionString[] = ['MANAGE_MESSAGES'];
+	permissions: PermissionString[] = ['MANAGE_MESSAGES', 'VIEW_CHANNEL'];
 
 	async execute(interaction: CommandInteraction) {
 		const { user, channel } = interaction;
@@ -35,7 +35,7 @@ export default class Guess implements Command {
 		if (await isUserInDB(user.id)) {
 			interaction.reply({
 				content: t('already_played', {
-					redTick: check.red, timestamp: dayjs().tz('America/Sao_Paulo').endOf('day').unix(),
+					redTick: check.red, timestamp: dayjs().tz('America/Sao_Paulo').endOf('day').unix() + 1,
 				}), ephemeral: true,
 			});
 
