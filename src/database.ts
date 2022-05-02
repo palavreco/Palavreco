@@ -59,16 +59,18 @@ export function setPlayed(id: string): void {
 /**
  * Resets the user's status to false, meaning they can play again
  * @param id The user's ID
- * @returns Wheter the user is reseted
+ * @returns The user state before resetting
  */
-export async function resetUser(id: string): Promise<boolean> {
+export async function resetUser(id: string): Promise<string> {
 	const user: QueryResult<UserRow> = await client.query(`SELECT id, status FROM users WHERE id = '${id}'`);
 
-	if (user.rows[0].status) {
+	if (!user.rowCount) {
+		return 'dont_exist';
+	} else if (user.rows[0].status) {
 		await client.query(`UPDATE users SET status = false WHERE id = '${id}'`);
-		return true;
+		return 'reseted';
 	} else {
-		return false;
+		return 'already_reseted';
 	}
 }
 
