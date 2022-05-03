@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsnd --transpile-only src/bot.ts",
     "commands": "tsnd --transpile-only src/register.ts",
-    "postinstall": "npm run tsc",
+    "postinstall": "npm run compile",
     "compile": "tsc",
     "start": "node build/bot.js",
     "lint": "eslint src"
