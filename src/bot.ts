@@ -1,64 +1,35 @@
 import fs from 'node:fs';
 import dotenv from 'dotenv';
-import { ActivityOptions, Client, Collection, Guild, MessageEmbed, TextChannel } from 'discord.js';
+import { Client, Collection, Guild } from 'discord.js';
 import { Command } from './interfaces/Command';
 import { newWord, setUp } from './database';
 import { hasPermissions } from './utils/permissions';
 import { runAtMidnight } from './utils/runner';
 import { log } from './utils/log';
 import { t } from './utils/replyHelper';
+import { setUpPresence } from './utils/presence';
+import { notifyLogChannel } from './utils/guildLog';
 import { check } from './utils/emotes.json';
 dotenv.config();
 
 const client = new Client({ intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS'] });
-let cLog: TextChannel;
 
 client.once('ready', () => {
 	log('Client is ready', 'BOT', 'green');
 
-	client.user!.setActivity({ type: 'PLAYING', name: '/adivinhar' });
-
-	const ac: ActivityOptions[] = [
-		{ name: `em ${client.guilds.cache.size} servidores`, type: 'PLAYING' },
-		{ name: '/adivinhar', type: 'PLAYING' },
-		{ name: 'suas tentativas...', type: 'WATCHING' },
-	];
-	setInterval(() => {
-		const activity = ac[Math.floor(Math.random() * ac.length)];
-		client.user!.setActivity({ name: activity.name, type: activity.type });
-	}, 900_000);
-
-	cLog = client.channels.cache.get(process.env.GUILD_UPDATE_CHANNEL) as TextChannel;
+	setUpPresence(client);
 });
 
-client.on('guildCreate', async (guild: Guild) => {
-	const { createdTimestamp, ownerId, memberCount, name, id } = guild;
+client.on('guildCreate', (guild: Guild) => {
+	notifyLogChannel('join', guild, client);
 
-	const owner = await guild.fetchOwner();
-	const embed = new MessageEmbed()
-		.setAuthor({ name: `${name} (${id})` }).setTitle('Novo servidor!')
-		.addFields(
-			{ name: 'Dono', value: `\`${owner.user.tag}\` (${ownerId})`, inline: true },
-			{ name: 'Membros', value: `${memberCount}`, inline: true },
-			{ name: 'Criado em', value: `<t:${Math.floor(createdTimestamp / 1000)}>`, inline: true },
-		).setFooter({ text: `Agora estou em ${client.guilds.cache.size} servidores!` }).setColor('#2f3136');
-
-	cLog.send({ embeds: [embed] });
-	log(`Joined ${name} (${id})`, 'BOT', 'blue');
+	log(`Joined ${guild.name} (${guild.id})`, 'BOT', 'blue');
 });
 
-client.on('guildDelete', async (guild: Guild) => {
-	const { ownerId, name, id } = guild;
+client.on('guildDelete', (guild: Guild) => {
+	notifyLogChannel('leave', guild, client);
 
-	const owner = await guild.fetchOwner().then(o => o.user.tag);
-	const embed = new MessageEmbed()
-		.setAuthor({ name: `${name} (${id})` }).setTitle('Saí de um servidor :(')
-		.addFields(
-			{ name: 'Dono', value: `\`${owner}\` (${ownerId})`, inline: true },
-		).setFooter({ text: `Agora estou em ${client.guilds.cache.size} servidores!` }).setColor('#2f3136');
-
-	cLog.send({ embeds: [embed] });
-	log(`Left ${name} (${id})`, 'BOT', 'red');
+	log(`Left ${guild.name} (${guild.id})`, 'BOT', 'red');
 });
 
 const botCmds: Collection<string, Command> = new Collection();

@@ -28,15 +28,17 @@ export async function setUp(): Promise<void> {
 /**
  * Indicates whether this user is registered in the database
  * @param id The user id to check
- * @returns {Promise<boolean | undefined>} Whether the user is registered
+ * @returns {Promise<string>} Whether the user is registered
  */
-export async function isUserInDB(id: string): Promise<boolean | undefined> {
+export async function isUserInDB(id: string): Promise<string> {
 	const userRow: QueryResult<UserRow> = await client.query(`SELECT id, status FROM users WHERE id = '${id}'`);
 
 	if (!userRow.rowCount) {
-		return false;
+		return 'not_registered';
 	} else if (userRow.rows[0].status) {
-		return true;
+		return 'registered_active';
+	} else {
+		return 'registered_inactive';
 	}
 }
 

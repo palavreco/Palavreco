@@ -32,18 +32,16 @@ export default class Guess implements Command {
 	async execute(interaction: CommandInteraction) {
 		const { user, channel } = interaction;
 
-		if (await isUserInDB(user.id)) {
+		if (await isUserInDB(user.id) === 'not_registered') {
+			registerUser(user.id);
+		} else if (await isUserInDB(user.id) === 'registered_active') {
 			interaction.reply({
 				content: t('already_played', {
 					redTick: check.red, timestamp: dayjs().tz('America/Sao_Paulo').endOf('day').unix() + 1,
 				}), ephemeral: true,
 			});
-
 			return;
-		} else {
-			registerUser(user.id);
 		}
-
 
 		const gameMessage: Record<number, string> = {};
 		for (let i = 0; i < 6; i++) gameMessage[i + 1] = square.gray.repeat(5);

@@ -60,8 +60,9 @@ export default class FeedBack implements Command {
 
 		const confEmb = new MessageEmbed()
 			.setColor('#2f3136')
-			.setTitle(`Confirmar ${isSug ? 'sugestão' : 'reporte'}?`)
+			.setTitle(t('confirm_operaction', { part: isSug ? t('suggestion') : t('report') }))
 			.setDescription(content!);
+
 		const row = new MessageActionRow().addComponents(
 			new MessageButton().setCustomId('confirm').setLabel('✔').setStyle('SUCCESS'),
 			new MessageButton().setCustomId('cancel').setLabel('✖').setStyle('DANGER'),
@@ -82,9 +83,9 @@ export default class FeedBack implements Command {
 
 			const emb = new MessageEmbed()
 				.setColor('#2f3136')
-				.setTitle(isSug ? 'Nova sugestão' : 'Reporte de bug')
+				.setTitle(isSug ? 'New suggestion' : 'Bug report')
 				.setDescription(content!)
-				.setFooter({ text: `Enviado por ${user.tag} (${user.id})`, iconURL: user.displayAvatarURL() });
+				.setFooter({ text: `Sent by ${user.tag} (${user.id})`, iconURL: user.displayAvatarURL() });
 
 			const message = await c.send({ embeds: [emb] });
 			handleOperation(message, emb, isSug);
