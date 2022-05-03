@@ -74,7 +74,7 @@ export default class FeedBack implements Command {
 		const confirmed = colResp === 'confirm';
 		await interaction.editReply({ content: confirmed
 			? t('success_operation', { greenTick: check.green })
-			: t('canceled_operation', { redTick: check.red }), embeds: [], components: [],
+			: t('cancelled_operation', { redTick: check.red }), embeds: [], components: [],
 		});
 
 		if (confirmed) {
@@ -83,11 +83,10 @@ export default class FeedBack implements Command {
 
 			const emb = new MessageEmbed()
 				.setColor('#2f3136')
-				.setTitle(isSug ? 'New suggestion' : 'Bug report')
-				.setDescription(content!)
+				.addField(isSug ? 'Suggestion' : 'Report', content!)
 				.setFooter({ text: `Sent by ${user.tag} (${user.id})`, iconURL: user.displayAvatarURL() });
 
-			const message = await c.send({ embeds: [emb] });
+			const message = await c.send({ content: isSug ? 'New suggestion' : 'Bug report', embeds: [emb] });
 			handleOperation(message, emb, isSug);
 		}
 	}
@@ -113,10 +112,10 @@ function handleOperation(msg: Message, embed: MessageEmbed, isSug: boolean) {
 		switch (r.emoji.name) {
 		case '🟩': {
 			embed
-				.setTitle(isSug ? 'Suggestion accepted' : 'Report accepted')
 				.setColor('GREEN')
 				.setFooter({ text: `${embed.footer?.text} - Accepted by ${u.tag}`, iconURL: u.displayAvatarURL() });
-			await msg.edit({ embeds: [embed] });
+
+			await msg.edit({ content: isSug ? 'Suggestion accepted' : 'Report accepted', embeds: [embed] });
 			await msg.pin();
 
 			u.send(t('feedback_thanks', {
@@ -130,18 +129,17 @@ function handleOperation(msg: Message, embed: MessageEmbed, isSug: boolean) {
 		}
 
 		case '🟨': {
-			const ask = await msg.channel.send('Write your answer:');
+			const ask = await msg.channel.send('**Write your answer:**');
 
 			const f = (m: Message) => m.author.id === u.id && m.channel.id === msg.channel.id;
 			const ans = await msg.channel.awaitMessages({ filter: f, max: 1 }).then(m => m.first());
 			ask.delete();
 
 			embed
-				.setTitle(isSug ? 'Suggestion answered' : 'Report answered')
 				.setColor('YELLOW')
-				.addField('Resposta', ans!.content)
+				.addField('Answer', ans!.content)
 				.setFooter({ text: `${embed.footer?.text} - Answered by ${u.tag}`, iconURL: u.displayAvatarURL() });
-			await msg.edit({ embeds: [embed] });
+			await msg.edit({ content: isSug ? 'Suggestion answered' : 'Report answered', embeds: [embed] });
 
 			u.send(t('feedback_thanks_answer', {
 				p: letter.green.p,
@@ -157,10 +155,9 @@ function handleOperation(msg: Message, embed: MessageEmbed, isSug: boolean) {
 		}
 		case '🟥': {
 			embed
-				.setTitle(isSug ? 'Suggestion rejected' : 'Report rejected')
 				.setColor('RED')
 				.setFooter({ text: `${embed.footer?.text} - Rejected by ${u.tag}`, iconURL: u.displayAvatarURL() });
-			await msg.edit({ embeds: [embed] });
+			await msg.edit({ content: isSug ? 'Suggestion rejected' : 'Report rejected', embeds: [embed] });
 
 			break;
 		}
