@@ -1,14 +1,15 @@
 {
   "name": "palavreco",
-  "version": "1.0.0",
-  "description": "Um bot de Discord que simula o Wordle",
-  "main": "bot.js",
+  "version": "2.0",
+  "description": "The Discord bot that simulates Wordle in Portuguese",
+  "main": "src/bot.ts",
   "scripts": {
     "dev": "tsnd --transpile-only src/bot.ts",
     "commands": "tsnd --transpile-only src/register.ts",
-    "postinstall": "npm run compile",
-    "compile": "tsc",
+
+    "build": "tsc",
     "start": "node build/bot.js",
+
     "lint": "eslint src"
   },
   "keywords": [
@@ -18,10 +19,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/vitorlops/Palavreco"
+    "url": "https://github.com/palavreco/Palavreco"
   },
   "bugs": {
-    "url": "https://github.com/vitorlops/Palavreco/issues"
+    "url": "https://github.com/palavreco/Palavreco/issues"
   },
   "engines": {
     "node": ">=16.13.2"
@@ -33,20 +34,20 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
-    "@types/pg": "^8.6.5",
     "dayjs": "^1.10.7",
     "discord-api-types": "^0.31.2",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
     "pg": "^8.7.3",
     "readline": "^1.3.0",
-    "templite": "^1.2.0",
-    "typescript": "^4.6.2"
+    "templite": "^1.2.0"
   },
   "devDependencies": {
+    "@types/pg": "^8.6.5",
     "@typescript-eslint/eslint-plugin": "^5.14.0",
     "@typescript-eslint/parser": "^5.14.0",
     "eslint": "^8.11.0",
-    "ts-node-dev": "^1.1.8"
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.6.4"
   }
 }

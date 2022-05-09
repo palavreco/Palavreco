@@ -28,9 +28,9 @@ export async function setUp(): Promise<void> {
 /**
  * Indicates whether this user is registered in the database
  * @param id The user id to check
- * @returns {Promise<string>} Whether the user is registered
+ * @returns {Promise<string>} The user status
  */
-export async function isUserInDB(id: string): Promise<string> {
+export async function getUserStatus(id: string): Promise<string> {
 	const userRow: QueryResult<UserRow> = await client.query(`SELECT id, status FROM users WHERE id = '${id}'`);
 
 	if (!userRow.rowCount) {
@@ -61,7 +61,7 @@ export function setPlayed(id: string): void {
 /**
  * Resets the user's status to false, meaning they can play again
  * @param id The user's ID
- * @returns The user state before resetting
+ * @returns {Promise<string>} The user state after resetting
  */
 export async function resetUser(id: string): Promise<string> {
 	const user: QueryResult<UserRow> = await client.query(`SELECT id, status FROM users WHERE id = '${id}'`);
@@ -78,7 +78,7 @@ export async function resetUser(id: string): Promise<string> {
 
 /**
  * Deletes/replaces the word in the database to a new one be used and resets all the users
- * @param replace Wheter to replace the word
+ * @param replace Whether to replace the word
  */
 export async function newWord(replace = false): Promise<void> {
 	const words: string[] = fs.readFileSync('src/words/wordsList.txt', 'utf8').split('\n');
@@ -104,7 +104,7 @@ export async function newWord(replace = false): Promise<void> {
 
 /**
  * Get the correct word for that day
- * @returns The word
+ * @returns {Promise<string>} The word
  */
 export function getWord(): Promise<string> {
 	return client.query('SELECT word, status FROM words WHERE status = true')
@@ -113,7 +113,7 @@ export function getWord(): Promise<string> {
 
 /**
  * Gets the days since the beginning of the bot
- * @returns The number of days
+ * @returns {Promise<number>} The number of days
  */
 export function getDay(): Promise<number> {
 	return client.query('SELECT * FROM words').then((res: QueryResult<WordRow>) => res.rowCount);

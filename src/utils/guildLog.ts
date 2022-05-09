@@ -2,25 +2,29 @@ import { Client, Guild, MessageEmbed, TextChannel } from 'discord.js';
 
 export async function notifyLogChannel(event: 'join' | 'leave', guild: Guild, client: Client): Promise<void> {
 	const { createdTimestamp, ownerId, memberCount, name, id } = guild;
-	const owner = await guild.fetchOwner();
+	const defaultImage = 'https://cdn.discordapp.com/embed/avatars/0.png';
 
 	let embed: MessageEmbed;
 	if (event === 'join') {
+		const owner = await guild.fetchOwner();
+
 		embed = new MessageEmbed()
-			.setAuthor({ name: `${name} (${id})` }).setTitle('Novo servidor!')
+			.setTitle('> New guild! 🎉').setDescription(`${name} (\`${id}\`)`)
+			.setThumbnail(guild.iconURL() ?? defaultImage)
 			.addFields(
-				{ name: 'Owner', value: `\`${owner.user.tag}\` (${ownerId})`, inline: true },
-				{ name: 'Members', value: `${memberCount}`, inline: true },
-				{ name: 'Created in', value: `<t:${Math.floor(createdTimestamp / 1000)}>`, inline: true },
+				{ name: 'Owner', value: `${owner.user.tag} (\`${ownerId}\`)` },
+				{ name: 'Members', value: String(memberCount) },
+				{ name: 'Created in', value: `<t:${Math.floor(createdTimestamp / 1000)}>` },
 			)
-			.setFooter({ text: `Now I'm in ${client.guilds.cache.size} servidores!` })
+			.setFooter({ text: `Now I'm in ${client.guilds.cache.size} guilds!` })
 			.setColor('GREEN');
 	} else {
 		embed = new MessageEmbed()
-			.setAuthor({ name: `${name} (${id})` }).setTitle('Saí de um servidor :(')
-			.addFields(
-				{ name: 'Dono', value: `\`${owner}\` (${ownerId})`, inline: true },
-			).setFooter({ text: `Agora estou em ${client.guilds.cache.size} servidores!` }).setColor('#2f3136');
+			.setTitle('> Left from a guild 😔').setDescription(`${name} (\`${id}\`)`)
+			.setThumbnail(guild.iconURL() ?? defaultImage)
+			.addFields({ name: 'Members', value: String(memberCount) })
+			.setFooter({ text: `Now I'm in ${client.guilds.cache.size} guilds!` })
+			.setColor('RED');
 
 	}
 
