@@ -1,6 +1,6 @@
 {
   "name": "palavreco",
-  "version": "2.0",
+  "version": "2.0.0",
   "description": "The Discord bot that simulates Wordle in Portuguese",
   "main": "src/bot.ts",
   "scripts": {
