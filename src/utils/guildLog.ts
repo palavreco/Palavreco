@@ -12,9 +12,9 @@ export async function notifyLogChannel(event: 'join' | 'leave', guild: Guild, cl
 			.setTitle('> New guild! 🎉').setDescription(`${name} (\`${id}\`)`)
 			.setThumbnail(guild.iconURL() ?? defaultImage)
 			.addFields(
-				{ name: 'Owner', value: `${owner.user.tag} (\`${ownerId}\`)` },
-				{ name: 'Members', value: String(memberCount) },
-				{ name: 'Created in', value: `<t:${Math.floor(createdTimestamp / 1000)}>` },
+				{ name: 'Owner', value: `${owner.user.tag} (\`${ownerId}\`)`, inline: true },
+				{ name: 'Members', value: String(memberCount), inline: true },
+				{ name: 'Created in', value: `<t:${Math.floor(createdTimestamp / 1000)}>`, inline: true },
 			)
 			.setFooter({ text: `Now I'm in ${client.guilds.cache.size} guilds!` })
 			.setColor('GREEN');
