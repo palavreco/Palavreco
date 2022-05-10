@@ -22,7 +22,7 @@
     "game_win": "Parabéns, você acertou em {{attempts}} tentativas! :tada:\n\n{{table}}",
     "game_lose": "{{table}}\n\nVocê perdeu, a palavra era **{{cw}}**. :frowning:\nQuem sabe na próxima você consegue!",
 
-    "plataform_ask": "<@{{user.id}}> Pressione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!",
+    "platform_ask": "<@{{user.id}}> Pressione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!",
 
     "identifier": "Jogo de <@{{user.id}}>:",
     "game_result_win": "Joguei palavreco.com #{{day}} {{attempts}}/6\n\n{{finalTable}}",

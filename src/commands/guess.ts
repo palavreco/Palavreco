@@ -3,12 +3,12 @@ import { CommandInteraction, MessageActionRow, MessageButton, PermissionString }
 import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
 import { t } from '../utils/replyHelper';
-import { isUserInDB, registerUser, getDay, getWord, setPlayed } from '../database';
+import { getUserStatus, registerUser, getDay, getWord, setPlayed } from '../database';
 import { runAtMidnight } from '../utils/runner';
 import { awaitMessage } from '../utils/msgCollector';
 import { isValid } from '../utils/checkWord';
 import { toDefault, toEmoji } from '../utils/converters';
-import { plataform } from '../utils/plataform';
+import { platform } from '../utils/platform';
 import { check, square } from '../utils/emotes.json';
 
 let usersTries: Record<string, { id: string, attempts: string[] }> = {};
@@ -32,9 +32,9 @@ export default class Guess implements Command {
 	async execute(interaction: CommandInteraction) {
 		const { user, channel } = interaction;
 
-		if (await isUserInDB(user.id) === 'not_registered') {
+		if (await getUserStatus(user.id) === 'not_registered') {
 			registerUser(user.id);
-		} else if (await isUserInDB(user.id) === 'registered_active') {
+		} else if (await getUserStatus(user.id) === 'registered_active') {
 			interaction.reply({
 				content: t('already_played', {
 					redTick: check.red, timestamp: dayjs().tz('America/Sao_Paulo').endOf('day').unix() + 1,
@@ -120,9 +120,9 @@ export default class Guess implements Command {
 					activeGames.splice(activeGames.indexOf(user.id), 1);
 					delete usersTries[user.id];
 
-					const msg = await channel!.send({ content: t('plataform_ask', { user }), components: [row] });
+					const msg = await channel!.send({ content: t('platform_ask', { user }), components: [row] });
 
-					if (await plataform(interaction) === 'pc-ios') {
+					if (await platform(interaction) === 'pc-ios') {
 						await msg.delete();
 
 						await channel!.send(t('identifier', { user }));
@@ -150,9 +150,9 @@ export default class Guess implements Command {
 						activeGames.splice(activeGames.indexOf(user.id), 1);
 						delete usersTries[user.id];
 
-						const msg = await channel!.send({ content: t('plataform_ask', { user }), components: [row] });
+						const msg = await channel!.send({ content: t('platform_ask', { user }), components: [row] });
 
-						if (await plataform(interaction) === 'pc-ios') {
+						if (await platform(interaction) === 'pc-ios') {
 							await msg.delete();
 
 							await channel!.send(t('identifier', { user }));
