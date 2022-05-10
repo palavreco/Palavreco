@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import { Client, Collection, Guild } from 'discord.js';
 import { Command } from './interfaces/Command';
 import { newWord, setUp } from './database';
-import { hasPermissions } from './utils/permissions';
+import { getMissingPermissions } from './utils/permissions';
 import { runAtMidnight } from './utils/runner';
 import { log } from './utils/log';
 import { t } from './utils/replyHelper';
@@ -51,12 +51,12 @@ client.on('interactionCreate', i => {
 	const command = botCmds.get(i.commandName);
 
 	if (command) {
-		const { success, message } = hasPermissions(command.permissions!, i);
+		const missingPermissions = getMissingPermissions(command.permissions, i);
 
-		if (!success) {
+		if (missingPermissions) {
 			i.reply(t('missing_permissions', {
 				redTick: check.red,
-				perms: message,
+				perms: missingPermissions.join(' '),
 			}));
 
 			return;

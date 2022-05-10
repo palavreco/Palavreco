@@ -1,0 +1,13 @@
+name: Auto Assign
+on:
+  pull_request:
+  types: [opened, ready_for_review]
+jobs:
+  add-reviews:
+    name: Add Reviwers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run auto-assign
+        uses: kentaro-m/auto-assign-action@v1.2.1
+        with:
+          configuration-path: '.github/reviwers.yml'

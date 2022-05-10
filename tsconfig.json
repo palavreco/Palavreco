@@ -10,8 +10,5 @@
         "resolveJsonModule": true,
         "outDir": "./build",
     },
-    "include": [
-        "./src/**/*.ts",
-        "*.ts",
-    ],
+    "include": ["./src/**/*.ts"],
 }

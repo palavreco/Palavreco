@@ -1,10 +1,10 @@
 import { CommandInteraction, PermissionString } from 'discord.js';
 
-export function hasPermissions(
-	permissions: PermissionString[],
+export function getMissingPermissions(
+	permissions: PermissionString[] | undefined,
 	interaction: CommandInteraction,
-): { success: boolean, message?: string } {
-	if (!permissions) return { success: true };
+): string[] | undefined {
+	if (!permissions) return undefined;
 
 	const { guild } = interaction;
 
@@ -12,8 +12,8 @@ export function hasPermissions(
 	const missingPermissions = (permissions.filter((p, i) => !permissionsBooleans[i])).map(p => `\`${p}\``);
 
 	if (permissionsBooleans.includes(false)) {
-		return { success: false, message: missingPermissions.join(' ') };
+		return missingPermissions;
 	} else {
-		return { success: true };
+		return undefined;
 	}
 }
