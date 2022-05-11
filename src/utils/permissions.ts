@@ -3,8 +3,8 @@ import { CommandInteraction, PermissionString } from 'discord.js';
 export function getMissingPermissions(
 	permissions: PermissionString[] | undefined,
 	interaction: CommandInteraction,
-): string[] | undefined {
-	if (!permissions) return undefined;
+): string[] | null {
+	if (!permissions) return null;
 
 	const { guild } = interaction;
 
@@ -14,6 +14,6 @@ export function getMissingPermissions(
 	if (permissionsBooleans.includes(false)) {
 		return missingPermissions;
 	} else {
-		return undefined;
+		return null;
 	}
 }
