@@ -25,7 +25,7 @@ export default class Guess implements Command {
 		'description': 'Tente adivinhar a palavra do dia!',
 	};
 
-	dev = true;
+	dev = false;
 
 	permissions: PermissionString[] = ['MANAGE_MESSAGES', 'VIEW_CHANNEL'];
 
