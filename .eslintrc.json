@@ -1,15 +1,25 @@
 {
-	"extends": "eslint:recommended",
+	"plugins": ["@typescript-eslint"],
+	"parser": "@typescript-eslint/parser",
+	"extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:@typescript-eslint/recommended-requiring-type-checking"],
 	"env": {
 		"node": true,
 		"es6": true
 	},
 	"parserOptions": {
+		"project": ["./tsconfig.json"],
 		"ecmaVersion": 2021
 	},
 	"rules": {
+		"@typescript-eslint/no-non-null-assertion": "off",
+		"@typescript-eslint/no-floating-promises": "off",
+		"@typescript-eslint/no-unsafe-assignment": "off",
+		"@typescript-eslint/no-unsafe-call": "off",
+		"@typescript-eslint/no-unsafe-member-access": "off",
+		"@typescript-eslint/no-misused-promises": "off",
+		"@typescript-eslint/restrict-template-expressions": "off",
+		"@typescript-eslint/ban-ts-comment": "off",
         "arrow-spacing": ["warn", { "before": true, "after": true }],
-		"brace-style": ["error", "stroustrup", { "allowSingleLine": true }],
 		"comma-dangle": ["error", "always-multiline"],
 		"comma-spacing": "error",
 		"comma-style": "error",
@@ -18,6 +28,7 @@
 		"handle-callback-err": "off",
 		"indent": ["error", "tab"],
 		"keyword-spacing": "error",
+		"max-len": ["error", { "code": 120 }],
 		"max-nested-callbacks": ["error", { "max": 4 }],
 		"max-statements-per-line": ["error", { "max": 2 }],
 		"no-console": "off",

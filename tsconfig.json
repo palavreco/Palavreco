@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "target": "ES6",
+        "module": "CommonJS",
+        "lib": ["ES2021"],
+        "strictNullChecks": true,
+        "noImplicitAny": true,
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "outDir": "./build",
+    },
+    "include": ["./src/**/*.ts"],
+}
