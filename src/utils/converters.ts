@@ -1,8 +1,6 @@
 import { letter } from './emotes.json';
 
 export function toDefault(content: string) {
-	// it is awful, i need suggestions for a better way to do this
-	// (arr be the content with each letter as an item)
 	content = content.replace(/\n/g, '');
 	content = content.replace(/>/g, '> ');
 	const arr = content.split(' ');
@@ -37,32 +35,36 @@ export function toEmoji(content: string, correct: string) {
 	const [contentArr, correctArr] = [content.split(''), correct.split('')];
 
 	const usedLetters = [];
-	const emojiWord: Record<number, string> = Object.create(null);
+	const emojiWord: Record<number, string> = {};
 	for (let i = 0; i < 6; i++) emojiWord[i + 1] = '';
 
 	for (let i = 0; i < contentArr.length; i++) {
-		const c = contentArr[i];
-		usedLetters.push(c);
+		if (contentArr[i] === correctArr[i]) {
+			usedLetters.push(contentArr[i]);
+			emojiWord[i + 1] = letter.green[correctArr[i] as alphabet];
+		}
+	}
 
-		if (c === correctArr[i]) {
-			emojiWord[i + 1] = letter.green[c as alphabetType];
-		} else if (correctArr.includes(c) && c !== correctArr[i]) {
-			const caracterCountCorrect = correctArr.filter(car => car === c);
-			const caracterCountContent = usedLetters.filter(car => car === c);
+	for (let i = 0; i < contentArr.length; i++) {
+		if (correctArr.includes(contentArr[i]) && contentArr[i] !== correctArr[i]) {
+			usedLetters.push(contentArr[i]);
+			const charCountCorrect = correctArr.filter(car => car === contentArr[i]).length;
+			const charCountContent = usedLetters.filter(car => car === contentArr[i]).length;
 
-			if (caracterCountContent.length > caracterCountCorrect.length) {
-				emojiWord[i + 1] = letter.gray[c as alphabetType];
+			if (charCountContent > charCountCorrect) {
+				emojiWord[i + 1] = letter.gray[contentArr[i] as alphabet];
 			} else {
-				emojiWord[i + 1] = letter.yellow[c as alphabetType];
+				emojiWord[i + 1] = letter.yellow[contentArr[i] as alphabet];
 			}
-		} else if (c !== correctArr[i]) {
-			emojiWord[i + 1] = letter.gray[c as alphabetType];
+		} else if (contentArr[i] !== correctArr[i]) {
+			usedLetters.push(contentArr[i]);
+			emojiWord[i + 1] = letter.gray[contentArr[i] as alphabet];
 		}
 	}
 
 	return Object.values(emojiWord).join('');
 }
 
-type alphabetType =
+type alphabet =
 	| 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm'
 	| 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z';
