@@ -115,7 +115,7 @@ export default class Guess implements Command {
 
 				if (word === correctWord) {
 					await interaction.editReply(t('game_win', { attempts: i + 1, table: table() }));
-					setPlayed(user.id);
+					setPlayed(user.id, true, i + 1);
 
 					activeGames.splice(activeGames.indexOf(user.id), 1);
 					delete usersTries[user.id];
@@ -144,8 +144,7 @@ export default class Guess implements Command {
 
 					if (i === 5) {
 						await interaction.editReply(t('game_lose', { table: table(), cw: correctWord.toUpperCase() }));
-
-						setPlayed(user.id);
+						setPlayed(user.id, false);
 
 						activeGames.splice(activeGames.indexOf(user.id), 1);
 						delete usersTries[user.id];

@@ -6,10 +6,8 @@
   "scripts": {
     "dev": "tsnd --transpile-only src/bot.ts",
     "commands": "tsnd --transpile-only src/register.ts",
-
     "build": "tsc",
     "start": "node build/bot.js",
-
     "lint": "eslint src"
   },
   "keywords": [
@@ -39,6 +37,7 @@
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
     "pg": "^8.7.3",
+    "quickchart-js": "^3.0.2",
     "readline": "^1.3.0",
     "templite": "^1.2.0"
   },

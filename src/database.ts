@@ -1,7 +1,8 @@
+/* eslint-disable max-len */
 import fs from 'node:fs';
 import dotenv from 'dotenv';
 import { Client, QueryResult } from 'pg';
-import { UserRow, WordRow } from './interfaces/Database';
+import { GuessesRow, StatsRow, UserRow, WordRow } from './interfaces/Database';
 import { log } from './utils/log';
 dotenv.config();
 
@@ -18,11 +19,17 @@ export async function setUp(): Promise<void> {
 
 	const tableUsers = 'CREATE TABLE IF NOT EXISTS "users" ("id" TEXT, "status" BOOLEAN);';
 	const tableWords = 'CREATE TABLE IF NOT EXISTS "words" ("word" TEXT, "status" BOOLEAN);';
+	const tableStats = 'CREATE TABLE IF NOT EXISTS "stats" ("id" TEXT, "games" INTEGER, "wins" INTEGER, "win_percentage" INTEGER, "current_streak" INTEGER, "best_streak" INTEGER);';
+	const tableGuesses = 'CREATE TABLE IF NOT EXISTS "guesses" ("id" TEXT, "one" INTEGER, "two" INTEGER, "three" INTEGER, "four" INTEGER, "five" INTEGER, "six" INTEGER, "losses" INTEGER);';
 
 	await client.query(tableUsers)
 		.then(() => log('Users table created/verified', 'DB', 'green'));
 	await client.query(tableWords)
 		.then(() => log('Words table created/verified', 'DB', 'green'));
+	await client.query(tableStats)
+		.then(() => log('Stats table created/verified', 'DB', 'green'));
+	await client.query(tableGuesses)
+		.then(() => log('Guesses table created/verified', 'DB', 'green'));
 }
 
 /**
@@ -54,8 +61,64 @@ export function registerUser(id: string): void {
  * Sets the status of a user to false in the database
  * @param id The user id to set as played
  */
-export function setPlayed(id: string): void {
+export async function setPlayed(id: string, win: boolean, guesses?: number): Promise<void> {
 	client.query(`UPDATE users SET status = true WHERE id = '${id}'`);
+
+	const userStats: QueryResult<StatsRow> = await client.query(`SELECT * FROM stats WHERE id = '${id}'`);
+	const userGuesses: QueryResult<GuessesRow> = await client.query(`SELECT * FROM guesses WHERE id = '${id}'`);
+
+	// @ts-ignore
+	const number = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six' }[guesses];
+	const winned = win ? 1 : 0;
+
+	if (!userGuesses.rowCount) {
+		if (win) {
+			await client.query(`INSERT INTO guesses (id, one, two, three, four, five, six, losses) VALUES ('${id}', 0, 0, 0, 0, 0, 0, 0)`);
+			await client.query(`UPDATE guesses SET ${number} = ${number} + 1 WHERE id = '${id}'`);
+		} else {
+			await client.query(`INSERT INTO guesses (id, one, two, three, four, five, six, losses) VALUES ('${id}', 0, 0, 0, 0, 0, 0, 1)`);
+		}
+	} else {
+		if (win) {
+			await client.query(`UPDATE guesses SET ${number} = ${number} + 1 WHERE id = '${id}'`);
+		} else {
+			await client.query(`UPDATE guesses SET losses = losses + 1 WHERE id = '${id}'`);
+		}
+	}
+
+	if (!userStats.rowCount) {
+		await client.query(`INSERT INTO stats (id, games, wins, win_percentage, current_streak, best_streak) VALUES ('${id}', 1, ${winned}, ${win ? 100 : 0}, ${winned}, ${winned})`);
+
+	} else {
+		const current_streak = win ? userStats.rows[0].current_streak + 1 : 0;
+		const best_streak = win ? Math.max(userStats.rows[0].best_streak, current_streak) : userStats.rows[0].best_streak;
+		await client.query(`UPDATE stats SET games = games + 1, wins = wins + ${winned}, current_streak = ${current_streak}, best_streak = ${best_streak} WHERE id = '${id}'`);
+
+		const updatedUser: QueryResult<StatsRow> = await client.query(`SELECT * FROM stats WHERE id = '${id}'`);
+		const percentage = (updatedUser.rows[0].wins / updatedUser.rows[0].games) * 100;
+		await client.query(`UPDATE stats SET win_percentage = ${percentage} WHERE id = '${id}'`);
+	}
+
+}
+
+/**
+ * Gets the stats of a user from the database
+ * @param id The user's ID
+ * @returns {Promise<StatsRow>} The user's stats object
+ */
+export async function getStats(id: string): Promise<StatsRow | null> {
+	const stats: QueryResult<StatsRow> = await client.query(`SELECT * FROM stats WHERE id = '${id}'`);
+	return stats ? stats.rows[0] : null;
+}
+
+/**
+ * Gets the guesses of a user from the database
+ * @param id The user's ID
+ * @returns {Promise<GuessesRow>} The user's guesses object
+ */
+export async function getGuesses(id: string): Promise<GuessesRow | null> {
+	const guesses: QueryResult<GuessesRow> = await client.query(`SELECT * FROM guesses WHERE id = '${id}'`);
+	return guesses ? guesses.rows[0] : null;
 }
 
 /**
