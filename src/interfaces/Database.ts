@@ -1,14 +1,14 @@
-export interface WordRow {
+export interface Word {
     word: string;
     status: boolean;
 }
 
-export interface UserRow {
+export interface User {
     id: string;
     status: boolean;
 }
 
-export interface StatsRow {
+export interface Stats {
     id: string;
     games: number;
     wins: number;
@@ -17,7 +17,7 @@ export interface StatsRow {
     best_streak: number;
 }
 
-export interface GuessesRow {
+export interface Guesses {
     id: string;
     one: number;
     two: number;

@@ -3,10 +3,10 @@ import { Client, CommandInteraction, MessageEmbed, User } from 'discord.js';
 import { ApplicationCommandOptionType, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import QuickChart from 'quickchart-js';
 import { getGuesses, getStats } from '../database';
-import { GuessesRow, StatsRow } from '../interfaces/Database';
+import { Guesses, Stats } from '../interfaces/Database';
 import { check } from '../utils/emotes.json';
 
-export default class Stats implements Command {
+export default class StatsC implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
 		name: 'stats',
 		description: 'Mostra as estatísticas de um usuário',
@@ -35,7 +35,7 @@ export default class Stats implements Command {
 		interaction.reply({ embeds: [this.makeEmbed(stats, guesses!, client)] });
 	}
 
-	makeEmbed(stats: StatsRow, guesses: GuessesRow, client: Client) {
+	makeEmbed(stats: Stats, guesses: Guesses, client: Client) {
 		const { id, wins, games, win_percentage, current_streak, best_streak } = stats;
 		const { one, two, three, four, five, six, losses } = guesses;
 		const user: User = client.users.cache.get(id)!;
@@ -90,6 +90,6 @@ export default class Stats implements Command {
 				{ name: 'Sequência de vitórias', value: '```' + current_streak.toString() + '```', inline: true },
 				{ name: 'Melhor sequência', value: '```' + best_streak.toString() + '```', inline: true },
 			])
-			.setImage(chart.getUrl().replace('&w=500&h=300', '&w=450&h=275'));
+			.setImage(chart.getUrl());
 	}
 }
