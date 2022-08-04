@@ -32,6 +32,7 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.25",
     "dayjs": "^1.10.7",
     "discord-api-types": "^0.31.2",
     "discord.js": "^13.6.0",

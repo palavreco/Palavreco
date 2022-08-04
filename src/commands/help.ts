@@ -2,7 +2,7 @@ import { CommandInteraction } from 'discord.js';
 import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
 import { t } from '../utils/replyHelper';
-import { letter } from '../utils/emotes.json';
+import { letter } from '../utils/assets.json';
 
 export default class Help implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {

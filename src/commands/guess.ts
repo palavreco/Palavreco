@@ -9,7 +9,7 @@ import { awaitMessage } from '../utils/msgCollector';
 import { isValid } from '../utils/checkWord';
 import { toDefault, toEmoji } from '../utils/converters';
 import { platform } from '../utils/platform';
-import { check, square } from '../utils/emotes.json';
+import { check, square } from '../utils/assets.json';
 
 let usersTries: Record<string, { id: string, attempts: string[] }> = {};
 let activeGames: string[] = [];

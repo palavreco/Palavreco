@@ -93,5 +93,6 @@
     "check": {
         "green": "<:greenTick:893584062084681768>",
         "red": "<:redTick:893584062076305418>"
-    }
+    },
+    "rankTemplate": "https://cdn.discordapp.com/attachments/935802603957272576/1004715487629942894/rank_template.png"
 }

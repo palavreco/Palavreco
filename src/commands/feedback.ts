@@ -15,7 +15,7 @@ import {
 } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
 import { t } from '../utils/replyHelper';
-import { check, letter } from '../utils/emotes.json';
+import { check, letter } from '../utils/assets.json';
 
 export default class FeedBack implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {

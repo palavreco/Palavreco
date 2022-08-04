@@ -4,7 +4,7 @@ import { ApplicationCommandOptionType, RESTPostAPIChatInputApplicationCommandsJS
 import QuickChart from 'quickchart-js';
 import { getGuesses, getStats } from '../database';
 import { Guesses, Stats } from '../interfaces/Database';
-import { check } from '../utils/emotes.json';
+import { check } from '../utils/assets.json';
 
 export default class StatsC implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {

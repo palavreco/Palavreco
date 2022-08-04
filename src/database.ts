@@ -129,6 +129,14 @@ export async function getGuesses(id: string): Promise<Guesses | undefined> {
 }
 
 /**
+ * Gets all the users and their guesses distributions from the database
+ * @returns {Promise<Guesses[]>} The list of all registered users
+ */
+export async function getAllGuesses(): Promise<Guesses[]> {
+	return await db<Guesses>('guesses').select('*');
+}
+
+/**
  * Resets the user's status to false, meaning they can play again
  * @param id The user's ID
  * @returns {Promise<string>} The user state after resetting

@@ -2,7 +2,7 @@ import { CommandInteraction } from 'discord.js';
 import { ApplicationCommandOptionType, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
 import { resetUser } from '../database';
-import { check } from '../utils/emotes.json';
+import { check } from '../utils/assets.json';
 
 export default class Reset implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
