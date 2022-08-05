@@ -1,5 +1,7 @@
 import fs from 'node:fs';
 import dotenv from 'dotenv';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
 import { Client, QueryResult } from 'pg';
 import { UserRow, WordRow } from './interfaces/Database';
 import { log } from './utils/log';
@@ -117,4 +119,14 @@ export function getWord(): Promise<string> {
  */
 export function getDay(): Promise<number> {
 	return client.query('SELECT * FROM words').then((res: QueryResult<WordRow>) => res.rowCount);
+}
+
+export async function verifyWord(): Promise<boolean> {
+	const dateFirstGame = dayjs().tz('America/Sao_Paulo').subtract(await getDay(), 'd');
+	if (dayjs().tz('America/Sao_Paulo').diff(dateFirstGame, 'd') !== await getDay()) {
+		newWord();
+		log('New word & users reseted!', 'DB', 'purple');
+		return true;
+	}
+	return false;
 }

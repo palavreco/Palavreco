@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import dotenv from 'dotenv';
 import { Client, Collection, Guild } from 'discord.js';
 import { Command } from './interfaces/Command';
-import { newWord, setUp } from './database';
+import { verifyWord, newWord, setUp } from './database';
 import { getMissingPermissions } from './utils/permissions';
 import { runAtMidnight } from './utils/runner';
 import { log } from './utils/log';
@@ -68,6 +68,7 @@ client.on('interactionCreate', i => {
 
 client.login(process.env.TOKEN);
 setUp();
+verifyWord();
 
 runAtMidnight(() => {
 	newWord();

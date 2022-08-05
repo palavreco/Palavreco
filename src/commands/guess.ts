@@ -3,7 +3,7 @@ import { CommandInteraction, MessageActionRow, MessageButton, PermissionString }
 import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
 import { t } from '../utils/replyHelper';
-import { getUserStatus, registerUser, getDay, getWord, setPlayed } from '../database';
+import { getUserStatus, registerUser, getDay, getWord, setPlayed, verifyWord } from '../database';
 import { runAtMidnight } from '../utils/runner';
 import { awaitMessage } from '../utils/msgCollector';
 import { isValid } from '../utils/checkWord';
@@ -30,6 +30,11 @@ export default class Guess implements Command {
 	permissions: PermissionString[] = ['MANAGE_MESSAGES', 'VIEW_CHANNEL'];
 
 	async execute(interaction: CommandInteraction) {
+		if (await verifyWord()) {
+			usersTries = {};
+			activeGames = [];
+		}
+
 		const { user, channel } = interaction;
 
 		if (await getUserStatus(user.id) === 'not_registered') {
