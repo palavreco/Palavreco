@@ -6,6 +6,7 @@ import { Client, QueryResult } from 'pg';
 import { UserRow, WordRow } from './interfaces/Database';
 import { log } from './utils/log';
 dotenv.config();
+dayjs.extend(timezone);
 
 const client = new Client({
 	connectionString: process.env.DATABASE_URL,
