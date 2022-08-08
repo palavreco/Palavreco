@@ -15,7 +15,7 @@ const namePixels = {
 	'2': [945, 305], '3': [126, 427],
 	'4': [511, 427], '5': [896, 427],
 	'6': [126, 541], '7': [511, 541],
-	'8': [896, 541], '9': [896, 827],
+	'8': [896, 541], '9': [511, 827],
 };
 
 export async function makeImage(
@@ -26,6 +26,15 @@ export async function makeImage(
 	const canvas = createCanvas(1240, 750);
 	const ctx = canvas.getContext('2d');
 	ctx.drawImage(await loadImage(rankTemplate), 0, 0);
+
+	newStyle(ctx, { font: '28px inter', fill: '#ffffff', align: 'start' });
+	isServer ? ctx.fillText(int.guild?.name.toUpperCase(), 30, 55) : ctx.fillText('RANK GLOBAL', 30, 55);
+
+	const userPosition = scores.findIndex(s => s.id === int.user.id) + 1 ?? '';
+	if (userPosition) {
+		newStyle(ctx, { font: '18px inter', fill: '#c1c1c1', align: 'start' });
+		ctx.fillText(`Sua posição: ${userPosition}`, 30, 83);
+	}
 
 	for (let j = 0; j < scores.length; j++) {
 		if (j > 9) break;
@@ -50,26 +59,31 @@ export async function makeImage(
 
 		// @ts-ignore
 		const [width, height] = [namePixels[i][0], namePixels[i][1]];
+		const { username, discriminator, points } = user;
 
 		if (i < 3) {
-			newStyle(ctx, { font: '27px inter', fill: '#ffffff', align: 'end' });
-			ctx.fillText(normalizeText(user.username), width, height);
-
 			newStyle(ctx, { font: '18px inter', fill: '#b5b5b5', align: 'start' });
-			ctx.fillText(`#${user.discriminator}`, width + 5, height);
+			const dWidth = ctx.measureText(`#${discriminator}`).width;
+
+			newStyle(ctx, { font: '27px inter', fill: '#ffffff', align: 'center' });
+			ctx.fillText(normalizeText(username), width - (dWidth / 2), height);
+			const nWidth = ctx.measureText(normalizeText(username)).width;
+
+			newStyle(ctx, { font: '18px inter', fill: '#b5b5b5', align: 'center' });
+			ctx.fillText(`#${discriminator}`, width + (nWidth / 2) + 5, height);
 
 			newStyle(ctx, { font: '22px inter', fill: '#c1c1c1', align: 'center' });
-			ctx.fillText(`${user.points} points`, width, height + 30);
+			ctx.fillText(`${points} pontos`, width, height + 30);
 		} else {
 			newStyle(ctx, { font: '20px inter', fill: '#ffffff', align: 'start' });
-			ctx.fillText(normalizeText(user.username), width, height);
-			const tWidth = ctx.measureText(normalizeText(user.username)).width;
+			ctx.fillText(normalizeText(username), width, height);
+			const tWidth = ctx.measureText(normalizeText(username)).width;
 
 			newStyle(ctx, { font: '15px inter', fill: '#b5b5b5', align: 'start' });
-			ctx.fillText(`#${user.discriminator}`, width + tWidth + 5, height);
+			ctx.fillText(`#${discriminator}`, width + tWidth + 5, height);
 
 			newStyle(ctx, { font: '22px inter', fill: '#c1c1c1', align: 'center' });
-			ctx.fillText(`${user.points}`, width + 250, height);
+			ctx.fillText(`${points}`, width + 250, height);
 		}
 	}
 

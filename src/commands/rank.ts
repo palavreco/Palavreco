@@ -45,6 +45,7 @@ export default class Rank implements Command {
 			return { id, points };
 		}).sort((a, b) => b.points - a.points);
 
-		interaction.reply({ files: [await makeImage(isServer, scores, interaction)] });
+		await interaction.deferReply();
+		await interaction.editReply({ files: [await makeImage(isServer, scores, interaction)] });
 	}
 }
