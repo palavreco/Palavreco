@@ -2,8 +2,11 @@ import fs from 'node:fs';
 import dotenv from 'dotenv';
 import { knex } from 'knex';
 import { Guesses, Stats, User, Word } from './interfaces/Database';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
 import { log } from './utils/log';
 dotenv.config();
+dayjs.extend(timezone);
 
 const db = knex({ client: 'pg', connection: process.env.DATABASE_URL });
 
@@ -191,4 +194,14 @@ export async function getWord(): Promise<string> {
  */
 export function getDay(): Promise<number> {
 	return db<Word>('words').select('*').then(r => r.length);
+}
+
+export async function verifyWord(): Promise<boolean> {
+	const dateFirstGame = dayjs().tz('America/Sao_Paulo').subtract(await getDay(), 'd');
+	if (dayjs().tz('America/Sao_Paulo').diff(dateFirstGame, 'd') !== await getDay()) {
+		newWord();
+		log('New word & users reseted!', 'DB', 'purple');
+		return true;
+	}
+	return false;
 }
