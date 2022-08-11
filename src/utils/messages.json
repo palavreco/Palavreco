@@ -25,8 +25,9 @@
     "platform_ask": "<@{{user.id}}> Pressione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!",
 
     "identifier": "Jogo de <@{{user.id}}>:",
-    "game_result_win": "Joguei palavreco.com #{{day}} {{attempts}}/6\n\n{{finalTable}}",
-    "game_result_lose": "Joguei palavreco.com #{{day}} X/6\n\n{{finalTable}}",
+    "game_result_win": "Joguei palavreco.com #{{day}} • {{attempts}}/6\n\n{{finalTable}}",
+    "game_result_win_streak": "Joguei palavreco.com #{{day}} • {{attempts}}/6 • {{streak}} 🔥\n\n{{finalTable}}",
+    "game_result_lose": "Joguei palavreco.com #{{day}} • X/6\n\n{{finalTable}}",
 
     "missing_permissions": "{{redTick}} Eu não tenho permissão para executar este comando, por favor edite meu cargo a partir das informações abaixo.\nPermissões necessárias: **{{perms}}**"
 }

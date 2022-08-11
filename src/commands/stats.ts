@@ -27,12 +27,12 @@ export default class StatsC implements Command {
 		const optionOrUser = option ? option : user;
 		const stats = await getStats(optionOrUser.id);
 		const guesses = await getGuesses(optionOrUser.id);
-		if (!stats) {
+		if (!stats || !guesses) {
 			interaction.reply(`${check.red} **${optionOrUser.tag}** não tem nenhuma estatística!`);
 			return;
 		}
 
-		interaction.reply({ embeds: [this.makeEmbed(stats, guesses!, client)] });
+		interaction.reply({ embeds: [this.makeEmbed(stats, guesses, client)] });
 	}
 
 	makeEmbed(stats: Stats, guesses: Guesses, client: Client) {
@@ -43,7 +43,7 @@ export default class StatsC implements Command {
 		const all = one + two + three + four + five + six + losses;
 		const percentages = [];
 		for (const key in guesses) {
-			if (key !== 'id') {
+			if (key !== 'id' && key !== 'guilds') {
 				// @ts-ignore
 				percentages.push(Math.round((guesses[key] / all) * 100));
 			}
@@ -86,7 +86,7 @@ export default class StatsC implements Command {
 			.addFields([
 				{ name: 'Jogos', value: '```' + games.toString() + '```', inline: true },
 				{ name: 'Vitórias', value: '```' + wins.toString() + '```', inline: true },
-				{ name: 'Percentual de vitórias', value: '```' + win_percentage.toString() + '% ```', inline: true },
+				{ name: '% de vitórias', value: '```' + win_percentage.toString() + '% ```', inline: true },
 				{ name: 'Sequência de vitórias', value: '```' + current_streak.toString() + '```', inline: true },
 				{ name: 'Melhor sequência', value: '```' + best_streak.toString() + '```', inline: true },
 			])

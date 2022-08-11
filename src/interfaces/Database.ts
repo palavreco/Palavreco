@@ -26,4 +26,5 @@ export interface Guesses {
     five: number;
     six: number;
     losses: number;
+    guilds: string[];
 }

@@ -3,7 +3,7 @@ import { CommandInteraction, MessageActionRow, MessageButton, PermissionString }
 import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
 import { t } from '../utils/replyHelper';
-import { getUserStatus, registerUser, getDay, getWord, setPlayed, verifyWord } from '../database';
+import { getUserStatus, registerUser, getDay, getWord, setPlayed, verifyWord, getStats } from '../database';
 import { runAtMidnight } from '../utils/runner';
 import { awaitMessage } from '../utils/msgCollector';
 import { isValid } from '../utils/checkWord';
@@ -35,7 +35,7 @@ export default class Guess implements Command {
 			activeGames = [];
 		}
 
-		const { user, channel } = interaction;
+		const { user, channel, guildId } = interaction;
 
 		if (await getUserStatus(user.id) === 'not_registered') {
 			registerUser(user.id);
@@ -70,6 +70,7 @@ export default class Guess implements Command {
 		const playingUser: { id: string, attempts: string[] } = { id: user.id, attempts: [] };
 		const correctWord = await getWord();
 		const day = await getDay();
+		const streak = (await getStats(user.id))?.current_streak;
 
 		let i = 0;
 		if (activeGames.includes(user.id)) {
@@ -120,7 +121,7 @@ export default class Guess implements Command {
 
 				if (word === correctWord) {
 					await interaction.editReply(t('game_win', { attempts: i + 1, table: table() }));
-					setPlayed(user.id, true, i + 1);
+					setPlayed(user.id, true, guildId, i + 1);
 
 					activeGames.splice(activeGames.indexOf(user.id), 1);
 					delete usersTries[user.id];
@@ -131,16 +132,28 @@ export default class Guess implements Command {
 						await msg.delete();
 
 						await channel!.send(t('identifier', { user }));
-						await channel!.send(t('game_result_win', {
-							day, attempts: i + 1, finalTable: toDefault(table()),
-						}));
+						if (streak && streak > 4) {
+							await channel!.send(t('game_result_win_streak', {
+								day, attempts: i + 1, finalTable: toDefault(table()), streak,
+							}));
+						} else {
+							await channel!.send(t('game_result_win', {
+								day, attempts: i + 1, finalTable: toDefault(table()),
+							}));
+						}
 					} else {
 						await msg.delete();
 
 						await channel!.send(t('identifier', { user }));
-						await channel!.send('```' + t('game_result_win', {
-							day, attempts: i + 1, finalTable: toDefault(table()),
-						}) + '```');
+						if (streak && streak > 4) {
+							await channel!.send('```' + t('game_result_win_streak', {
+								day, attempts: i + 1, finalTable: toDefault(table()), streak,
+							}) + '```');
+						} else {
+							await channel!.send('```' + t('game_result_win', {
+								day, attempts: i + 1, finalTable: toDefault(table()),
+							}) + '```');
+						}
 					}
 
 					break;
@@ -149,7 +162,7 @@ export default class Guess implements Command {
 
 					if (i === 5) {
 						await interaction.editReply(t('game_lose', { table: table(), cw: correctWord.toUpperCase() }));
-						setPlayed(user.id, false);
+						setPlayed(user.id, false, guildId);
 
 						activeGames.splice(activeGames.indexOf(user.id), 1);
 						delete usersTries[user.id];

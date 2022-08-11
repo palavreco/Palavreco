@@ -31,6 +31,10 @@ export function setUp(): void {
 		if (!await db.schema.hasTable(table)) {
 			await db.schema.createTable(table, t => {
 				Object.entries(tables[table]).forEach(([key, type]) => t[type](key));
+
+				if (table === 'guesses') {
+					t.specificType('guilds', 'text[]');
+				}
 			});
 		}
 	});
@@ -63,7 +67,7 @@ export async function getUserStatus(id: string): Promise<string> {
  * Sets the status of a user to false in the database
  * @param id The user id to set as played
  */
-export async function setPlayed(id: string, win: boolean, guesses?: number): Promise<void> {
+export async function setPlayed(id: string, win: boolean, guildId: string | null, guesses?: number): Promise<void> {
 	await db('users').update({ status: true }).where('id', id);
 
 	const user = {
@@ -76,16 +80,26 @@ export async function setPlayed(id: string, win: boolean, guesses?: number): Pro
 
 	if (!user.guesses) {
 		if (win) {
-			await db('guesses').insert({ id, one: 0, two: 0, three: 0, four: 0, five: 0, six: 0, losses: 0 });
+			await db('guesses').insert({
+				id, one: 0, two: 0, three: 0, four: 0,
+				five: 0, six: 0, losses: 0, guilds: guildId ? [guildId] : [],
+			});
 			await db('guesses').update({ [number]: db.raw('?? + 1', [number]) }).where('id', id);
 		} else {
-			await db('guesses').insert({ id, one: 0, two: 0, three: 0, four: 0, five: 0, six: 0, losses: 1 });
+			await db('guesses').insert({
+				id, one: 0, two: 0, three: 0, four: 0,
+				five: 0, six: 0, losses: 1, guilds: guildId ? [guildId] : [],
+			});
 		}
 	} else {
 		if (win) {
 			await db('guesses').update({ [number]: db.raw('?? + 1', [number]) }).where('id', id);
 		} else {
 			await db('guesses').update({ losses: db.raw('?? + 1', ['losses']) }).where('id', id);
+		}
+
+		if (guildId && !user.guesses.guilds.includes(guildId)) {
+			await db('guesses').update({ guilds: db.raw('array_append(guilds, ?)', [guildId]) }).where('id', id);
 		}
 	}
 

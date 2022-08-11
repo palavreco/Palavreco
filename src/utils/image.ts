@@ -1,5 +1,7 @@
 import { createCanvas, GlobalFonts, loadImage, SKRSContext2D } from '@napi-rs/canvas';
 import { CommandInteraction, MessageAttachment } from 'discord.js';
+import { getStats } from '../database';
+import { Guesses } from '../interfaces/Database';
 import { rankTemplate } from '../utils/assets.json';
 
 GlobalFonts.registerFromPath('src/utils/inter.ttf', 'inter');
@@ -15,12 +17,13 @@ const namePixels = {
 	'2': [945, 305], '3': [126, 427],
 	'4': [511, 427], '5': [896, 427],
 	'6': [126, 541], '7': [511, 541],
-	'8': [896, 541], '9': [511, 827],
+	'8': [896, 541], '9': [516, 659],
 };
 
 export async function makeImage(
 	isServer: boolean,
 	scores: { id: string, points: number }[],
+	allUsers: Guesses[],
 	int: CommandInteraction,
 ): Promise<MessageAttachment> {
 	const canvas = createCanvas(1240, 750);
@@ -30,10 +33,10 @@ export async function makeImage(
 	newStyle(ctx, { font: '28px inter', fill: '#ffffff', align: 'start' });
 	isServer ? ctx.fillText(int.guild?.name.toUpperCase(), 30, 55) : ctx.fillText('RANK GLOBAL', 30, 55);
 
-	const userPosition = scores.findIndex(s => s.id === int.user.id) + 1 ?? '';
+	const userPosition = allUsers.findIndex(u => u.id === scores[0].id) + 1 ?? '';
 	if (userPosition) {
 		newStyle(ctx, { font: '18px inter', fill: '#c1c1c1', align: 'start' });
-		ctx.fillText(`Sua posição: ${userPosition}`, 30, 83);
+		ctx.fillText(`Sua posição: ${userPosition}`, 30, 80);
 	}
 
 	for (let j = 0; j < scores.length; j++) {
@@ -47,43 +50,46 @@ export async function makeImage(
 	}
 
 	for (let i = 0; i < 10; i++) {
-		let user: { username: string; discriminator: string, points: number };
+		let user: { username: string; discriminator: string, points: number, games: number };
 		if (scores[i]) {
 			const { id, points } = scores[i];
 			const obj = await int.client.users.fetch(id);
-			const { username, discriminator } = obj;
-			user = { username, discriminator, points };
+			const stats = await getStats(id);
+
+			user = { username: obj.username, discriminator: obj.discriminator, points, games: stats!.games };
 		} else {
 			break;
 		}
 
 		// @ts-ignore
 		const [width, height] = [namePixels[i][0], namePixels[i][1]];
-		const { username, discriminator, points } = user;
+		const { username, discriminator, points, games } = user;
 
 		if (i < 3) {
 			newStyle(ctx, { font: '18px inter', fill: '#b5b5b5', align: 'start' });
 			const dWidth = ctx.measureText(`#${discriminator}`).width;
 
 			newStyle(ctx, { font: '27px inter', fill: '#ffffff', align: 'center' });
-			ctx.fillText(normalizeText(username), width - (dWidth / 2), height);
-			const nWidth = ctx.measureText(normalizeText(username)).width;
+			ctx.fillText(normalizeText(username, 'small'), width - (dWidth / 2), height);
+			const nWidth = ctx.measureText(normalizeText(username, 'small')).width;
 
 			newStyle(ctx, { font: '18px inter', fill: '#b5b5b5', align: 'center' });
 			ctx.fillText(`#${discriminator}`, width + (nWidth / 2) + 5, height);
 
 			newStyle(ctx, { font: '22px inter', fill: '#c1c1c1', align: 'center' });
-			ctx.fillText(`${points} pontos`, width, height + 30);
+			ctx.fillText(`${points} pontos • ${games} jogos`, width, height + 30);
 		} else {
+			const name = i != 9 ? normalizeText(username, 'small') : normalizeText(username, 'big');
+
 			newStyle(ctx, { font: '20px inter', fill: '#ffffff', align: 'start' });
-			ctx.fillText(normalizeText(username), width, height);
-			const tWidth = ctx.measureText(normalizeText(username)).width;
+			ctx.fillText(name, width, height);
+			const tWidth = ctx.measureText(name).width;
 
 			newStyle(ctx, { font: '15px inter', fill: '#b5b5b5', align: 'start' });
 			ctx.fillText(`#${discriminator}`, width + tWidth + 5, height);
 
 			newStyle(ctx, { font: '22px inter', fill: '#c1c1c1', align: 'center' });
-			ctx.fillText(`${points}`, width + 250, height);
+			ctx.fillText(`${points} • ${games}`, i != 9 ? width + 230 : width + 250, height);
 		}
 	}
 
@@ -96,7 +102,12 @@ function newStyle(ctx: SKRSContext2D, { font, fill, align }: Record<string, stri
 	ctx.textAlign = align;
 }
 
-function normalizeText(text: string) {
-	if (text.length > 10) return text.slice(0, 9) + '…';
-	else return text;
+function normalizeText(text: string, type: 'small' | 'big') {
+	if (type === 'small') {
+		if (text.length > 9) return text.slice(0, 8) + '…';
+		else return text;
+	} else {
+		if (text.length > 12) return text.slice(0, 11) + '…';
+		else return text;
+	}
 }
