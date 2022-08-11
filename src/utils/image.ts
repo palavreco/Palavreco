@@ -30,12 +30,12 @@ export async function makeImage(
 	const ctx = canvas.getContext('2d');
 	ctx.drawImage(await loadImage(rankTemplate), 0, 0);
 
-	newStyle(ctx, { font: '28px inter', fill: '#ffffff', align: 'start' });
+	newStyle(ctx, { font: '28px inter', fill: '#111111', align: 'start' });
 	isServer ? ctx.fillText(int.guild?.name.toUpperCase(), 30, 55) : ctx.fillText('RANK GLOBAL', 30, 55);
 
 	const userPosition = allUsers.findIndex(u => u.id === scores[0].id) + 1 ?? '';
 	if (userPosition) {
-		newStyle(ctx, { font: '18px inter', fill: '#c1c1c1', align: 'start' });
+		newStyle(ctx, { font: '18px inter', fill: '#373737', align: 'start' });
 		ctx.fillText(`Sua posição: ${userPosition}`, 30, 80);
 	}
 
@@ -56,7 +56,7 @@ export async function makeImage(
 			const obj = await int.client.users.fetch(id);
 			const stats = await getStats(id);
 
-			user = { username: obj.username, discriminator: obj.discriminator, points, games: stats!.games };
+			user = { username: obj.username, discriminator: obj.discriminator, points, games: 17 };
 		} else {
 			break;
 		}
@@ -66,17 +66,17 @@ export async function makeImage(
 		const { username, discriminator, points, games } = user;
 
 		if (i < 3) {
-			newStyle(ctx, { font: '18px inter', fill: '#b5b5b5', align: 'start' });
+			newStyle(ctx, { font: '18px inter', fill: '#232322', align: 'start' });
 			const dWidth = ctx.measureText(`#${discriminator}`).width;
 
-			newStyle(ctx, { font: '27px inter', fill: '#ffffff', align: 'center' });
+			newStyle(ctx, { font: '27px inter', fill: '#111111', align: 'center' });
 			ctx.fillText(normalizeText(username, 'small'), width - (dWidth / 2), height);
 			const nWidth = ctx.measureText(normalizeText(username, 'small')).width;
 
-			newStyle(ctx, { font: '18px inter', fill: '#b5b5b5', align: 'center' });
+			newStyle(ctx, { font: '18px inter', fill: '#232322', align: 'center' });
 			ctx.fillText(`#${discriminator}`, width + (nWidth / 2) + 5, height);
 
-			newStyle(ctx, { font: '22px inter', fill: '#c1c1c1', align: 'center' });
+			newStyle(ctx, { font: '22px inter', fill: '#313131', align: 'center' });
 			ctx.fillText(`${points} pontos • ${games} jogos`, width, height + 30);
 		} else {
 			const name = i != 9 ? normalizeText(username, 'small') : normalizeText(username, 'big');
