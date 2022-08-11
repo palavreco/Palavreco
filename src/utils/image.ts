@@ -56,7 +56,7 @@ export async function makeImage(
 			const obj = await int.client.users.fetch(id);
 			const stats = await getStats(id);
 
-			user = { username: obj.username, discriminator: obj.discriminator, points, games: 17 };
+			user = { username: obj.username, discriminator: obj.discriminator, points, games: stats!.games };
 		} else {
 			break;
 		}
