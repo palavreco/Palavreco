@@ -31,7 +31,7 @@ export async function makeImage(
 	ctx.drawImage(await loadImage(rankTemplate), 0, 0);
 
 	newStyle(ctx, { font: '28px inter', fill: '#111111', align: 'start' });
-	isServer ? ctx.fillText(int.guild?.name.toUpperCase(), 30, 55) : ctx.fillText('RANK GLOBAL', 30, 55);
+	isServer ? ctx.fillText(int.guild!.name.toUpperCase(), 30, 55) : ctx.fillText('RANK GLOBAL', 30, 55);
 
 	const userPosition = allUsers.findIndex(u => u.id === scores[0].id) + 1 ?? '';
 	if (userPosition) {
@@ -99,6 +99,7 @@ export async function makeImage(
 function newStyle(ctx: SKRSContext2D, { font, fill, align }: Record<string, string>) {
 	ctx.font = font;
 	ctx.fillStyle = fill;
+	// @ts-ignore it works but doesn't have the types
 	ctx.textAlign = align;
 }
 

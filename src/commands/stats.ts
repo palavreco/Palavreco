@@ -51,7 +51,9 @@ export default class StatsC implements Command {
 		percentages.push(110);
 
 		const chart = new QuickChart();
+		// all ts-ignore's here are safe to use, will check latter if we can get rid of them
 		chart.setConfig({
+			// @ts-ignore
 			type: 'horizontalBar',
 			data: {
 				labels: ['1️', '2️', '3', '4', '5', '6', '❌'],
@@ -64,10 +66,13 @@ export default class StatsC implements Command {
 				legend: { display: false },
 				title: { display: true, text: 'DISTRIBUIÇÃO DE TENTATIVAS' },
 				scales: {
+					// @ts-ignore
 					xAxes: [{ display: false, gridLines: { display: false } }],
+					// @ts-ignore
 					yAxes: [{ gridLines: { display: false } }],
 				},
 				plugins: {
+					// @ts-ignore
 					datalabels: { align: 'end', anchor: 'end', color: '#111', borderWidth: 2, borderRadius: 5,
 						backgroundColor: 'rgba(222, 222, 222, 0.6)',
 						borderColor: 'rgba(196, 196, 196, 1)',
