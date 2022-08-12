@@ -36,7 +36,7 @@ export async function makeImage(
 	const userPosition = allUsers.findIndex(u => u.id === scores[0].id) + 1 ?? '';
 	if (userPosition) {
 		newStyle(ctx, { font: '18px inter', fill: '#373737', align: 'start' });
-		ctx.fillText(`Sua posição: ${userPosition}`, 30, 80);
+		ctx.fillText(`Sua posição: ${userPosition} de ${allUsers.length}`, 30, 80);
 	}
 
 	for (let j = 0; j < scores.length; j++) {

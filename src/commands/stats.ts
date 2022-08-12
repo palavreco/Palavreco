@@ -48,7 +48,7 @@ export default class StatsC implements Command {
 				percentages.push(Math.round((guesses[key] / all) * 100));
 			}
 		}
-		percentages.push(100);
+		percentages.push(110);
 
 		const chart = new QuickChart();
 		chart.setConfig({
@@ -79,16 +79,18 @@ export default class StatsC implements Command {
 			},
 		});
 
+		const hasStreak = current_streak > 4 ? ' 🔥' : '';
+
 		return new MessageEmbed()
 			.setTitle(user.tag)
 			.setThumbnail(user.displayAvatarURL())
 			.setColor('#2f3136')
 			.addFields([
-				{ name: 'Jogos', value: '```' + games.toString() + '```', inline: true },
-				{ name: 'Vitórias', value: '```' + wins.toString() + '```', inline: true },
-				{ name: '% de vitórias', value: '```' + win_percentage.toString() + '% ```', inline: true },
-				{ name: 'Sequência de vitórias', value: '```' + current_streak.toString() + '```', inline: true },
-				{ name: 'Melhor sequência', value: '```' + best_streak.toString() + '```', inline: true },
+				{ name: 'Jogos', value: '```' + `${games}` + '```', inline: true },
+				{ name: 'Vitórias', value: '```' + `${wins}` + '```', inline: true },
+				{ name: '% de vitórias', value: '```' + `${win_percentage}%` + '```', inline: true },
+				{ name: 'Sequência de vitórias', value: '```' + `${current_streak}${hasStreak}` + '```', inline: true },
+				{ name: 'Melhor sequência', value: '```' + `${best_streak}` + '```', inline: true },
 			])
 			.setImage(chart.getUrl());
 	}
