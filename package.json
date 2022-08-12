@@ -32,7 +32,6 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
-    "chart.js": "^3.9.1",
     "dayjs": "^1.10.7",
     "discord-api-types": "^0.31.2",
     "discord.js": "^13.6.0",
@@ -47,6 +46,7 @@
     "@types/pg": "^8.6.5",
     "@typescript-eslint/eslint-plugin": "^5.14.0",
     "@typescript-eslint/parser": "^5.14.0",
+    "chart.js": "^3.9.1",
     "eslint": "^8.11.0",
     "quickchart-js": "^3.0.2",
     "ts-node-dev": "^1.1.8",
