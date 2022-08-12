@@ -1,7 +1,6 @@
 import { createCanvas, GlobalFonts, loadImage, SKRSContext2D } from '@napi-rs/canvas';
 import { CommandInteraction, MessageAttachment } from 'discord.js';
 import { getStats } from '../database';
-import { Guesses } from '../interfaces/Database';
 import { rankTemplate } from '../utils/assets.json';
 
 GlobalFonts.registerFromPath('src/utils/inter.ttf', 'inter');
@@ -23,7 +22,6 @@ const namePixels = {
 export async function makeImage(
 	isServer: boolean,
 	scores: { id: string, points: number }[],
-	allUsers: Guesses[],
 	int: CommandInteraction,
 ): Promise<MessageAttachment> {
 	const canvas = createCanvas(1240, 750);
@@ -33,10 +31,10 @@ export async function makeImage(
 	newStyle(ctx, { font: '28px inter', fill: '#111111', align: 'start' });
 	isServer ? ctx.fillText(int.guild!.name.toUpperCase(), 30, 55) : ctx.fillText('RANK GLOBAL', 30, 55);
 
-	const userPosition = allUsers.findIndex(u => u.id === scores[0].id) + 1 ?? '';
+	const userPosition = scores.findIndex(s => s.id === int.user.id);
 	if (userPosition) {
 		newStyle(ctx, { font: '18px inter', fill: '#373737', align: 'start' });
-		ctx.fillText(`Sua posição: ${userPosition} de ${allUsers.length}`, 30, 80);
+		ctx.fillText(`Sua posição: ${userPosition} de ${scores.length}`, 30, 80);
 	}
 
 	for (let j = 0; j < scores.length; j++) {

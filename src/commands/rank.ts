@@ -57,6 +57,6 @@ export default class Rank implements Command {
 		}
 
 		await interaction.deferReply();
-		await interaction.editReply({ files: [await makeImage(isServer, scores, globalUsers, interaction)] });
+		await interaction.editReply({ files: [await makeImage(isServer, scores, interaction)] });
 	}
 }
