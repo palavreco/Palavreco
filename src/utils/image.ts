@@ -31,7 +31,7 @@ export async function makeImage(
 	newStyle(ctx, { font: '28px inter', fill: '#111111', align: 'start' });
 	isServer ? ctx.fillText(int.guild!.name.toUpperCase(), 30, 55) : ctx.fillText('RANK GLOBAL', 30, 55);
 
-	const userPosition = scores.findIndex(s => s.id === int.user.id);
+	const userPosition = scores.findIndex(s => s.id === int.user.id) + 1 ?? '';
 	if (userPosition) {
 		newStyle(ctx, { font: '18px inter', fill: '#373737', align: 'start' });
 		ctx.fillText(`Sua posição: ${userPosition} de ${scores.length}`, 30, 80);
