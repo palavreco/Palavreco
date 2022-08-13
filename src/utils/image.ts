@@ -29,12 +29,32 @@ export async function makeImage(
 	ctx.drawImage(await loadImage(rankTemplate), 0, 0);
 
 	newStyle(ctx, { font: '28px inter', fill: '#111111', align: 'start' });
-	isServer ? ctx.fillText(int.guild!.name.toUpperCase(), 30, 55) : ctx.fillText('RANK GLOBAL', 30, 55);
+	if (isServer) {
+		const icon = int.guild!.iconURL({ size: 64 });
+		if (icon) {
+			const imgCanvas = createCanvas(64, 64);
+			const imgCtx = imgCanvas.getContext('2d');
+
+			imgCtx.save();
+			roundedImage(imgCtx, 0, 0, 64, 64, 15);
+			imgCtx.fillStyle = '#3d6b4a';
+			imgCtx.fill();
+			imgCtx.clip();
+			imgCtx.drawImage(await loadImage(icon), 0, 0, 64, 64);
+			imgCtx.restore();
+
+			ctx.drawImage(imgCanvas, 17, 17);
+		}
+
+		ctx.fillText(normalizeText(int.guild!.name.toUpperCase(), 'title'), 90, 48);
+	} else {
+		ctx.fillText('RANK GLOBAL', 90, 48);
+	}
 
 	const userPosition = scores.findIndex(s => s.id === int.user.id) + 1 ?? '';
 	if (userPosition) {
 		newStyle(ctx, { font: '18px inter', fill: '#373737', align: 'start' });
-		ctx.fillText(`Sua posição: ${userPosition} de ${scores.length}`, 30, 80);
+		ctx.fillText(`Sua posição: ${userPosition} de ${scores.length}`, 90, 73);
 	}
 
 	for (let j = 0; j < scores.length; j++) {
@@ -101,12 +121,30 @@ function newStyle(ctx: SKRSContext2D, { font, fill, align }: Record<string, stri
 	ctx.textAlign = align;
 }
 
-function normalizeText(text: string, type: 'small' | 'big') {
+function normalizeText(text: string, type: 'small' | 'big' | 'title') {
 	if (type === 'small') {
 		if (text.length > 9) return text.slice(0, 8) + '…';
 		else return text;
-	} else {
+	} else if (type === 'big') {
 		if (text.length > 12) return text.slice(0, 11) + '…';
 		else return text;
+	} else {
+		if (text.length > 20) return text.slice(0, 19) + '…';
+		else return text;
 	}
+}
+
+// @ts-ignore lazy
+function roundedImage(ctx, x, y, width, height, radius) {
+	ctx.beginPath();
+	ctx.moveTo(x + radius, y);
+	ctx.lineTo(x + width - radius, y);
+	ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+	ctx.lineTo(x + width, y + height - radius);
+	ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+	ctx.lineTo(x + radius, y + height);
+	ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+	ctx.lineTo(x, y + radius);
+	ctx.quadraticCurveTo(x, y, x + radius, y);
+	ctx.closePath();
 }
