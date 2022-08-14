@@ -20,6 +20,6 @@ export default class Help implements Command {
 					.setCustomId('help_rank').setEmoji('1008463019484909570').setLabel('Rank').setStyle('PRIMARY'),
 			]);
 
-		interaction.reply({ content: t('help'), components: [row] });
+		interaction.reply({ content: t('help'), components: [row], ephemeral: true });
 	}
 }
