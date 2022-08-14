@@ -1,8 +1,7 @@
-import { CommandInteraction } from 'discord.js';
+import { CommandInteraction, MessageActionRow, MessageButton } from 'discord.js';
 import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
 import { t } from '../utils/replyHelper';
-import { letter } from '../utils/assets.json';
 
 export default class Help implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
@@ -13,10 +12,14 @@ export default class Help implements Command {
 	dev = false;
 
 	execute(interaction: CommandInteraction) {
-		interaction.reply(t('help', {
-			e: letter.green.e,
-			i: letter.yellow.i,
-			v: letter.gray.v,
-		}));
+		const row = new MessageActionRow()
+			.addComponents([
+				new MessageButton()
+					.setCustomId('help_game').setEmoji('1008463018495066232').setLabel('Jogo').setStyle('PRIMARY'),
+				new MessageButton()
+					.setCustomId('help_rank').setEmoji('1008463019484909570').setLabel('Rank').setStyle('PRIMARY'),
+			]);
+
+		interaction.reply({ content: t('help'), components: [row] });
 	}
 }
