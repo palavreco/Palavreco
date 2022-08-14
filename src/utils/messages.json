@@ -5,16 +5,16 @@
     "suggestion": "sugestão",
     "report": "reporte",
 
-    "success_operation": "{{greenTick}} Operação concluída. Obrigado!",
-    "cancelled_operation": "{{redTick}} Operação cancelada.",
+    "success_operation": "✅ Operação concluída. Obrigado!",
+    "cancelled_operation": "❌ Operação cancelada.",
 
     "feedback_thanks": "{{p}} Olá! Obrigado {{part}}. **A equipe de desenvolvedores agradece!**",
     "feedback_thanks_answer": "{{p}} Olá! Obrigado {{part}}. A equipe de desenvolvedores te respondeu.\n\n**Resposta:** {{answer}}",
     "feedback_sug": "pela sugestão",
     "feedback_bug": "pelo reporte",
 
-    "already_played": "{{redTick}} Você já jogou hoje!\nTempo restante até a próxima palavra: <t:{{timestamp}}:R>",
-    "already_playing": "{{redTick}} Você já está jogando!\nSe a mensagem não aparece mais, mande `cancelar` no canal onde o jogo foi iniciado e tente novamente.",
+    "already_played": "❌ Você já jogou hoje!\nTempo restante até a próxima palavra: <t:{{timestamp}}:R>",
+    "already_playing": "❌ Você já está jogando!\nSe a mensagem não aparece mais, mande `cancelar` no canal onde o jogo foi iniciado e tente novamente.",
 
     "game_message": "Adivinhe o **PALAVRECO** de hoje! 👀\n\n{{table}}\nPara cancelar o jogo, digite `cancelar`",
     "not_five_letters": "Adivinhe o **PALAVRECO** de hoje! 👀\n\n{{table}}\n**Atenção:** A palavra deve ter 5 letras!",
@@ -29,5 +29,5 @@
     "game_result_win_streak": "Joguei palavreco.com #{{day}} • {{attempts}}/6 • {{streak}} 🔥\n\n{{finalTable}}",
     "game_result_lose": "Joguei palavreco.com #{{day}} • X/6\n\n{{finalTable}}",
 
-    "missing_permissions": "{{redTick}} Eu não tenho permissão para executar este comando, por favor edite meu cargo a partir das informações abaixo.\nPermissões necessárias: **{{perms}}**"
+    "missing_permissions": "❌ Eu não tenho permissão para executar este comando, por favor edite meu cargo a partir das informações abaixo.\nPermissões necessárias: **{{perms}}**"
 }

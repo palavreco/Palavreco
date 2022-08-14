@@ -15,7 +15,7 @@ import {
 } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
 import { t } from '../utils/replyHelper';
-import { check, letter } from '../utils/assets.json';
+import { letter } from '../utils/assets.json';
 
 export default class FeedBack implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
@@ -72,9 +72,8 @@ export default class FeedBack implements Command {
 
 		const colResp = await collector(channel, interaction);
 		const confirmed = colResp === 'confirm';
-		await interaction.editReply({ content: confirmed
-			? t('success_operation', { greenTick: check.green })
-			: t('cancelled_operation', { redTick: check.red }), embeds: [], components: [],
+		await interaction.editReply({ embeds: [], components: [],
+			content: confirmed ? t('success_operation') : t('cancelled_operation'),
 		});
 
 		if (confirmed) {
@@ -122,7 +121,7 @@ function handleOperation(msg: Message, embed: MessageEmbed, isSug: boolean, user
 				p: letter.green.p,
 				part: isSug ? t('feedback_sug') : t('feedback_bug'),
 			})).catch(() => {
-				msg.channel.send(`${check.red} **${u.tag}** can't receive DMs.`);
+				msg.channel.send(`❌ **${u.tag}** can't receive DMs.`);
 			});
 
 			break;
@@ -146,7 +145,7 @@ function handleOperation(msg: Message, embed: MessageEmbed, isSug: boolean, user
 				part: isSug ? t('feedback_sug') : t('feedback_bug'),
 				answer: ans!.content,
 			})).catch(() => {
-				msg.channel.send(`${check.red} **${u.tag}** can't receive DMs.`);
+				msg.channel.send(`❌ **${u.tag}** can't receive DMs.`);
 			});
 
 			ans?.delete();

@@ -4,7 +4,6 @@ import { ApplicationCommandOptionType, RESTPostAPIChatInputApplicationCommandsJS
 import QuickChart from 'quickchart-js';
 import { getGuesses, getStats } from '../database';
 import { Guesses, Stats } from '../interfaces/Database';
-import { check } from '../utils/assets.json';
 
 export default class StatsC implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
@@ -28,7 +27,7 @@ export default class StatsC implements Command {
 		const stats = await getStats(optionOrUser.id);
 		const guesses = await getGuesses(optionOrUser.id);
 		if (!stats || !guesses) {
-			interaction.reply(`${check.red} **${optionOrUser.tag}** não tem nenhuma estatística!`);
+			interaction.reply(`❌ **${optionOrUser.tag}** não tem nenhuma estatística!`);
 			return;
 		}
 

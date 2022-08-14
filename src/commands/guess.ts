@@ -9,7 +9,7 @@ import { awaitMessage } from '../utils/msgCollector';
 import { isValid } from '../utils/checkWord';
 import { toDefault, toEmoji } from '../utils/converters';
 import { platform } from '../utils/platform';
-import { check, square } from '../utils/assets.json';
+import { square } from '../utils/assets.json';
 
 let usersTries: Record<string, { id: string, attempts: string[] }> = {};
 let activeGames: string[] = [];
@@ -42,7 +42,7 @@ export default class Guess implements Command {
 		} else if (await getUserStatus(user.id) === 'registered_active') {
 			interaction.reply({
 				content: t('already_played', {
-					redTick: check.red, timestamp: dayjs().tz('America/Sao_Paulo').endOf('day').unix() + 1,
+					timestamp: dayjs().tz('America/Sao_Paulo').endOf('day').unix() + 1,
 				}), ephemeral: true,
 			});
 			return;
@@ -74,7 +74,7 @@ export default class Guess implements Command {
 
 		let i = 0;
 		if (activeGames.includes(user.id)) {
-			await interaction.reply({ content: t('already_playing', { redTick: check.red }), ephemeral: true });
+			await interaction.reply({ content: t('already_playing'), ephemeral: true });
 
 			return;
 		} else {

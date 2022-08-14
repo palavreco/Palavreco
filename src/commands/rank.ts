@@ -3,7 +3,6 @@ import { ApplicationCommandOptionType, RESTPostAPIChatInputApplicationCommandsJS
 import { Command } from '../interfaces/Command';
 import { getAllGuesses } from '../database';
 import { makeImage } from '../utils/image';
-import { check } from '../utils/assets.json';
 
 export default class Rank implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
@@ -31,7 +30,7 @@ export default class Rank implements Command {
 		const globalUsers = await getAllGuesses();
 
 		if (!guildId && isServer) {
-			interaction.reply(`${check.red} Não é possível mostrar o rank do servidor sem estar em um servidor.`);
+			interaction.reply('❌ Não é possível mostrar o rank do servidor sem estar em um servidor.');
 			return;
 		}
 
@@ -44,15 +43,15 @@ export default class Rank implements Command {
 		};
 
 		const scores = serverOrGlobal().map(user => {
-			const { id, one, two, three, four, five, six, losses } = user;
-			let points = (one * 3) + (two * 2) + three + (four * 0.75) + (five * 0.5) + (six * 0.25) - losses;
+			const { id, one, two, three, four, five, six } = user;
+			let points = (one * 3) + (two * 2) + three + (four * 0.75) + (five * 0.5) + (six * 0.25);
 			if (points < 0) points = 0;
 
 			return { id, points };
 		}).sort((a, b) => b.points - a.points);
 
 		if (!scores.length) {
-			interaction.reply(`${check.red} Não há nenhum usuário no rank.`);
+			interaction.reply('❌ Não há nenhum usuário no rank.');
 			return;
 		}
 

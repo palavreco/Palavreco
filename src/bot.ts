@@ -9,7 +9,6 @@ import { log } from './utils/log';
 import { t } from './utils/replyHelper';
 import { setUpPresence } from './utils/presence';
 import { notifyLogChannel } from './utils/guildLog';
-import { check } from './utils/assets.json';
 dotenv.config();
 
 const client = new Client({ intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS'] });
@@ -55,7 +54,6 @@ client.on('interactionCreate', i => {
 
 		if (missingPermissions) {
 			i.reply(t('missing_permissions', {
-				redTick: check.red,
 				perms: missingPermissions.join(' '),
 			}));
 
