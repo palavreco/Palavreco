@@ -4,7 +4,7 @@ import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-typ
 import { Command } from '../interfaces/Command';
 import { t } from '../utils/replyHelper';
 import { getUserStatus, registerUser, getDay, getWord, setPlayed, verifyWord, getStats } from '../database';
-import { runAtMidnight } from '../utils/runner';
+import { runAtEndOf } from '../utils/runner';
 import { awaitMessage } from '../utils/msgCollector';
 import { isValid } from '../utils/checkWord';
 import { toDefault, toEmoji } from '../utils/converters';
@@ -14,7 +14,7 @@ import { square } from '../utils/assets.json';
 let usersTries: Record<string, { id: string, attempts: string[] }> = {};
 let activeGames: string[] = [];
 
-runAtMidnight(() => {
+runAtEndOf('day', () => {
 	usersTries = {};
 	activeGames = [];
 });
@@ -70,7 +70,6 @@ export default class Guess implements Command {
 		const playingUser: { id: string, attempts: string[] } = { id: user.id, attempts: [] };
 		const correctWord = await getWord();
 		const day = await getDay();
-		const streak = (await getStats(user.id))?.current_streak;
 
 		let i = 0;
 		if (activeGames.includes(user.id)) {
@@ -127,6 +126,7 @@ export default class Guess implements Command {
 					delete usersTries[user.id];
 
 					const msg = await channel!.send({ content: t('platform_ask', { user }), components: [row] });
+					const streak = (await getStats(user.id))?.current_streak;
 
 					if (await platform(interaction) === 'pc-ios') {
 						await msg.delete();

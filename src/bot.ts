@@ -2,9 +2,9 @@ import fs from 'node:fs';
 import dotenv from 'dotenv';
 import { Client, Collection, Guild } from 'discord.js';
 import { Command } from './interfaces/Command';
-import { verifyWord, newWord, setUp } from './database';
+import { verifyWord, newWord, setUp, resetRank } from './database';
 import { getMissingPermissions } from './utils/permissions';
-import { runAtMidnight } from './utils/runner';
+import { runAtEndOf } from './utils/runner';
 import { log } from './utils/log';
 import { t } from './utils/replyHelper';
 import { setUpPresence } from './utils/presence';
@@ -80,7 +80,11 @@ client.login(process.env.TOKEN);
 setUp();
 verifyWord();
 
-runAtMidnight(() => {
+runAtEndOf('day', () => {
 	newWord();
 	log('New word & users reseted!', 'DB', 'purple');
+});
+
+runAtEndOf('month', () => {
+	resetRank();
 });

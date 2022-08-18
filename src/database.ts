@@ -219,3 +219,7 @@ export async function verifyWord(): Promise<boolean> {
 	}
 	return false;
 }
+
+export async function resetRank(): Promise<void> {
+	await db('users').delete();
+}
