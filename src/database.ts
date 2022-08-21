@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import dotenv from 'dotenv';
 import { knex } from 'knex';
-import { Guesses, Stats, User, Word } from './interfaces/Database';
+import { Guesses, Rank, Stats, User, Word } from './interfaces/Database';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import { log } from './utils/log';
@@ -10,16 +10,13 @@ dayjs.extend(timezone);
 
 const db = knex({ client: 'pg', connection: process.env.DATABASE_URL });
 
-/**
- * Connect to the database and create the tables if they don't exist
- */
 export function setUp(): void {
 	const tables: Record<string, Record<string, 'text' | 'integer' | 'boolean'>> = {
 		users: { id: 'text', status: 'boolean' },
 		words: { word: 'text', status: 'boolean' },
 		stats: {
 			id: 'text', games: 'integer', wins: 'integer',
-			win_percentage: 'integer', current_streak: 'integer', best_streak: 'integer',
+			win_percentage: 'integer', currentStreak: 'integer', bestStreak: 'integer',
 		},
 		guesses: {
 			id: 'text', one: 'integer', two: 'integer', three: 'integer',
@@ -42,19 +39,10 @@ export function setUp(): void {
 	log('Database setup complete', 'DB', 'blue');
 }
 
-/**
- * Registers a user in the database
- * @param id The id of the user to register
- */
 export async function registerUser(id: string): Promise<void> {
 	await db('users').insert({ id, status: false });
 }
 
-/**
- * Indicates whether this user is registered in the database
- * @param id The user id to check
- * @returns {Promise<string>} The user status
- */
 export async function getUserStatus(id: string): Promise<string> {
 	const user = await db<User>('users').where('id', id).first();
 
@@ -63,10 +51,6 @@ export async function getUserStatus(id: string): Promise<string> {
 	else return 'registered_inactive';
 }
 
-/**
- * Sets the status of a user to false in the database
- * @param id The user id to set as played
- */
 export async function setPlayed(id: string, win: boolean, guildId: string | null, guesses?: number): Promise<void> {
 	await db('users').update({ status: true }).where('id', id);
 
@@ -106,18 +90,18 @@ export async function setPlayed(id: string, win: boolean, guildId: string | null
 	if (!user.stats) {
 		await db('stats').insert({
 			id, games: 1, wins: winned, win_percentage: win ? 100 : 0,
-			current_streak: winned, best_streak: winned,
+			currentStreak: winned, bestStreak: winned,
 		});
 	} else {
-		const best = win && user.stats.current_streak >= user.stats.best_streak
-			? user.stats.current_streak + 1
-			: user.stats.best_streak;
+		const best = win && user.stats.currentStreak >= user.stats.bestStreak
+			? user.stats.currentStreak + 1
+			: user.stats.bestStreak;
 
 		await db('stats').update({
 			games: db.raw('?? + 1', ['games']),
 			wins: db.raw('?? + ??', ['wins', winned]),
-			current_streak: win ? db.raw('?? + 1', ['current_streak']) : 0,
-			best_streak: best,
+			currentStreak: win ? db.raw('?? + 1', ['currentStreak']) : 0,
+			bestStreak: best,
 		}).where('id', id);
 
 		const updatedUser = await db<Stats>('stats').where('id', id).first();
@@ -127,37 +111,18 @@ export async function setPlayed(id: string, win: boolean, guildId: string | null
 
 }
 
-/**
- * Gets the stats of a user from the database
- * @param id The user's ID
- * @returns {Promise<Stats>} The user's stats object
- */
 export async function getStats(id: string): Promise<Stats | undefined> {
 	return await db<Stats>('stats').where('id', id).first();
 }
 
-/**
- * Gets the guesses of a user from the database
- * @param id The user's ID
- * @returns {Promise<Guesses>} The user's guesses object
- */
 export async function getGuesses(id: string): Promise<Guesses | undefined> {
-	return await db<Guesses>('guesses').where('id', id).first();
+	return await db<Guesses>('rank').where('id', id).first();
 }
 
-/**
- * Gets all the users and their guesses distributions from the database
- * @returns {Promise<Guesses[]>} The list of all registered users
- */
-export async function getAllGuesses(): Promise<Guesses[]> {
-	return await db<Guesses>('guesses').select('*');
+export async function getRank(): Promise<Rank[]> {
+	return await db<Rank>('rank').select('*');
 }
 
-/**
- * Resets the user's status to false, meaning they can play again
- * @param id The user's ID
- * @returns {Promise<string>} The user state after resetting
- */
 export async function resetUser(id: string): Promise<string> {
 	const user = await db<User>('users').where('id', id).first();
 
@@ -171,10 +136,6 @@ export async function resetUser(id: string): Promise<string> {
 	}
 }
 
-/**
- * Deletes/replaces the word in the database to a new one be used and resets all the users
- * @param replace Whether to replace the word
- */
 export async function newWord(replace = false): Promise<void> {
 	const words: string[] = fs.readFileSync('src/words/wordsList.txt', 'utf8').split('\n');
 	const rw: string = words[Math.floor(Math.random() * words.length)].replace('\r', '');
@@ -194,18 +155,10 @@ export async function newWord(replace = false): Promise<void> {
 	}
 }
 
-/**
- * Get the correct word for that day
- * @returns {Promise<string>} The word
- */
 export async function getWord(): Promise<string> {
 	return db<Word>('words').where('status', true).first().then(r => r!.word);
 }
 
-/**
- * Gets the days since the beginning of the bot
- * @returns {Promise<number>} The number of days
- */
 export function getDay(): Promise<number> {
 	return db<Word>('words').select('*').then(r => r.length);
 }

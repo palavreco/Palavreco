@@ -127,7 +127,7 @@ export default class Guess implements Command {
 					delete usersTries[user.id];
 
 					const msg = await channel!.send({ content: t('platform_ask', { user }), components: [row] });
-					const streak = (await getStats(user.id))?.current_streak;
+					const streak = (await getStats(user.id))?.currentStreak;
 
 					if (await platform(interaction) === 'pc-ios') {
 						await msg.delete();

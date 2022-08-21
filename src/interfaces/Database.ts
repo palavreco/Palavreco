@@ -12,9 +12,15 @@ export interface Stats {
     id: string;
     games: number;
     wins: number;
-    win_percentage: number;
-    current_streak: number;
-    best_streak: number;
+    currentStreak: number;
+    bestStreak: number;
+    guesses: number[];
+}
+
+export interface Rank {
+    id: string;
+    guesses: number[];
+    guilds: string[];
 }
 
 export interface Guesses {
