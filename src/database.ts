@@ -1,31 +1,53 @@
 import fs from 'node:fs';
 import dotenv from 'dotenv';
+import { knex } from 'knex';
+import { Guesses, Stats, User, Word } from './interfaces/Database';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
-import { Client, QueryResult } from 'pg';
-import { UserRow, WordRow } from './interfaces/Database';
 import { log } from './utils/log';
 dotenv.config();
 dayjs.extend(timezone);
 
-const client = new Client({
-	connectionString: process.env.DATABASE_URL,
-	ssl: { rejectUnauthorized: false },
-});
+const db = knex({ client: 'pg', connection: process.env.DATABASE_URL });
 
 /**
  * Connect to the database and create the tables if they don't exist
  */
-export async function setUp(): Promise<void> {
-	client.connect();
+export function setUp(): void {
+	const tables: Record<string, Record<string, 'text' | 'integer' | 'boolean'>> = {
+		users: { id: 'text', status: 'boolean' },
+		words: { word: 'text', status: 'boolean' },
+		stats: {
+			id: 'text', games: 'integer', wins: 'integer',
+			win_percentage: 'integer', current_streak: 'integer', best_streak: 'integer',
+		},
+		guesses: {
+			id: 'text', one: 'integer', two: 'integer', three: 'integer',
+			four: 'integer', five: 'integer', six: 'integer', losses: 'integer',
+		},
+	};
 
-	const tableUsers = 'CREATE TABLE IF NOT EXISTS "users" ("id" TEXT, "status" BOOLEAN);';
-	const tableWords = 'CREATE TABLE IF NOT EXISTS "words" ("word" TEXT, "status" BOOLEAN);';
+	Object.keys(tables).forEach(async table => {
+		if (!await db.schema.hasTable(table)) {
+			await db.schema.createTable(table, t => {
+				Object.entries(tables[table]).forEach(([key, type]) => t[type](key));
 
-	await client.query(tableUsers)
-		.then(() => log('Users table created/verified', 'DB', 'green'));
-	await client.query(tableWords)
-		.then(() => log('Words table created/verified', 'DB', 'green'));
+				if (table === 'guesses') {
+					t.specificType('guilds', 'text[]');
+				}
+			});
+		}
+	});
+
+	log('Database setup complete', 'DB', 'blue');
+}
+
+/**
+ * Registers a user in the database
+ * @param id The id of the user to register
+ */
+export async function registerUser(id: string): Promise<void> {
+	await db('users').insert({ id, status: false });
 }
 
 /**
@@ -34,31 +56,101 @@ export async function setUp(): Promise<void> {
  * @returns {Promise<string>} The user status
  */
 export async function getUserStatus(id: string): Promise<string> {
-	const userRow: QueryResult<UserRow> = await client.query(`SELECT id, status FROM users WHERE id = '${id}'`);
+	const user = await db<User>('users').where('id', id).first();
 
-	if (!userRow.rowCount) {
-		return 'not_registered';
-	} else if (userRow.rows[0].status) {
-		return 'registered_active';
-	} else {
-		return 'registered_inactive';
-	}
-}
-
-/**
- * Registers a user in the database
- * @param id The id of the user to register
- */
-export function registerUser(id: string): void {
-	client.query(`INSERT INTO users (id, status) VALUES ('${id}', false)`);
+	if (!user) return 'not_registered';
+	else if (user.status) return 'registered_active';
+	else return 'registered_inactive';
 }
 
 /**
  * Sets the status of a user to false in the database
  * @param id The user id to set as played
  */
-export function setPlayed(id: string): void {
-	client.query(`UPDATE users SET status = true WHERE id = '${id}'`);
+export async function setPlayed(id: string, win: boolean, guildId: string | null, guesses?: number): Promise<void> {
+	await db('users').update({ status: true }).where('id', id);
+
+	const user = {
+		stats: await db<Stats>('stats').where('id', id).first(),
+		guesses: await db<Guesses>('guesses').where('id', id).first(),
+	};
+
+	const number = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six' }[guesses!]!;
+	const winned = win ? 1 : 0;
+
+	if (!user.guesses) {
+		if (win) {
+			await db('guesses').insert({
+				id, one: 0, two: 0, three: 0, four: 0,
+				five: 0, six: 0, losses: 0, guilds: guildId ? [guildId] : [],
+			});
+			await db('guesses').update({ [number]: db.raw('?? + 1', [number]) }).where('id', id);
+		} else {
+			await db('guesses').insert({
+				id, one: 0, two: 0, three: 0, four: 0,
+				five: 0, six: 0, losses: 1, guilds: guildId ? [guildId] : [],
+			});
+		}
+	} else {
+		if (win) {
+			await db('guesses').update({ [number]: db.raw('?? + 1', [number]) }).where('id', id);
+		} else {
+			await db('guesses').update({ losses: db.raw('?? + 1', ['losses']) }).where('id', id);
+		}
+
+		if (guildId && !user.guesses.guilds.includes(guildId)) {
+			await db('guesses').update({ guilds: db.raw('array_append(guilds, ?)', [guildId]) }).where('id', id);
+		}
+	}
+
+	if (!user.stats) {
+		await db('stats').insert({
+			id, games: 1, wins: winned, win_percentage: win ? 100 : 0,
+			current_streak: winned, best_streak: winned,
+		});
+	} else {
+		const best = win && user.stats.current_streak >= user.stats.best_streak
+			? user.stats.current_streak + 1
+			: user.stats.best_streak;
+
+		await db('stats').update({
+			games: db.raw('?? + 1', ['games']),
+			wins: db.raw('?? + ??', ['wins', winned]),
+			current_streak: win ? db.raw('?? + 1', ['current_streak']) : 0,
+			best_streak: best,
+		}).where('id', id);
+
+		const updatedUser = await db<Stats>('stats').where('id', id).first();
+		const percentage = Math.round((updatedUser!.wins / updatedUser!.games) * 100);
+		await db('stats').update({ win_percentage: percentage }).where('id', id);
+	}
+
+}
+
+/**
+ * Gets the stats of a user from the database
+ * @param id The user's ID
+ * @returns {Promise<Stats>} The user's stats object
+ */
+export async function getStats(id: string): Promise<Stats | undefined> {
+	return await db<Stats>('stats').where('id', id).first();
+}
+
+/**
+ * Gets the guesses of a user from the database
+ * @param id The user's ID
+ * @returns {Promise<Guesses>} The user's guesses object
+ */
+export async function getGuesses(id: string): Promise<Guesses | undefined> {
+	return await db<Guesses>('guesses').where('id', id).first();
+}
+
+/**
+ * Gets all the users and their guesses distributions from the database
+ * @returns {Promise<Guesses[]>} The list of all registered users
+ */
+export async function getAllGuesses(): Promise<Guesses[]> {
+	return await db<Guesses>('guesses').select('*');
 }
 
 /**
@@ -67,12 +159,12 @@ export function setPlayed(id: string): void {
  * @returns {Promise<string>} The user state after resetting
  */
 export async function resetUser(id: string): Promise<string> {
-	const user: QueryResult<UserRow> = await client.query(`SELECT id, status FROM users WHERE id = '${id}'`);
+	const user = await db<User>('users').where('id', id).first();
 
-	if (!user.rowCount) {
+	if (!user) {
 		return 'dont_exist';
-	} else if (user.rows[0].status) {
-		await client.query(`UPDATE users SET status = false WHERE id = '${id}'`);
+	} else if (user.status) {
+		await db('users').update({ status: false }).where('id', id);
 		return 'reseted';
 	} else {
 		return 'already_reseted';
@@ -88,17 +180,14 @@ export async function newWord(replace = false): Promise<void> {
 	const rw: string = words[Math.floor(Math.random() * words.length)].replace('\r', '');
 
 	for (let i = 0; i < words.length; i++) {
-		const word: QueryResult<WordRow> = await client.query(`SELECT word, status FROM words WHERE word = '${rw}'`);
+		const word = await db<Word>('words').where('word', rw).first();
 
-		if (word.rowCount === 0) {
-			if (replace) {
-				await client.query('DELETE FROM words WHERE status = true');
-			} else {
-				await client.query('UPDATE words SET status = false WHERE status = true');
-			}
+		if (!word) {
+			if (replace) await db('words').delete().where('status', true);
+			else await db('words').update({ status: false }).where('status', true);
 
-			await client.query(`INSERT INTO words (word, status) VALUES ('${rw}', true)`);
-			await client.query('DELETE FROM users');
+			await db('words').insert({ word: rw, status: true });
+			await db('users').update({ status: false });
 		} else {
 			continue;
 		}
@@ -109,9 +198,8 @@ export async function newWord(replace = false): Promise<void> {
  * Get the correct word for that day
  * @returns {Promise<string>} The word
  */
-export function getWord(): Promise<string> {
-	return client.query('SELECT word, status FROM words WHERE status = true')
-		.then((res: QueryResult<WordRow>) => res.rows[0].word);
+export async function getWord(): Promise<string> {
+	return db<Word>('words').where('status', true).first().then(r => r!.word);
 }
 
 /**
@@ -119,7 +207,7 @@ export function getWord(): Promise<string> {
  * @returns {Promise<number>} The number of days
  */
 export function getDay(): Promise<number> {
-	return client.query('SELECT * FROM words').then((res: QueryResult<WordRow>) => res.rowCount);
+	return db<Word>('words').select('*').then(r => r.length);
 }
 
 export async function verifyWord(): Promise<boolean> {
@@ -130,4 +218,8 @@ export async function verifyWord(): Promise<boolean> {
 		return true;
 	}
 	return false;
+}
+
+export async function resetRank(): Promise<void> {
+	await db('users').delete();
 }

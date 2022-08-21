@@ -1,4 +1,4 @@
-import { letter } from './emotes.json';
+import { letter } from './assets.json';
 
 export function toDefault(content: string) {
 	content = content.replace(/\n/g, '');

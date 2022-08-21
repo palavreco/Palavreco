@@ -3,18 +3,18 @@ import { CommandInteraction, MessageActionRow, MessageButton, PermissionString }
 import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
 import { t } from '../utils/replyHelper';
-import { getUserStatus, registerUser, getDay, getWord, setPlayed, verifyWord } from '../database';
-import { runAtMidnight } from '../utils/runner';
+import { getUserStatus, registerUser, getDay, getWord, setPlayed, verifyWord, getStats } from '../database';
+import { runAtEndOf } from '../utils/runner';
 import { awaitMessage } from '../utils/msgCollector';
 import { isValid } from '../utils/checkWord';
 import { toDefault, toEmoji } from '../utils/converters';
 import { platform } from '../utils/platform';
-import { check, square } from '../utils/emotes.json';
+import { square } from '../utils/assets.json';
 
 let usersTries: Record<string, { id: string, attempts: string[] }> = {};
 let activeGames: string[] = [];
 
-runAtMidnight(() => {
+runAtEndOf('day', () => {
 	usersTries = {};
 	activeGames = [];
 });
@@ -35,14 +35,14 @@ export default class Guess implements Command {
 			activeGames = [];
 		}
 
-		const { user, channel } = interaction;
+		const { user, channel, guildId } = interaction;
 
 		if (await getUserStatus(user.id) === 'not_registered') {
 			registerUser(user.id);
 		} else if (await getUserStatus(user.id) === 'registered_active') {
 			interaction.reply({
 				content: t('already_played', {
-					redTick: check.red, timestamp: dayjs().tz('America/Sao_Paulo').endOf('day').unix() + 1,
+					timestamp: dayjs().tz('America/Sao_Paulo').endOf('day').unix() + 1,
 				}), ephemeral: true,
 			});
 			return;
@@ -73,7 +73,7 @@ export default class Guess implements Command {
 
 		let i = 0;
 		if (activeGames.includes(user.id)) {
-			await interaction.reply({ content: t('already_playing', { redTick: check.red }), ephemeral: true });
+			await interaction.reply({ content: t('already_playing'), ephemeral: true });
 
 			return;
 		} else {
@@ -120,27 +120,41 @@ export default class Guess implements Command {
 
 				if (word === correctWord) {
 					await interaction.editReply(t('game_win', { attempts: i + 1, table: table() }));
-					setPlayed(user.id);
+					await interaction.followUp({ content: t('warn_news'), ephemeral: true });
+					setPlayed(user.id, true, guildId, i + 1);
 
 					activeGames.splice(activeGames.indexOf(user.id), 1);
 					delete usersTries[user.id];
 
 					const msg = await channel!.send({ content: t('platform_ask', { user }), components: [row] });
+					const streak = (await getStats(user.id))?.current_streak;
 
 					if (await platform(interaction) === 'pc-ios') {
 						await msg.delete();
 
 						await channel!.send(t('identifier', { user }));
-						await channel!.send(t('game_result_win', {
-							day, attempts: i + 1, finalTable: toDefault(table()),
-						}));
+						if (streak && streak > 4) {
+							await channel!.send(t('game_result_win_streak', {
+								day, attempts: i + 1, finalTable: toDefault(table()), streak,
+							}));
+						} else {
+							await channel!.send(t('game_result_win', {
+								day, attempts: i + 1, finalTable: toDefault(table()),
+							}));
+						}
 					} else {
 						await msg.delete();
 
 						await channel!.send(t('identifier', { user }));
-						await channel!.send('```' + t('game_result_win', {
-							day, attempts: i + 1, finalTable: toDefault(table()),
-						}) + '```');
+						if (streak && streak > 4) {
+							await channel!.send('```' + t('game_result_win_streak', {
+								day, attempts: i + 1, finalTable: toDefault(table()), streak,
+							}) + '```');
+						} else {
+							await channel!.send('```' + t('game_result_win', {
+								day, attempts: i + 1, finalTable: toDefault(table()),
+							}) + '```');
+						}
 					}
 
 					break;
@@ -149,8 +163,8 @@ export default class Guess implements Command {
 
 					if (i === 5) {
 						await interaction.editReply(t('game_lose', { table: table(), cw: correctWord.toUpperCase() }));
-
-						setPlayed(user.id);
+						await interaction.followUp({ content: t('warn_news'), ephemeral: true });
+						setPlayed(user.id, false, guildId);
 
 						activeGames.splice(activeGames.indexOf(user.id), 1);
 						delete usersTries[user.id];

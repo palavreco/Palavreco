@@ -2,14 +2,14 @@ import fs from 'node:fs';
 import dotenv from 'dotenv';
 import { Client, Collection, Guild } from 'discord.js';
 import { Command } from './interfaces/Command';
-import { verifyWord, newWord, setUp } from './database';
+import { verifyWord, newWord, setUp, resetRank } from './database';
 import { getMissingPermissions } from './utils/permissions';
-import { runAtMidnight } from './utils/runner';
+import { runAtEndOf } from './utils/runner';
 import { log } from './utils/log';
 import { t } from './utils/replyHelper';
 import { setUpPresence } from './utils/presence';
 import { notifyLogChannel } from './utils/guildLog';
-import { check } from './utils/emotes.json';
+import { letter } from './utils/assets.json';
 dotenv.config();
 
 const client = new Client({ intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS'] });
@@ -46,23 +46,33 @@ for (const file of cmdsFolder) {
 }
 
 client.on('interactionCreate', i => {
-	if (!i.isCommand()) return;
+	if (i.isCommand()) {
+		const command = botCmds.get(i.commandName);
 
-	const command = botCmds.get(i.commandName);
+		if (command) {
+			const missingPermissions = getMissingPermissions(command.permissions, i);
 
-	if (command) {
-		const missingPermissions = getMissingPermissions(command.permissions, i);
+			if (missingPermissions) {
+				i.reply(t('missing_permissions', {
+					perms: missingPermissions.join(' '),
+				}));
 
-		if (missingPermissions) {
-			i.reply(t('missing_permissions', {
-				redTick: check.red,
-				perms: missingPermissions.join(' '),
-			}));
+				return;
+			}
 
-			return;
+			command.execute(i);
 		}
-
-		command.execute(i);
+	} else if (i.isButton()) {
+		if (i.customId === 'help_game') {
+			i.reply({
+				content: t('help_game', { e: letter.green.e, i: letter.yellow.i, v: letter.gray.v }),
+				ephemeral: true,
+			});
+		} else if (i.customId === 'help_rank') {
+			i.reply({ content: t('help_rank'), ephemeral: true });
+		}
+	} else {
+		return;
 	}
 });
 
@@ -70,7 +80,11 @@ client.login(process.env.TOKEN);
 setUp();
 verifyWord();
 
-runAtMidnight(() => {
+runAtEndOf('day', () => {
 	newWord();
 	log('New word & users reseted!', 'DB', 'purple');
+});
+
+runAtEndOf('month', () => {
+	resetRank();
 });

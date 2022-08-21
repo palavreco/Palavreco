@@ -2,7 +2,6 @@ import { CommandInteraction } from 'discord.js';
 import { ApplicationCommandOptionType, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
 import { resetUser } from '../database';
-import { check } from '../utils/emotes.json';
 
 export default class Reset implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
@@ -25,13 +24,13 @@ export default class Reset implements Command {
 
 		switch (await resetUser(user!.id)) {
 		case 'dont_exist':
-			interaction.reply(`${check.red} **${user!.tag}** (\`${user!.id}\`) doesn't exist in the database`);
+			interaction.reply(`❌ **${user!.tag}** (\`${user!.id}\`) doesn't exist in the database`);
 			break;
 		case 'reseted':
-			interaction.reply(`${check.green} **${user!.tag}** (\`${user!.id}\`) has been reseted`);
+			interaction.reply(`✅ **${user!.tag}** (\`${user!.id}\`) has been reseted`);
 			break;
 		case 'already_reseted':
-			interaction.reply(`${check.red} **${user!.tag}** (\`${user!.id}\`) is already reseted`);
+			interaction.reply(`❌ **${user!.tag}** (\`${user!.id}\`) is already reseted`);
 		}
 	}
 }

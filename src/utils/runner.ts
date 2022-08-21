@@ -5,12 +5,12 @@ import timezone from 'dayjs/plugin/timezone';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-export function runAtMidnight(callback: () => void) {
-	const midnight = +dayjs().tz('America/Sao_Paulo').endOf('day') + 1;
-	const msUntilMidnight = midnight - +dayjs();
+export function runAtEndOf(endOf: 'day' | 'month', callback: () => void) {
+	const time = +dayjs().tz('America/Sao_Paulo').endOf(endOf) + 1;
+	const msUntilTime = time - +dayjs();
 
 	setTimeout(() => {
 		callback();
-		runAtMidnight(callback);
-	}, msUntilMidnight);
+		runAtEndOf(endOf, callback);
+	}, msUntilTime);
 }
