@@ -704,6 +704,7 @@ bunda
 gemer
 stand
 fundo
+funde
 amada
 chaga
 mover

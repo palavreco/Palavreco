@@ -22,15 +22,3 @@ export interface Rank {
     guesses: number[];
     guilds: string[];
 }
-
-export interface Guesses {
-    id: string;
-    one: number;
-    two: number;
-    three: number;
-    four: number;
-    five: number;
-    six: number;
-    losses: number;
-    guilds: string[];
-}

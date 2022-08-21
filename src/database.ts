@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import dotenv from 'dotenv';
 import { knex } from 'knex';
 import { Guesses, Rank, Stats, User, Word } from './interfaces/Database';
+
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import { log } from './utils/log';
@@ -16,7 +17,7 @@ export function setUp(): void {
 		words: { word: 'text', status: 'boolean' },
 		stats: {
 			id: 'text', games: 'integer', wins: 'integer',
-			win_percentage: 'integer', currentStreak: 'integer', bestStreak: 'integer',
+			currentStreak: 'integer', bestStreak: 'integer',
 		},
 		guesses: {
 			id: 'text', one: 'integer', two: 'integer', three: 'integer',
