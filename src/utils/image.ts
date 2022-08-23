@@ -1,6 +1,7 @@
 import { createCanvas, GlobalFonts, loadImage, SKRSContext2D } from '@napi-rs/canvas';
 import { CommandInteraction, MessageAttachment } from 'discord.js';
-import { getStats } from '../database';
+import QuickChart from 'quickchart-js';
+import { getUser } from '../database';
 import { rankTemplate } from '../utils/assets.json';
 
 GlobalFonts.registerFromPath('src/utils/inter.ttf', 'inter');
@@ -19,9 +20,9 @@ const namePixels = {
 	'8': [896, 541], '9': [516, 659],
 };
 
-export async function makeImage(
+export async function makeRank(
 	isServer: boolean,
-	scores: { id: string, points: number }[],
+	scores: ({ id: string, points: number } | undefined)[],
 	int: CommandInteraction,
 ): Promise<MessageAttachment> {
 	const canvas = createCanvas(1240, 750);
@@ -70,11 +71,11 @@ export async function makeImage(
 	for (let i = 0; i < 10; i++) {
 		let user: { username: string; discriminator: string, points: number, games: number };
 		if (scores[i]) {
-			const { id, points } = scores[i];
+			const { id, points } = scores[i]!;
 			const obj = await int.client.users.fetch(id);
-			const stats = await getStats(id);
+			const u = await getUser(id);
 
-			user = { username: obj.username, discriminator: obj.discriminator, points, games: stats!.games };
+			user = { username: obj.username, discriminator: obj.discriminator, points, games: u!.gamesWins[0] };
 		} else {
 			break;
 		}
@@ -117,7 +118,8 @@ export async function makeImage(
 function newStyle(ctx: SKRSContext2D, { font, fill, align }: Record<string, string>) {
 	ctx.font = font;
 	ctx.fillStyle = fill;
-	// @ts-ignore it works but doesn't have the types
+
+	// @ts-ignore
 	ctx.textAlign = align;
 }
 
@@ -134,17 +136,59 @@ function normalizeText(text: string, type: 'small' | 'big' | 'title') {
 	}
 }
 
-// @ts-ignore lazy
-function roundedImage(ctx, x, y, width, height, radius) {
+function roundedImage(ctx: SKRSContext2D, x: number, y: number, width: number, height: number, radius: number) {
 	ctx.beginPath();
 	ctx.moveTo(x + radius, y);
+
 	ctx.lineTo(x + width - radius, y);
 	ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+
 	ctx.lineTo(x + width, y + height - radius);
 	ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+
 	ctx.lineTo(x + radius, y + height);
 	ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+
 	ctx.lineTo(x, y + radius);
 	ctx.quadraticCurveTo(x, y, x + radius, y);
+
 	ctx.closePath();
+}
+
+export function makeStats(data: number[]): string {
+	const chart = new QuickChart();
+	chart.setConfig({
+		// @ts-ignore
+		type: 'horizontalBar',
+		data: {
+			labels: ['1️', '2️', '3', '4', '5', '6', '❌'],
+			datasets: [{
+				data, borderWidth: 2, borderRadius: 3,
+				backgroundColor: 'rgba(46, 209, 85, 0.5)',
+				borderColor: 'rgb(38, 173, 70)',
+			}],
+		},
+		options: {
+			legend: { display: false },
+			title: { display: true, text: 'DISTRIBUIÇÃO DE TENTATIVAS' },
+			scales: {
+				// @ts-ignore
+				xAxes: [{ display: false, gridLines: { display: false } }],
+				// @ts-ignore
+				yAxes: [{ gridLines: { display: false } }],
+			},
+			plugins: {
+				// @ts-ignore
+				datalabels: {
+					align: 'end', anchor: 'end', color: '#111',
+					borderWidth: 2, borderRadius: 5,
+					backgroundColor: 'rgba(222, 222, 222, 0.6)',
+					borderColor: 'rgba(196, 196, 196, 1)',
+					formatter: (value: string) => value + '%',
+				},
+			},
+		},
+	});
+
+	return chart.getUrl();
 }

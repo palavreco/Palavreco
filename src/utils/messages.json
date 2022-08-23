@@ -23,9 +23,6 @@
     "invalid_word": "Adivinhe o **PALAVRECO** de hoje! 👀\n\n{{table}}\n**Atenção:** A palavra não é válida!",
     "game_win": "Parabéns, você acertou em {{attempts}} tentativas! :tada:\n\n{{table}}",
     "game_lose": "{{table}}\n\nVocê perdeu, a palavra era **{{cw}}**. :frowning:\nQuem sabe na próxima você consegue!",
-    "warn_news": "👋 Lançamos coisas novas!\nVá em frente e use o comando **`/stats`** para ver suas estatísticas e **`/rank`** para ver a leaderboard baseada em pontos! Existem dois tipos de rank: `global` e `server`.\nA explicação sobre os pontos está na sessão \"Rank\" do comando **`/ajuda`**!\n\nEsperamos que você goste das mudanças e não esqueça de nos dar **`/feedback`**! 🎉",
-
-    "platform_ask": "<@{{user.id}}> Pressione o botão correspondente à plataforma em que está jogando para que seja possível copiar a mensagem e compartilhá-la!",
 
     "identifier": "Jogo de <@{{user.id}}>:",
     "game_result_win": "Joguei palavreco.com #{{day}} • {{attempts}}/6\n\n{{finalTable}}",
