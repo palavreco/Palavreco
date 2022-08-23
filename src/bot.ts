@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import dotenv from 'dotenv';
 import { Client, Collection, Guild } from 'discord.js';
 import { Command } from './interfaces/Command';
-import { verifyWord, newWord, setUp, resetRank } from './database';
+import { verifyWord, newWord, setUp, resetRank, setNewGuild } from './database';
 import { getMissingPermissions } from './utils/permissions';
 import { runAtEndOf } from './utils/runner';
 import { log } from './utils/log';
@@ -45,7 +45,7 @@ for (const file of cmdsFolder) {
 	});
 }
 
-client.on('interactionCreate', i => {
+client.on('interactionCreate', async i => {
 	if (i.isCommand()) {
 		const command = botCmds.get(i.commandName);
 
@@ -58,6 +58,10 @@ client.on('interactionCreate', i => {
 				}));
 
 				return;
+			}
+
+			if (i.guildId) {
+				await setNewGuild(i.user.id, i.guildId);
 			}
 
 			command.execute(i);

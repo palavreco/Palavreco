@@ -1,8 +1,7 @@
 import fs from 'node:fs';
 import dotenv from 'dotenv';
 import { knex } from 'knex';
-import { Guesses, Rank, Stats, User, Word } from './interfaces/Database';
-
+import { User, Word } from './interfaces/Database';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import { log } from './utils/log';
@@ -11,37 +10,29 @@ dayjs.extend(timezone);
 
 const db = knex({ client: 'pg', connection: process.env.DATABASE_URL });
 
-export function setUp(): void {
-	const tables: Record<string, Record<string, 'text' | 'integer' | 'boolean'>> = {
-		users: { id: 'text', status: 'boolean' },
-		words: { word: 'text', status: 'boolean' },
-		stats: {
-			id: 'text', games: 'integer', wins: 'integer',
-			currentStreak: 'integer', bestStreak: 'integer',
-		},
-		guesses: {
-			id: 'text', one: 'integer', two: 'integer', three: 'integer',
-			four: 'integer', five: 'integer', six: 'integer', losses: 'integer',
-		},
-	};
-
-	Object.keys(tables).forEach(async table => {
-		if (!await db.schema.hasTable(table)) {
-			await db.schema.createTable(table, t => {
-				Object.entries(tables[table]).forEach(([key, type]) => t[type](key));
-
-				if (table === 'guesses') {
-					t.specificType('guilds', 'text[]');
-				}
+export async function setUp(): Promise<void> {
+	if (!await db.schema.hasTable('users')) {
+		await db.schema.createTable('users', t => {
+			t.text('id'); t.boolean('status');
+			['gamesWins', 'streak', 'guesses', 'rank'].forEach(key => {
+				t.specificType(key, 'integer[]');
 			});
-		}
-	});
+			t.specificType('guilds', 'text[]');
+		});
+	}
+
+	if (!await db.schema.hasTable('words')) {
+		await db.schema.createTable('words', t => {
+			t.text('word'); t.boolean('status');
+		});
+	}
 
 	log('Database setup complete', 'DB', 'blue');
 }
 
-export async function registerUser(id: string): Promise<void> {
+export async function registerUser(id: string): Promise<User> {
 	await db('users').insert({ id, status: false });
+	return await db<User>('users').where({ id }).first() as User;
 }
 
 export async function getUserStatus(id: string): Promise<string> {
@@ -52,76 +43,57 @@ export async function getUserStatus(id: string): Promise<string> {
 	else return 'registered_inactive';
 }
 
-export async function setPlayed(id: string, win: boolean, guildId: string | null, guesses?: number): Promise<void> {
-	await db('users').update({ status: true }).where('id', id);
+export async function setPlayed(id: string, guesses: number): Promise<void> {
+	const user = await db<User>('users').where('id', id).first() as User;
+	const { gamesWins, streak, guesses: userGuesses } = user;
+	const won = guesses <= 6 ? true : false;
 
-	const user = {
-		stats: await db<Stats>('stats').where('id', id).first(),
-		guesses: await db<Guesses>('guesses').where('id', id).first(),
-	};
-
-	const number = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six' }[guesses!]!;
-	const winned = win ? 1 : 0;
-
-	if (!user.guesses) {
-		if (win) {
-			await db('guesses').insert({
-				id, one: 0, two: 0, three: 0, four: 0,
-				five: 0, six: 0, losses: 0, guilds: guildId ? [guildId] : [],
-			});
-			await db('guesses').update({ [number]: db.raw('?? + 1', [number]) }).where('id', id);
-		} else {
-			await db('guesses').insert({
-				id, one: 0, two: 0, three: 0, four: 0,
-				five: 0, six: 0, losses: 1, guilds: guildId ? [guildId] : [],
-			});
-		}
-	} else {
-		if (win) {
-			await db('guesses').update({ [number]: db.raw('?? + 1', [number]) }).where('id', id);
-		} else {
-			await db('guesses').update({ losses: db.raw('?? + 1', ['losses']) }).where('id', id);
-		}
-
-		if (guildId && !user.guesses.guilds.includes(guildId)) {
-			await db('guesses').update({ guilds: db.raw('array_append(guilds, ?)', [guildId]) }).where('id', id);
-		}
-	}
-
-	if (!user.stats) {
-		await db('stats').insert({
-			id, games: 1, wins: winned, win_percentage: win ? 100 : 0,
-			currentStreak: winned, bestStreak: winned,
+	if (gamesWins) {
+		const distribution = userGuesses.map((guess, index) => {
+			if (index === guesses - 1) return guess + 1;
+			else return guess;
 		});
-	} else {
-		const best = win && user.stats.currentStreak >= user.stats.bestStreak
-			? user.stats.currentStreak + 1
-			: user.stats.bestStreak;
 
-		await db('stats').update({
-			games: db.raw('?? + 1', ['games']),
-			wins: db.raw('?? + ??', ['wins', winned]),
-			currentStreak: win ? db.raw('?? + 1', ['currentStreak']) : 0,
-			bestStreak: best,
+		await db('users').update({
+			status: true,
+			gamesWins: [gamesWins[0] + 1, gamesWins[1] + (won ? 1 : 0)],
+			streak: [won ? streak[0] + 1 : 0, won && streak[0] >= streak[1] ? streak[0] + 1 : streak[1]],
+			guesses: distribution,
+			rank: distribution,
 		}).where('id', id);
+	} else {
+		const distribution = Array(7).fill(0);
+		distribution[guesses - 1] = 1;
 
-		const updatedUser = await db<Stats>('stats').where('id', id).first();
-		const percentage = Math.round((updatedUser!.wins / updatedUser!.games) * 100);
-		await db('stats').update({ win_percentage: percentage }).where('id', id);
+		await db('users').update({
+			status: true,
+			gamesWins: [1, won ? 1 : 0],
+			streak: [won ? 1 : 0, won ? 1 : 0],
+			guesses: distribution,
+			rank: distribution,
+		}).where('id', id);
+	}
+}
+
+export async function setNewGuild(userId: string, guildId: string): Promise<void> {
+	const user = await db<User>('users').where('id', userId).first() ?? await registerUser(userId);
+
+	if (!user.guilds) {
+		await db('users').update({ guilds: [guildId] }).where('id', userId);
 	}
 
+	const updatedUser = await db<User>('users').where('id', userId).first();
+	if (updatedUser!.guilds.includes(guildId)) return;
+
+	await db('users').update({ guilds: db.raw('array_append(guilds, ?)', [guildId]) }).where('id', userId);
 }
 
-export async function getStats(id: string): Promise<Stats | undefined> {
-	return await db<Stats>('stats').where('id', id).first();
+export async function getUser(id: string): Promise<User | undefined> {
+	return await db<User>('users').where('id', id).first();
 }
 
-export async function getGuesses(id: string): Promise<Guesses | undefined> {
-	return await db<Guesses>('rank').where('id', id).first();
-}
-
-export async function getRank(): Promise<Rank[]> {
-	return await db<Rank>('rank').select('*');
+export async function getAllUsers(): Promise<User[]> {
+	return await db<User>('users').select('*');
 }
 
 export async function resetUser(id: string): Promise<string> {
@@ -175,5 +147,5 @@ export async function verifyWord(): Promise<boolean> {
 }
 
 export async function resetRank(): Promise<void> {
-	await db('users').delete();
+	await db('users').update({ rank: null });
 }

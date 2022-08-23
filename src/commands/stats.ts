@@ -1,8 +1,7 @@
 import { Command } from '../interfaces/Command';
 import { CommandInteraction, MessageEmbed, User } from 'discord.js';
 import { ApplicationCommandOptionType, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
-import { getStats } from '../database';
-import { Stats } from '../interfaces/Database';
+import { getUser } from '../database';
 import { makeStats } from '../utils/image';
 
 export default class StatsC implements Command {
@@ -23,14 +22,20 @@ export default class StatsC implements Command {
 		const { options, user } = interaction;
 		const target = options.getUser('user') ?? user;
 
-		const stats = await getStats(target.id);
-		if (!stats) return interaction.reply(`❌ **${target.tag}** não tem nenhuma estatística!`);
+		const u = await getUser(target.id);
+		if (!u) return interaction.reply(`❌ **${target.tag}** não tem nenhuma estatística!`);
+
+		const { gamesWins, streak, guesses } = u;
+		const stats = { gamesWins, streak, guesses };
 
 		interaction.reply({ embeds: [this.makeEmbed(stats, target)] });
 	}
 
-	makeEmbed(stats: Stats, user: User) {
-		const { wins, games, currentStreak, bestStreak, guesses } = stats;
+	makeEmbed(stats: { gamesWins: number[], streak: number[], guesses: number[] }, user: User) {
+		const { gamesWins, streak, guesses } = stats;
+		const [games, wins, currentStreak, bestStreak] = [
+			gamesWins[0], gamesWins[1], streak[0], streak[1],
+		];
 
 		const sum = guesses.reduce((a, b) => a + b, 0);
 		const percentages = guesses.map(g => Math.round((g / sum) * 100));

@@ -1,7 +1,7 @@
 import { createCanvas, GlobalFonts, loadImage, SKRSContext2D } from '@napi-rs/canvas';
 import { CommandInteraction, MessageAttachment } from 'discord.js';
 import QuickChart from 'quickchart-js';
-import { getStats } from '../database';
+import { getUser } from '../database';
 import { rankTemplate } from '../utils/assets.json';
 
 GlobalFonts.registerFromPath('src/utils/inter.ttf', 'inter');
@@ -22,7 +22,7 @@ const namePixels = {
 
 export async function makeRank(
 	isServer: boolean,
-	scores: { id: string, points: number }[],
+	scores: ({ id: string, points: number } | undefined)[],
 	int: CommandInteraction,
 ): Promise<MessageAttachment> {
 	const canvas = createCanvas(1240, 750);
@@ -71,11 +71,11 @@ export async function makeRank(
 	for (let i = 0; i < 10; i++) {
 		let user: { username: string; discriminator: string, points: number, games: number };
 		if (scores[i]) {
-			const { id, points } = scores[i];
+			const { id, points } = scores[i]!;
 			const obj = await int.client.users.fetch(id);
-			const stats = await getStats(id);
+			const u = await getUser(id);
 
-			user = { username: obj.username, discriminator: obj.discriminator, points, games: stats!.games };
+			user = { username: obj.username, discriminator: obj.discriminator, points, games: u!.gamesWins[0] };
 		} else {
 			break;
 		}

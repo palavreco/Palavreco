@@ -6,19 +6,9 @@ export interface Word {
 export interface User {
     id: string;
     status: boolean;
-}
-
-export interface Stats {
-    id: string;
-    games: number;
-    wins: number;
-    currentStreak: number;
-    bestStreak: number;
+    gamesWins: number[];
+    streak: number[];
     guesses: number[];
-}
-
-export interface Rank {
-    id: string;
-    guesses: number[];
+    rank: number[];
     guilds: string[];
 }
