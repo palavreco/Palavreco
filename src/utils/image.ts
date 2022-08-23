@@ -52,6 +52,7 @@ export async function makeRank(
 		ctx.fillText('RANK GLOBAL', 90, 48);
 	}
 
+	// @ts-ignore
 	const userPosition = scores.findIndex(s => s.id === int.user.id) + 1 ?? '';
 	if (userPosition) {
 		newStyle(ctx, { font: '18px inter', fill: '#373737', align: 'start' });
