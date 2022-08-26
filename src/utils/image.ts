@@ -76,7 +76,7 @@ export async function makeRank(
 			const obj = await int.client.users.fetch(id);
 			const u = await getUser(id);
 
-			user = { username: obj.username, discriminator: obj.discriminator, points, games: u!.gamesWins[0] };
+			user = { username: obj.username, discriminator: obj.discriminator, points, games: u!.gameswins[0] };
 		} else {
 			break;
 		}

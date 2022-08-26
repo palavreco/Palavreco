@@ -25,16 +25,16 @@ export default class StatsC implements Command {
 		const u = await getUser(target.id);
 		if (!u) return interaction.reply(`❌ **${target.tag}** não tem nenhuma estatística!`);
 
-		const { gamesWins, streak, guesses } = u;
-		const stats = { gamesWins, streak, guesses };
+		const { gameswins, streak, guesses } = u;
+		const stats = { gameswins, streak, guesses };
 
 		interaction.reply({ embeds: [this.makeEmbed(stats, target)] });
 	}
 
-	makeEmbed(stats: { gamesWins: number[], streak: number[], guesses: number[] }, user: User) {
-		const { gamesWins, streak, guesses } = stats;
+	makeEmbed(stats: { gameswins: number[], streak: number[], guesses: number[] }, user: User) {
+		const { gameswins, streak, guesses } = stats;
 		const [games, wins, currentStreak, bestStreak] = [
-			gamesWins[0], gamesWins[1], streak[0], streak[1],
+			gameswins[0], gameswins[1], streak[0], streak[1],
 		];
 
 		const sum = guesses.reduce((a, b) => a + b, 0);

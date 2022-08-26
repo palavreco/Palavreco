@@ -14,7 +14,7 @@ export async function setUp(): Promise<void> {
 	if (!await db.schema.hasTable('users')) {
 		await db.schema.createTable('users', t => {
 			t.text('id'); t.boolean('status');
-			['gamesWins', 'streak', 'guesses', 'rank'].forEach(key => {
+			['gameswins', 'streak', 'guesses', 'rank'].forEach(key => {
 				t.specificType(key, 'integer[]');
 			});
 			t.specificType('guilds', 'text[]');
@@ -45,10 +45,10 @@ export async function getUserStatus(id: string): Promise<string> {
 
 export async function setPlayed(id: string, guesses: number): Promise<void> {
 	const user = await db<User>('users').where('id', id).first() as User;
-	const { gamesWins, streak, guesses: userGuesses } = user;
+	const { gameswins, streak, guesses: userGuesses } = user;
 	const won = guesses <= 6 ? true : false;
 
-	if (gamesWins) {
+	if (gameswins) {
 		const distribution = userGuesses.map((guess, index) => {
 			if (index === guesses - 1) return guess + 1;
 			else return guess;
@@ -56,7 +56,7 @@ export async function setPlayed(id: string, guesses: number): Promise<void> {
 
 		await db('users').update({
 			status: true,
-			gamesWins: [gamesWins[0] + 1, gamesWins[1] + (won ? 1 : 0)],
+			gameswins: [gameswins[0] + 1, gameswins[1] + (won ? 1 : 0)],
 			streak: [won ? streak[0] + 1 : 0, won && streak[0] >= streak[1] ? streak[0] + 1 : streak[1]],
 			guesses: distribution,
 			rank: distribution,
@@ -67,7 +67,7 @@ export async function setPlayed(id: string, guesses: number): Promise<void> {
 
 		await db('users').update({
 			status: true,
-			gamesWins: [1, won ? 1 : 0],
+			gameswins: [1, won ? 1 : 0],
 			streak: [won ? 1 : 0, won ? 1 : 0],
 			guesses: distribution,
 			rank: distribution,
