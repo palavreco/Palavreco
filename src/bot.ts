@@ -89,6 +89,6 @@ runAtEndOf('day', () => {
 	log('New word & users reseted!', 'DB', 'purple');
 });
 
-runAtEndOf('month', () => {
-	resetRank();
-});
+// runAtEndOf('month', () => {
+// 	resetRank();
+// });
