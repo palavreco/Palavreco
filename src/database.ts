@@ -45,34 +45,35 @@ export async function getUserStatus(id: string): Promise<string> {
 
 export async function setPlayed(id: string, guesses: number): Promise<void> {
 	const user = await db<User>('users').where('id', id).first() as User;
-	const { gameswins, streak, guesses: userGuesses } = user;
+	const { gameswins, gameswinsrank, streak, guesses: userGuesses, rank } = user;
 	const won = guesses <= 6 ? true : false;
 
-	if (gameswins) {
-		const distribution = userGuesses.map((guess, index) => {
-			if (index === guesses - 1) return guess + 1;
-			else return guess;
-		});
+	let [gDistribution, rDistribution] = [Array(7).fill(0) as number[], Array(7).fill(0) as number[]];
 
-		await db('users').update({
-			status: true,
-			gameswins: [gameswins[0] + 1, gameswins[1] + (won ? 1 : 0)],
-			streak: [won ? streak[0] + 1 : 0, won && streak[0] >= streak[1] ? streak[0] + 1 : streak[1]],
-			guesses: distribution,
-			rank: distribution,
-		}).where('id', id);
-	} else {
-		const distribution = Array(7).fill(0);
-		distribution[guesses - 1] = 1;
+	gDistribution = userGuesses ? userGuesses.map((g, i) => {
+		if (i === guesses - 1) return g + 1;
+		else return g;
+	}) : gDistribution.map((g, i) => {
+		if (i === guesses - 1) return 1;
+		else return 0;
+	});
+	rDistribution = rank ? rank.map((g, i) => {
+		if (i === guesses - 1) return g + 1;
+		else return g;
+	}) : rDistribution.map((g, i) => {
+		if (i === guesses - 1) return 1;
+		else return 0;
+	});
 
-		await db('users').update({
-			status: true,
-			gameswins: [1, won ? 1 : 0],
-			streak: [won ? 1 : 0, won ? 1 : 0],
-			guesses: distribution,
-			rank: distribution,
-		}).where('id', id);
-	}
+	await db('users').update({
+		status: true,
+		gameswins: gameswins ? [gameswins[0] + 1, gameswins[1] + (won ? 1 : 0)] : [1, won ? 1 : 0],
+		gameswinsrank: gameswinsrank ? [gameswinsrank[0] + 1, gameswinsrank[1] + (won ? 1 : 0)] : [1, won ? 1 : 0],
+		// eslint-disable-next-line max-len
+		streak: streak ? [won ? streak[0] + 1 : 0, won && streak[0] >= streak[1] ? streak[0] + 1 : streak[1]] : [won ? 1 : 0, won ? 1 : 0],
+		guesses: gDistribution,
+		rank: rDistribution,
+	}).where('id', id);
 }
 
 export async function setNewGuild(userId: string, guildId: string): Promise<void> {
@@ -147,5 +148,5 @@ export async function verifyWord(): Promise<boolean> {
 }
 
 export async function resetRank(): Promise<void> {
-	await db('users').update({ rank: null });
+	await db('users').update({ rank: null, gameswinsrank: null });
 }
