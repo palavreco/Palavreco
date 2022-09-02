@@ -1,19 +1,22 @@
 import fs from 'node:fs';
 import readline from 'readline';
+import { bisect } from './bisect';
+
+const cache: string[] = [];
 
 export async function isValid(word: string) {
-	const readLine = readline.createInterface({
-		input: fs.createReadStream('src/words/validGuess.txt'),
-		output: process.stdout,
-		terminal: false,
-	});
+	if (cache.length === 0) {
+		const readLine = readline.createInterface({
+			input: fs.createReadStream('src/words/validGuess.txt'),
+			output: process.stdout,
+			terminal: false,
+		});
 
-	let valid = false;
-	for await (const line of readLine) {
-		if (line === word) {
-			valid = true;
+		for await (const line of readLine) {
+			cache.push(line);
 		}
 	}
 
-	return valid;
+	const index = bisect(cache, word);
+	return cache[index] === word;
 }
