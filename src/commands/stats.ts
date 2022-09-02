@@ -23,7 +23,7 @@ export default class StatsC implements Command {
 		const target = options.getUser('user') ?? user;
 
 		const u = await getUser(target.id);
-		if (!u) return interaction.reply(`❌ **${target.tag}** não tem nenhuma estatística!`);
+		if (!u?.guesses) return interaction.reply(`❌ **${target.tag}** não tem nenhuma estatística!`);
 
 		const { gameswins, streak, guesses } = u;
 		const stats = { gameswins, streak, guesses };
