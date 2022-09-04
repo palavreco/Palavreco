@@ -12,7 +12,9 @@ import { notifyLogChannel } from './utils/guildLog';
 import { letter } from './utils/assets.json';
 dotenv.config();
 
-const client = new Client({ intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS'] });
+const client = new Client({
+	intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS'],
+});
 
 client.once('ready', () => {
 	log('Client is ready', 'BOT', 'green');
@@ -39,13 +41,13 @@ for (const file of cmdsFolder) {
 	const name = file.split('.')[0];
 	const cmd = import(`./commands/${name}`);
 
-	cmd.then(command => {
+	cmd.then((command) => {
 		const cmdInstance: Command = new command.default();
 		botCmds.set(cmdInstance.commandStructure.name, cmdInstance);
 	});
 }
 
-client.on('interactionCreate', async i => {
+client.on('interactionCreate', async (i) => {
 	if (i.isCommand()) {
 		const command = botCmds.get(i.commandName);
 
@@ -53,9 +55,11 @@ client.on('interactionCreate', async i => {
 			const missingPermissions = getMissingPermissions(command.permissions, i);
 
 			if (missingPermissions) {
-				i.reply(t('missing_permissions', {
-					perms: missingPermissions.join(' '),
-				}));
+				i.reply(
+					t('missing_permissions', {
+						perms: missingPermissions.join(' '),
+					}),
+				);
 
 				return;
 			}
@@ -69,7 +73,11 @@ client.on('interactionCreate', async i => {
 	} else if (i.isButton()) {
 		if (i.customId === 'help_game') {
 			i.reply({
-				content: t('help_game', { e: letter.green.e, i: letter.yellow.i, v: letter.gray.v }),
+				content: t('help_game', {
+					e: letter.green.e,
+					i: letter.yellow.i,
+					v: letter.gray.v,
+				}),
 				ephemeral: true,
 			});
 		} else if (i.customId === 'help_rank') {

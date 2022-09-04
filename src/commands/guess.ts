@@ -3,14 +3,22 @@ import { CommandInteraction, PermissionString } from 'discord.js';
 import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
 import { t } from '../utils/replyHelper';
-import { getUserStatus, registerUser, getDay, getWord, setPlayed, verifyWord, getUser } from '../database';
+import {
+	getUserStatus,
+	registerUser,
+	getDay,
+	getWord,
+	setPlayed,
+	verifyWord,
+	getUser,
+} from '../database';
 import { runAtEndOf } from '../utils/runner';
 import { awaitMessage } from '../utils/msgCollector';
 import { isValid } from '../utils/checkWord';
 import { toDefault, toEmoji } from '../utils/converters';
 import { square } from '../utils/assets.json';
 
-let usersTries: Record<string, { id: string, attempts: string[] }> = {};
+let usersTries: Record<string, { id: string; attempts: string[] }> = {};
 let activeGames: string[] = [];
 
 runAtEndOf('day', () => {
@@ -20,8 +28,8 @@ runAtEndOf('day', () => {
 
 export default class Guess implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
-		'name': 'adivinhar',
-		'description': 'Tente adivinhar a palavra do dia!',
+		name: 'adivinhar',
+		description: 'Tente adivinhar a palavra do dia!',
 	};
 
 	dev = false;
@@ -36,13 +44,14 @@ export default class Guess implements Command {
 
 		const { user, channel } = interaction;
 
-		if (await getUserStatus(user.id) === 'not_registered') {
+		if ((await getUserStatus(user.id)) === 'not_registered') {
 			registerUser(user.id);
-		} else if (await getUserStatus(user.id) === 'registered_active') {
+		} else if ((await getUserStatus(user.id)) === 'registered_active') {
 			interaction.reply({
 				content: t('already_played', {
 					timestamp: dayjs().tz('America/Sao_Paulo').endOf('day').unix() + 1,
-				}), ephemeral: true,
+				}),
+				ephemeral: true,
 			});
 			return;
 		}
@@ -65,20 +74,28 @@ export default class Guess implements Command {
 			return Object.values(gameMessage).join('\n');
 		}
 
-
-		const playingUser: { id: string, attempts: string[] } = { id: user.id, attempts: [] };
+		const playingUser: { id: string; attempts: string[] } = {
+			id: user.id,
+			attempts: [],
+		};
 		const correctWord = await getWord();
 		const day = await getDay();
 
 		let i = 0;
 		if (activeGames.includes(user.id)) {
-			await interaction.reply({ content: t('already_playing'), ephemeral: true });
+			await interaction.reply({
+				content: t('already_playing'),
+				ephemeral: true,
+			});
 
 			return;
 		} else {
 			activeGames.push(user.id);
 
-			await interaction.reply({ content: t('game_message', { table: table() }), ephemeral: true });
+			await interaction.reply({
+				content: t('game_message', { table: table() }),
+				ephemeral: true,
+			});
 
 			const u = usersTries[user.id];
 			if (u) {
@@ -94,7 +111,9 @@ export default class Guess implements Command {
 				input.message!.delete();
 			}, 300);
 
-			const word = input.content.normalize('NFKD').replace(/\p{Diacritic}/gu, '');
+			const word = input.content
+				.normalize('NFKD')
+				.replace(/\p{Diacritic}/gu, '');
 			if (word === 'cancelar') {
 				await interaction.editReply('Você encerrou o jogo :(');
 				activeGames.splice(activeGames.indexOf(user.id), 1);
@@ -104,7 +123,7 @@ export default class Guess implements Command {
 				await interaction.editReply(t('not_five_letters', { table: table() }));
 
 				i--;
-			} else if (!await isValid(word)) {
+			} else if (!(await isValid(word))) {
 				await interaction.editReply(t('invalid_word', { table: table() }));
 
 				i--;
@@ -113,7 +132,9 @@ export default class Guess implements Command {
 				if (Array.isArray(attempts)) attempts.push(toEmoji(word, correctWord));
 
 				if (word === correctWord) {
-					await interaction.editReply(t('game_win', { attempts: i + 1, table: table() }));
+					await interaction.editReply(
+						t('game_win', { attempts: i + 1, table: table() }),
+					);
 					await setPlayed(user.id, i + 1);
 
 					activeGames.splice(activeGames.indexOf(user.id), 1);
@@ -123,13 +144,22 @@ export default class Guess implements Command {
 
 					await channel!.send(t('identifier', { user }));
 					if (streak && streak > 4) {
-						await channel!.send(t('game_result_win_streak', {
-							day, attempts: i + 1, finalTable: toDefault(table()), streak,
-						}));
+						await channel!.send(
+							t('game_result_win_streak', {
+								day,
+								attempts: i + 1,
+								finalTable: toDefault(table()),
+								streak,
+							}),
+						);
 					} else {
-						await channel!.send(t('game_result_win', {
-							day, attempts: i + 1, finalTable: toDefault(table()),
-						}));
+						await channel!.send(
+							t('game_result_win', {
+								day,
+								attempts: i + 1,
+								finalTable: toDefault(table()),
+							}),
+						);
 					}
 
 					break;
@@ -137,16 +167,22 @@ export default class Guess implements Command {
 					await interaction.editReply(t('game_message', { table: table() }));
 
 					if (i === 5) {
-						await interaction.editReply(t('game_lose', { table: table(), cw: correctWord.toUpperCase() }));
+						await interaction.editReply(
+							t('game_lose', { table: table(), cw: correctWord.toUpperCase() }),
+						);
 						await setPlayed(user.id, 7);
 
 						activeGames.splice(activeGames.indexOf(user.id), 1);
 						delete usersTries[user.id];
 
 						await channel!.send(t('identifier', { user }));
-						await channel!.send(t('game_result_lose', {
-							day, attempts: i + 1, finalTable: toDefault(table()),
-						}));
+						await channel!.send(
+							t('game_result_lose', {
+								day,
+								attempts: i + 1,
+								finalTable: toDefault(table()),
+							}),
+						);
 
 						return;
 					}

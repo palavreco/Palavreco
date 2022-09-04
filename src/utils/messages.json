@@ -1,33 +1,33 @@
 {
-    "help": "Selecione o tópico que deseja tirar dúvidas através dos botões abaixo!",
-    "help_game": "🕹️ **Como jogar?**\nUse o comando **`/adivinhar`** e tente acertar a palavra em *6 tentativas*!\nPara cada uma das tentativas é preciso o envio de uma mensagem que contenha uma palavra válida de 5 letras.\nApós cada tentativa, a cor dos emojis mudará para mostrar o quão perto você estava.\n\n**Exemplos:**\n🇹 {{e}} 🇲 🇴 🇷\nA letra **E** está na palavra e no lugar certo.\n🇨 🇴 {{i}} 🇸 🇦\nA letra **I** está na palavra mas no lugar errado.\n🇦 🇹 🇮 {{v}} 🇴\nA letra **V** não está na palavra.\n\nA cada dia uma nova palavra será sorteada, use o comando **`/adivinhar`** e se divirta!",
-    "help_rank": "📊 **Como funciona o rank?**\nExistem *dois* tipos de rank, **o rank do servidor e o rank global**. Como default a pessoa sempre será adicionada no rank global, mas para entrar no rank do servidor é preciso que o usuário jogue pelo menos um jogo no servidor em questão! É importante também referir que o rank não é permanente, **todo começo de mês todos os ranks serão resetados**.\n\nA **sua pontuação** no comando **`/rank`** é calculada da seguinte forma: a cada jogo, dependendo de quantas tentativas você usou pra acertar, você ganha uma **quantidade X de pontos dependendo do número de tentativas usadas:**\n🥇 1º • **3 pontos**;\n🥈 2º • **2 pontos**;\n🥉 3º • **1 ponto**;\n🏅 4º • **0.75 pontos**;\n🏅 5º • **0.5 pontos**;\n🏅 6º • **0.25 pontos**;\n💀 Caso não acerte • **0 pontos**.",
+	"help": "Selecione o tópico que deseja tirar dúvidas através dos botões abaixo!",
+	"help_game": "🕹️ **Como jogar?**\nUse o comando **`/adivinhar`** e tente acertar a palavra em *6 tentativas*!\nPara cada uma das tentativas é preciso o envio de uma mensagem que contenha uma palavra válida de 5 letras.\nApós cada tentativa, a cor dos emojis mudará para mostrar o quão perto você estava.\n\n**Exemplos:**\n🇹 {{e}} 🇲 🇴 🇷\nA letra **E** está na palavra e no lugar certo.\n🇨 🇴 {{i}} 🇸 🇦\nA letra **I** está na palavra mas no lugar errado.\n🇦 🇹 🇮 {{v}} 🇴\nA letra **V** não está na palavra.\n\nA cada dia uma nova palavra será sorteada, use o comando **`/adivinhar`** e se divirta!",
+	"help_rank": "📊 **Como funciona o rank?**\nExistem *dois* tipos de rank, **o rank do servidor e o rank global**. Como default a pessoa sempre será adicionada no rank global, mas para entrar no rank do servidor é preciso que o usuário jogue pelo menos um jogo no servidor em questão! É importante também referir que o rank não é permanente, **todo começo de mês todos os ranks serão resetados**.\n\nA **sua pontuação** no comando **`/rank`** é calculada da seguinte forma: a cada jogo, dependendo de quantas tentativas você usou pra acertar, você ganha uma **quantidade X de pontos dependendo do número de tentativas usadas:**\n🥇 1º • **3 pontos**;\n🥈 2º • **2 pontos**;\n🥉 3º • **1 ponto**;\n🏅 4º • **0.75 pontos**;\n🏅 5º • **0.5 pontos**;\n🏅 6º • **0.25 pontos**;\n💀 Caso não acerte • **0 pontos**.",
 
-    "confirm_operaction": "Confirmar {{part}}?",
-    "suggestion": "sugestão",
-    "report": "reporte",
+	"confirm_operaction": "Confirmar {{part}}?",
+	"suggestion": "sugestão",
+	"report": "reporte",
 
-    "success_operation": "✅ Operação concluída. Obrigado!",
-    "cancelled_operation": "❌ Operação cancelada.",
+	"success_operation": "✅ Operação concluída. Obrigado!",
+	"cancelled_operation": "❌ Operação cancelada.",
 
-    "feedback_thanks": "{{p}} Olá! Obrigado {{part}}. **A equipe de desenvolvedores agradece!**",
-    "feedback_thanks_answer": "{{p}} Olá! Obrigado {{part}}. A equipe de desenvolvedores te respondeu.\n\n**Resposta:** {{answer}}",
-    "feedback_sug": "pela sugestão",
-    "feedback_bug": "pelo reporte",
+	"feedback_thanks": "{{p}} Olá! Obrigado {{part}}. **A equipe de desenvolvedores agradece!**",
+	"feedback_thanks_answer": "{{p}} Olá! Obrigado {{part}}. A equipe de desenvolvedores te respondeu.\n\n**Resposta:** {{answer}}",
+	"feedback_sug": "pela sugestão",
+	"feedback_bug": "pelo reporte",
 
-    "already_played": "❌ Você já jogou hoje!\nTempo restante até a próxima palavra: <t:{{timestamp}}:R>",
-    "already_playing": "❌ Você já está jogando!\nSe a mensagem não aparece mais, mande `cancelar` no canal onde o jogo foi iniciado e tente novamente.",
+	"already_played": "❌ Você já jogou hoje!\nTempo restante até a próxima palavra: <t:{{timestamp}}:R>",
+	"already_playing": "❌ Você já está jogando!\nSe a mensagem não aparece mais, mande `cancelar` no canal onde o jogo foi iniciado e tente novamente.",
 
-    "game_message": "Adivinhe o **PALAVRECO** de hoje! 👀\n\n{{table}}\nPara cancelar o jogo, digite `cancelar`",
-    "not_five_letters": "Adivinhe o **PALAVRECO** de hoje! 👀\n\n{{table}}\n**Atenção:** A palavra deve ter 5 letras!",
-    "invalid_word": "Adivinhe o **PALAVRECO** de hoje! 👀\n\n{{table}}\n**Atenção:** A palavra não é válida!",
-    "game_win": "Parabéns, você acertou em {{attempts}} tentativas! :tada:\n\n{{table}}",
-    "game_lose": "{{table}}\n\nVocê perdeu, a palavra era **{{cw}}**. :frowning:\nQuem sabe na próxima você consegue!",
+	"game_message": "Adivinhe o **PALAVRECO** de hoje! 👀\n\n{{table}}\nPara cancelar o jogo, digite `cancelar`",
+	"not_five_letters": "Adivinhe o **PALAVRECO** de hoje! 👀\n\n{{table}}\n**Atenção:** A palavra deve ter 5 letras!",
+	"invalid_word": "Adivinhe o **PALAVRECO** de hoje! 👀\n\n{{table}}\n**Atenção:** A palavra não é válida!",
+	"game_win": "Parabéns, você acertou em {{attempts}} tentativas! :tada:\n\n{{table}}",
+	"game_lose": "{{table}}\n\nVocê perdeu, a palavra era **{{cw}}**. :frowning:\nQuem sabe na próxima você consegue!",
 
-    "identifier": "Jogo de <@{{user.id}}>:",
-    "game_result_win": "Joguei palavreco.com #{{day}} • {{attempts}}/6\n\n{{finalTable}}",
-    "game_result_win_streak": "Joguei palavreco.com #{{day}} • {{attempts}}/6 • {{streak}} 🔥\n\n{{finalTable}}",
-    "game_result_lose": "Joguei palavreco.com #{{day}} • X/6\n\n{{finalTable}}",
+	"identifier": "Jogo de <@{{user.id}}>:",
+	"game_result_win": "Joguei palavreco.com #{{day}} • {{attempts}}/6\n\n{{finalTable}}",
+	"game_result_win_streak": "Joguei palavreco.com #{{day}} • {{attempts}}/6 • {{streak}} 🔥\n\n{{finalTable}}",
+	"game_result_lose": "Joguei palavreco.com #{{day}} • X/6\n\n{{finalTable}}",
 
-    "missing_permissions": "❌ Eu não tenho permissão para executar este comando, por favor edite meu cargo a partir das informações abaixo.\nPermissões necessárias: **{{perms}}**"
+	"missing_permissions": "❌ Eu não tenho permissão para executar este comando, por favor edite meu cargo a partir das informações abaixo.\nPermissões necessárias: **{{perms}}**"
 }
