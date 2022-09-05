@@ -27,7 +27,7 @@
 		"curly": ["error", "multi-line", "consistent"],
 		"dot-location": ["error", "property"],
 		"handle-callback-err": "off",
-		"indent": 0,
+		"indent": "off",
 		"keyword-spacing": "error",
 		"max-len": ["error", { "code": 120 }],
 		"max-nested-callbacks": ["error", { "max": 4 }],
