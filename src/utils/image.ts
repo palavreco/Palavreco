@@ -1,4 +1,9 @@
-import { createCanvas, GlobalFonts, loadImage, SKRSContext2D } from '@napi-rs/canvas';
+import {
+	createCanvas,
+	GlobalFonts,
+	loadImage,
+	SKRSContext2D,
+} from '@napi-rs/canvas';
 import { CommandInteraction, MessageAttachment } from 'discord.js';
 import QuickChart from 'quickchart-js';
 import { getUser } from '../database';
@@ -7,22 +12,30 @@ import { rankTemplate } from '../utils/assets.json';
 GlobalFonts.registerFromPath('src/utils/inter.ttf', 'inter');
 
 const numberPixels = {
-	'3': [77, 438], '4': [462, 438],
-	'5': [847, 438], '6': [77, 552],
-	'7': [462, 552], '8': [847, 552],
+	'3': [77, 438],
+	'4': [462, 438],
+	'5': [847, 438],
+	'6': [77, 552],
+	'7': [462, 552],
+	'8': [847, 552],
 	'9': [439, 671],
 };
 const namePixels = {
-	'0': [620, 253], '1': [295, 305],
-	'2': [945, 305], '3': [126, 427],
-	'4': [511, 427], '5': [896, 427],
-	'6': [126, 541], '7': [511, 541],
-	'8': [896, 541], '9': [516, 659],
+	'0': [620, 253],
+	'1': [295, 305],
+	'2': [945, 305],
+	'3': [126, 427],
+	'4': [511, 427],
+	'5': [896, 427],
+	'6': [126, 541],
+	'7': [511, 541],
+	'8': [896, 541],
+	'9': [516, 659],
 };
 
 export async function makeRank(
 	isServer: boolean,
-	scores: ({ id: string, points: number } | undefined)[],
+	scores: ({ id: string; points: number } | undefined)[],
 	int: CommandInteraction,
 ): Promise<MessageAttachment> {
 	const canvas = createCanvas(1240, 750);
@@ -53,7 +66,7 @@ export async function makeRank(
 	}
 
 	// @ts-ignore
-	const userPosition = scores.findIndex(s => s.id === int.user.id) + 1 ?? '';
+	const userPosition = scores.findIndex((s) => s.id === int.user.id) + 1 ?? '';
 	if (userPosition) {
 		newStyle(ctx, { font: '18px inter', fill: '#373737', align: 'start' });
 		ctx.fillText(`Sua posição: ${userPosition} de ${scores.length}`, 90, 73);
@@ -70,13 +83,23 @@ export async function makeRank(
 	}
 
 	for (let i = 0; i < 10; i++) {
-		let user: { username: string; discriminator: string, points: number, games: number };
+		let user: {
+			username: string;
+			discriminator: string;
+			points: number;
+			games: number;
+		};
 		if (scores[i]) {
 			const { id, points } = scores[i]!;
 			const obj = await int.client.users.fetch(id);
 			const u = await getUser(id);
 
-			user = { username: obj.username, discriminator: obj.discriminator, points, games: u!.gameswinsrank[0] };
+			user = {
+				username: obj.username,
+				discriminator: obj.discriminator,
+				points,
+				games: u!.gameswinsrank[0],
+			};
 		} else {
 			break;
 		}
@@ -90,16 +113,23 @@ export async function makeRank(
 			const dWidth = ctx.measureText(`#${discriminator}`).width;
 
 			newStyle(ctx, { font: '27px inter', fill: '#111111', align: 'center' });
-			ctx.fillText(normalizeText(username, 'small'), width - (dWidth / 2), height);
+			ctx.fillText(
+				normalizeText(username, 'small'),
+				width - dWidth / 2,
+				height,
+			);
 			const nWidth = ctx.measureText(normalizeText(username, 'small')).width;
 
 			newStyle(ctx, { font: '18px inter', fill: '#232322', align: 'center' });
-			ctx.fillText(`#${discriminator}`, width + (nWidth / 2) + 5, height);
+			ctx.fillText(`#${discriminator}`, width + nWidth / 2 + 5, height);
 
 			newStyle(ctx, { font: '22px inter', fill: '#313131', align: 'center' });
 			ctx.fillText(`${points} pontos • ${games} jogos`, width, height + 30);
 		} else {
-			const name = i != 9 ? normalizeText(username, 'small') : normalizeText(username, 'big');
+			const name =
+				i != 9
+					? normalizeText(username, 'small')
+					: normalizeText(username, 'big');
 
 			newStyle(ctx, { font: '20px inter', fill: '#ffffff', align: 'start' });
 			ctx.fillText(name, width, height);
@@ -109,14 +139,21 @@ export async function makeRank(
 			ctx.fillText(`#${discriminator}`, width + tWidth + 5, height);
 
 			newStyle(ctx, { font: '22px inter', fill: '#c1c1c1', align: 'center' });
-			ctx.fillText(`${points} • ${games}`, i != 9 ? width + 230 : width + 250, height);
+			ctx.fillText(
+				`${points} • ${games}`,
+				i != 9 ? width + 230 : width + 250,
+				height,
+			);
 		}
 	}
 
 	return new MessageAttachment(await canvas.encode('png'), 'rank.png');
 }
 
-function newStyle(ctx: SKRSContext2D, { font, fill, align }: Record<string, string>) {
+function newStyle(
+	ctx: SKRSContext2D,
+	{ font, fill, align }: Record<string, string>,
+) {
 	ctx.font = font;
 	ctx.fillStyle = fill;
 
@@ -137,7 +174,14 @@ function normalizeText(text: string, type: 'small' | 'big' | 'title') {
 	}
 }
 
-function roundedImage(ctx: SKRSContext2D, x: number, y: number, width: number, height: number, radius: number) {
+function roundedImage(
+	ctx: SKRSContext2D,
+	x: number,
+	y: number,
+	width: number,
+	height: number,
+	radius: number,
+) {
 	ctx.beginPath();
 	ctx.moveTo(x + radius, y);
 
@@ -163,11 +207,15 @@ export function makeStats(data: number[]): string {
 		type: 'horizontalBar',
 		data: {
 			labels: ['1️', '2️', '3', '4', '5', '6', '❌'],
-			datasets: [{
-				data, borderWidth: 2, borderRadius: 3,
-				backgroundColor: 'rgba(46, 209, 85, 0.5)',
-				borderColor: 'rgb(38, 173, 70)',
-			}],
+			datasets: [
+				{
+					data,
+					borderWidth: 2,
+					borderRadius: 3,
+					backgroundColor: 'rgba(46, 209, 85, 0.5)',
+					borderColor: 'rgb(38, 173, 70)',
+				},
+			],
 		},
 		options: {
 			legend: { display: false },
@@ -181,8 +229,11 @@ export function makeStats(data: number[]): string {
 			plugins: {
 				// @ts-ignore
 				datalabels: {
-					align: 'end', anchor: 'end', color: '#111',
-					borderWidth: 2, borderRadius: 5,
+					align: 'end',
+					anchor: 'end',
+					color: '#111',
+					borderWidth: 2,
+					borderRadius: 5,
 					backgroundColor: 'rgba(222, 222, 222, 0.6)',
 					borderColor: 'rgba(196, 196, 196, 1)',
 					formatter: (value: string) => value + '%',

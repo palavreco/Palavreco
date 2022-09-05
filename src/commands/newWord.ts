@@ -5,8 +5,8 @@ import { newWord } from '../database';
 
 export default class NewWord implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
-		'name': 'neword',
-		'description': 'Change the day word',
+		name: 'neword',
+		description: 'Change the day word',
 	};
 
 	dev = true;

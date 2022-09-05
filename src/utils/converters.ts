@@ -10,7 +10,7 @@ export function toDefault(content: string) {
 	for (let i = 0; i < 6; i++) table[i + 1] = '';
 
 	let convertedLetters = '';
-	arr.forEach(emoji => {
+	arr.forEach((emoji) => {
 		if (Object.values(letter['yellow']).includes(emoji)) {
 			convertedLetters += '🟨 ';
 		} else if (Object.values(letter['green']).includes(emoji)) {
@@ -48,8 +48,12 @@ export function toEmoji(content: string, correct: string) {
 	for (let i = 0; i < contentArr.length; i++) {
 		if (correctArr.includes(contentArr[i]) && contentArr[i] !== correctArr[i]) {
 			usedLetters.push(contentArr[i]);
-			const charCountCorrect = correctArr.filter(car => car === contentArr[i]).length;
-			const charCountContent = usedLetters.filter(car => car === contentArr[i]).length;
+			const charCountCorrect = correctArr.filter(
+				(car) => car === contentArr[i],
+			).length;
+			const charCountContent = usedLetters.filter(
+				(car) => car === contentArr[i],
+			).length;
 
 			if (charCountContent > charCountCorrect) {
 				emojiWord[i + 1] = letter.gray[contentArr[i] as alphabet];
@@ -66,5 +70,29 @@ export function toEmoji(content: string, correct: string) {
 }
 
 type alphabet =
-	| 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm'
-	| 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z';
+	| 'a'
+	| 'b'
+	| 'c'
+	| 'd'
+	| 'e'
+	| 'f'
+	| 'g'
+	| 'h'
+	| 'i'
+	| 'j'
+	| 'k'
+	| 'l'
+	| 'm'
+	| 'n'
+	| 'o'
+	| 'p'
+	| 'q'
+	| 'r'
+	| 's'
+	| 't'
+	| 'u'
+	| 'v'
+	| 'w'
+	| 'x'
+	| 'y'
+	| 'z';

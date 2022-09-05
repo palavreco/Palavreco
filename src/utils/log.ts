@@ -11,11 +11,17 @@ export function log(
 
 function resolveColor(color: string) {
 	switch (color) {
-	case 'red': return '\x1b[31m';
-	case 'green': return '\x1b[32m';
-	case 'blue': return '\x1b[34m';
-	case 'yellow': return '\x1b[33m';
-	case 'purple': return '\x1b[35m';
-	default: return '\x1b[90m';
+		case 'red':
+			return '\x1b[31m';
+		case 'green':
+			return '\x1b[32m';
+		case 'blue':
+			return '\x1b[34m';
+		case 'yellow':
+			return '\x1b[33m';
+		case 'purple':
+			return '\x1b[35m';
+		default:
+			return '\x1b[90m';
 	}
 }

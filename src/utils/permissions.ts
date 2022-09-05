@@ -8,8 +8,12 @@ export function getMissingPermissions(
 
 	const { guild } = interaction;
 
-	const permissionsBooleans = permissions.map(p => guild!.me!.permissions.has(p));
-	const missingPermissions = (permissions.filter((p, i) => !permissionsBooleans[i])).map(p => `\`${p}\``);
+	const permissionsBooleans = permissions.map((p) =>
+		guild!.me!.permissions.has(p),
+	);
+	const missingPermissions = permissions
+		.filter((p, i) => !permissionsBooleans[i])
+		.map((p) => `\`${p}\``);
 
 	if (permissionsBooleans.includes(false)) {
 		return missingPermissions;
