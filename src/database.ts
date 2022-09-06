@@ -15,7 +15,7 @@ export async function setUp(): Promise<void> {
 		await db.schema.createTable('users', (t) => {
 			t.text('id');
 			t.boolean('status');
-			['gameswins', 'streak', 'guesses', 'rank'].forEach((key) => {
+			['gamesWins', 'streak', 'guesses', 'rank'].forEach((key) => {
 				t.specificType(key, 'integer[]');
 			});
 			t.specificType('guilds', 'text[]');
@@ -47,7 +47,7 @@ export async function getUserStatus(id: string): Promise<string> {
 
 export async function setPlayed(id: string, guesses: number): Promise<void> {
 	const user = (await db<User>('users').where('id', id).first()) as User;
-	const { gameswins, gameswinsrank, streak, guesses: userGuesses, rank } = user;
+	const { gamesWins, gameswinsrank, streak, guesses: userGuesses, rank } = user;
 	const won = guesses <= 6 ? true : false;
 
 	let [gDistribution, rDistribution] = [
@@ -77,8 +77,8 @@ export async function setPlayed(id: string, guesses: number): Promise<void> {
 	await db('users')
 		.update({
 			status: true,
-			gameswins: gameswins
-				? [gameswins[0] + 1, gameswins[1] + (won ? 1 : 0)]
+			gamesWins: gamesWins
+				? [gamesWins[0] + 1, gamesWins[1] + (won ? 1 : 0)]
 				: [1, won ? 1 : 0],
 			gameswinsrank: gameswinsrank
 				? [gameswinsrank[0] + 1, gameswinsrank[1] + (won ? 1 : 0)]

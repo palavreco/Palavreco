@@ -1,4 +1,3 @@
-/* eslint-disable no-mixed-spaces-and-tabs */
 import { Client, ActivityOptions } from 'discord.js';
 
 export function setUpPresence(client: Client): void {

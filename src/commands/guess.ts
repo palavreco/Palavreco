@@ -16,7 +16,7 @@ import { runAtEndOf } from '../utils/runner';
 import { awaitMessage } from '../utils/msgCollector';
 import { isValid } from '../utils/checkWord';
 import { toDefault, toEmoji } from '../utils/converters';
-import { square } from '../utils/assets.json';
+import { square } from '../dunno/assets.json';
 
 let usersTries: Record<string, { id: string; attempts: string[] }> = {};
 let activeGames: string[] = [];

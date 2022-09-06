@@ -7,7 +7,7 @@ import {
 import { CommandInteraction, MessageAttachment } from 'discord.js';
 import QuickChart from 'quickchart-js';
 import { getUser } from '../database';
-import { rankTemplate } from '../utils/assets.json';
+import { rankTemplate } from '../dunno/assets.json';
 
 GlobalFonts.registerFromPath('src/utils/inter.ttf', 'inter');
 

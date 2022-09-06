@@ -1,4 +1,4 @@
-export function bisect<T>(array: T[], item: T): number {
+export default function bisect<T>(array: T[], item: T): number {
 	let low = 0;
 	let mid;
 	let high = array.length;

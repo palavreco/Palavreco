@@ -2,14 +2,10 @@ import fs from 'node:fs';
 import dotenv from 'dotenv';
 import { Client, Collection, Guild } from 'discord.js';
 import { Command } from './interfaces/Command';
-import { verifyWord, newWord, setUp, resetRank, setNewGuild } from './database';
-import { getMissingPermissions } from './utils/permissions';
-import { runAtEndOf } from './utils/runner';
-import { log } from './utils/log';
-import { t } from './utils/replyHelper';
-import { setUpPresence } from './utils/presence';
-import { notifyLogChannel } from './utils/guildLog';
-import { letter } from './utils/assets.json';
+import { verifyWord, newWord, setUp, setNewGuild } from './database';
+import { checkPermissions, runAtEndOf, log, t, setUpPresence, notifyLogChannel } from './utils';
+import { letter } from './dunno/assets.json';
+
 dotenv.config();
 
 const client = new Client({
@@ -52,23 +48,25 @@ client.on('interactionCreate', async (i) => {
 		const command = botCmds.get(i.commandName);
 
 		if (command) {
-			const missingPermissions = getMissingPermissions(command.permissions, i);
+			if (i.guild) {
+				await setNewGuild(i.user.id, i.guild.id);
 
-			if (missingPermissions) {
-				i.reply(
-					t('missing_permissions', {
-						perms: missingPermissions.join(' '),
-					}),
-				);
+				const missingPermissions = checkPermissions(command.permissions, i.guild);
 
-				return;
+				if (missingPermissions) {
+					i.reply(
+						t('missing_permissions', {
+							perms: missingPermissions.join(' '),
+						}),
+					);
+
+					return;
+				}
+
+				command.execute(i);
+			} else {
+				command.execute(i);
 			}
-
-			if (i.guildId) {
-				await setNewGuild(i.user.id, i.guildId);
-			}
-
-			command.execute(i);
 		}
 	} else if (i.isButton()) {
 		if (i.customId === 'help_game') {

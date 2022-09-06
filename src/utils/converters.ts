@@ -1,12 +1,9 @@
-import { letter } from './assets.json';
+import { letter } from '../dunno/assets.json';
 
 export function toDefault(content: string) {
-	content = content.replace(/\n/g, '');
-	content = content.replace(/>/g, '> ');
-	const arr = content.split(' ');
-	arr.splice(-1);
+	const arr = content.replace(/\n/g, '').replace(/>/g, '> ').split(' ').slice(0, -1);
 
-	const table: Record<number, string> = Object.create(null);
+	const table: Record<number, string> = {};
 	for (let i = 0; i < 6; i++) table[i + 1] = '';
 
 	let convertedLetters = '';

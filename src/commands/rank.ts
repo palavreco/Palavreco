@@ -5,7 +5,7 @@ import {
 } from 'discord-api-types/v10';
 import { Command } from '../interfaces/Command';
 import { getAllUsers } from '../database';
-import { makeRank } from '../utils/image';
+import { makeRank } from '../utils';
 
 export default class Rank implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {

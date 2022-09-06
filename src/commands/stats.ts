@@ -5,9 +5,9 @@ import {
 	RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from 'discord-api-types/v10';
 import { getUser } from '../database';
-import { makeStats } from '../utils/image';
+import { makeStats } from '../utils';
 
-export default class StatsC implements Command {
+export default class Stats implements Command {
 	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
 		name: 'stats',
 		description: 'Mostra as estatísticas de um usuário',
@@ -34,20 +34,20 @@ export default class StatsC implements Command {
 			);
 		}
 
-		const { gameswins, streak, guesses } = u;
-		const stats = { gameswins, streak, guesses };
+		const { gamesWins, streak, guesses } = u;
+		const stats = { gamesWins, streak, guesses };
 
 		interaction.reply({ embeds: [this.makeEmbed(stats, target)] });
 	}
 
 	makeEmbed(
-		stats: { gameswins: number[]; streak: number[]; guesses: number[] },
+		stats: { gamesWins: number[]; streak: number[]; guesses: number[] },
 		user: User,
 	) {
-		const { gameswins, streak, guesses } = stats;
+		const { gamesWins, streak, guesses } = stats;
 		const [games, wins, currentStreak, bestStreak] = [
-			gameswins[0],
-			gameswins[1],
+			gamesWins[0],
+			gamesWins[1],
 			streak[0],
 			streak[1],
 		];
@@ -57,7 +57,7 @@ export default class StatsC implements Command {
 		percentages.push(110);
 
 		const guessesDistribution = makeStats(percentages);
-		const hasStreak = currentStreak > 4 ? ' 🔥' : '';
+		const hasStreak = currentStreak >= 5 ? ' 🔥' : '';
 
 		return new MessageEmbed()
 			.setTitle(user.tag)
