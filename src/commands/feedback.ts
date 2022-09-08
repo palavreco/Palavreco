@@ -9,28 +9,24 @@ import {
 	TextBasedChannel,
 	User,
 } from 'discord.js';
-import {
-	ApplicationCommandOptionType,
-	RESTPostAPIChatInputApplicationCommandsJSONBody,
-} from 'discord-api-types/v10';
-import { Command } from '../interfaces/Command';
-import { t } from '../utils/replyHelper';
+import { Command, CommandData, OptionType } from '../interfaces';
 import { letter } from '../dunno/assets.json';
+import { t } from '../utils';
 
 export default class FeedBack implements Command {
-	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
+	commandStructure: CommandData = {
 		name: 'feedback',
 		description: 'Dê um feedback para o Palavreco!',
 		options: [
 			{
 				name: 'sugestão',
 				description: 'Sugira algo para o bot',
-				type: ApplicationCommandOptionType.Subcommand,
+				type: OptionType.Subcommand,
 				options: [
 					{
 						name: 'texto',
 						description: 'Coloque o conteúdo da sugestão',
-						type: ApplicationCommandOptionType.String,
+						type: OptionType.String,
 						required: true,
 					},
 				],
@@ -38,12 +34,12 @@ export default class FeedBack implements Command {
 			{
 				name: 'bug',
 				description: 'Reporte um bug do bot',
-				type: ApplicationCommandOptionType.Subcommand,
+				type: OptionType.Subcommand,
 				options: [
 					{
 						name: 'texto',
 						description: 'Coloque o conteúdo do reporte',
-						type: ApplicationCommandOptionType.String,
+						type: OptionType.String,
 						required: true,
 					},
 				],
@@ -143,12 +139,10 @@ function handleOperation(
 	reactionCollector.on('collect', async (r, u) => {
 		switch (r.emoji.name) {
 			case '🟩': {
-				embed
-					.setColor('GREEN')
-					.setFooter({
-						text: `${embed.footer?.text} - Accepted by ${u.tag}`,
-						iconURL: user.displayAvatarURL(),
-					});
+				embed.setColor('GREEN').setFooter({
+					text: `${embed.footer?.text} - Accepted by ${u.tag}`,
+					iconURL: user.displayAvatarURL(),
+				});
 
 				await msg.edit({
 					content: isSug ? 'Suggestion accepted' : 'Report accepted',
@@ -209,12 +203,10 @@ function handleOperation(
 				break;
 			}
 			case '🟥': {
-				embed
-					.setColor('RED')
-					.setFooter({
-						text: `${embed.footer?.text} - Rejected by ${u.tag}`,
-						iconURL: user.displayAvatarURL(),
-					});
+				embed.setColor('RED').setFooter({
+					text: `${embed.footer?.text} - Rejected by ${u.tag}`,
+					iconURL: user.displayAvatarURL(),
+				});
 				await msg.edit({
 					content: isSug ? 'Suggestion rejected' : 'Report rejected',
 					embeds: [embed],

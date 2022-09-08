@@ -1,10 +1,9 @@
 import { CommandInteraction } from 'discord.js';
-import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
-import { Command } from '../interfaces/Command';
+import { Command, CommandData } from '../interfaces';
 import { newWord } from '../database';
 
 export default class NewWord implements Command {
-	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
+	commandStructure: CommandData = {
 		name: 'neword',
 		description: 'Change the day word',
 	};

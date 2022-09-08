@@ -6,9 +6,7 @@ export function checkPermissions(
 ): string[] | null {
 	if (!permissions) return null;
 
-	const booleans = permissions.map((p) =>
-		guild.me!.permissions.has(p),
-	);
+	const booleans = permissions.map((p) => guild.me!.permissions.has(p));
 
 	const missing = permissions
 		.filter((p, i) => !booleans[i])

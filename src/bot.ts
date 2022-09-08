@@ -1,11 +1,17 @@
 import fs from 'node:fs';
 import dotenv from 'dotenv';
 import { Client, Collection, Guild } from 'discord.js';
-import { Command } from './interfaces/Command';
+import { Command } from './interfaces';
 import { verifyWord, newWord, setUp, setNewGuild } from './database';
-import { checkPermissions, runAtEndOf, log, t, setUpPresence, notifyLogChannel } from './utils';
+import {
+	checkPermissions,
+	runAtEndOf,
+	log,
+	t,
+	setUpPresence,
+	notifyLogChannel,
+} from './utils';
 import { letter } from './dunno/assets.json';
-
 dotenv.config();
 
 const client = new Client({
@@ -51,7 +57,10 @@ client.on('interactionCreate', async (i) => {
 			if (i.guild) {
 				await setNewGuild(i.user.id, i.guild.id);
 
-				const missingPermissions = checkPermissions(command.permissions, i.guild);
+				const missingPermissions = checkPermissions(
+					command.permissions,
+					i.guild,
+				);
 
 				if (missingPermissions) {
 					i.reply(

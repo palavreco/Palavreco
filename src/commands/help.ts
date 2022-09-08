@@ -3,12 +3,11 @@ import {
 	MessageActionRow,
 	MessageButton,
 } from 'discord.js';
-import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
-import { Command } from '../interfaces/Command';
-import { t } from '../utils/replyHelper';
+import { Command, CommandData } from '../interfaces';
+import { t } from '../utils';
 
 export default class Help implements Command {
-	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
+	commandStructure: CommandData = {
 		name: 'ajuda',
 		description: 'Mostra como o jogo funciona',
 	};

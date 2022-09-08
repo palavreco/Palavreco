@@ -1,7 +1,11 @@
 import { letter } from '../dunno/assets.json';
 
 export function toDefault(content: string) {
-	const arr = content.replace(/\n/g, '').replace(/>/g, '> ').split(' ').slice(0, -1);
+	const arr = content
+		.replace(/\n/g, '')
+		.replace(/>/g, '> ')
+		.split(' ')
+		.slice(0, -1);
 
 	const table: Record<number, string> = {};
 	for (let i = 0; i < 6; i++) table[i + 1] = '';

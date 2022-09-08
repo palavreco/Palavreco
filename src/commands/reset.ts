@@ -1,13 +1,9 @@
 import { CommandInteraction } from 'discord.js';
-import {
-	ApplicationCommandOptionType,
-	RESTPostAPIChatInputApplicationCommandsJSONBody,
-} from 'discord-api-types/v10';
-import { Command } from '../interfaces/Command';
+import { Command, CommandData, OptionType } from '../interfaces';
 import { resetUser } from '../database';
 
 export default class Reset implements Command {
-	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
+	commandStructure: CommandData = {
 		name: 'reset',
 		description: 'Set the user status to false, i.e. the user can play again',
 		options: [
@@ -15,7 +11,7 @@ export default class Reset implements Command {
 				name: 'user',
 				description: 'The user to reset',
 				required: true,
-				type: ApplicationCommandOptionType.User,
+				type: OptionType.User,
 			},
 		],
 	};

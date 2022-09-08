@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
-import { Command } from './interfaces/Command';
-import { log } from './utils/log';
+import { Command } from './interfaces';
+import { log } from './utils';
 dotenv.config();
 
 const { CLIENT_ID, GUILD_ID, TOKEN } = process.env;

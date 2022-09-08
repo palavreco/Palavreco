@@ -8,7 +8,8 @@
     "commands": "tsnd --transpile-only src/register.ts",
     "build": "tsc",
     "start": "node build/bot.js",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "prettier": "prettier src --write"
   },
   "keywords": [
     "discord",

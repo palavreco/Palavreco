@@ -1,21 +1,17 @@
-import { Command } from '../interfaces/Command';
 import { CommandInteraction, MessageEmbed, User } from 'discord.js';
-import {
-	ApplicationCommandOptionType,
-	RESTPostAPIChatInputApplicationCommandsJSONBody,
-} from 'discord-api-types/v10';
+import { Command, CommandData, OptionType } from '../interfaces';
 import { getUser } from '../database';
 import { makeStats } from '../utils';
 
 export default class Stats implements Command {
-	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
+	commandStructure: CommandData = {
 		name: 'stats',
 		description: 'Mostra as estatísticas de um usuário',
 		options: [
 			{
 				name: 'user',
 				description: 'O usuário que deseja ver as estatísticas',
-				type: ApplicationCommandOptionType.User,
+				type: OptionType.User,
 				required: false,
 			},
 		],
@@ -34,20 +30,20 @@ export default class Stats implements Command {
 			);
 		}
 
-		const { gamesWins, streak, guesses } = u;
-		const stats = { gamesWins, streak, guesses };
+		const { gameswins, streak, guesses } = u;
+		const stats = { gameswins, streak, guesses };
 
 		interaction.reply({ embeds: [this.makeEmbed(stats, target)] });
 	}
 
 	makeEmbed(
-		stats: { gamesWins: number[]; streak: number[]; guesses: number[] },
+		stats: { gameswins: number[]; streak: number[]; guesses: number[] },
 		user: User,
 	) {
-		const { gamesWins, streak, guesses } = stats;
+		const { gameswins, streak, guesses } = stats;
 		const [games, wins, currentStreak, bestStreak] = [
-			gamesWins[0],
-			gamesWins[1],
+			gameswins[0],
+			gameswins[1],
 			streak[0],
 			streak[1],
 		];

@@ -1,11 +1,14 @@
 import fs from 'node:fs';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 import dotenv from 'dotenv';
 import { knex } from 'knex';
-import { User, Word } from './interfaces/Database';
-import dayjs from 'dayjs';
-import timezone from 'dayjs/plugin/timezone';
-import { log } from './utils/log';
+import { User, Word } from './interfaces/database';
+import { log } from './utils';
 dotenv.config();
+
+dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const db = knex({ client: 'pg', connection: process.env.DATABASE_URL });
@@ -15,7 +18,7 @@ export async function setUp(): Promise<void> {
 		await db.schema.createTable('users', (t) => {
 			t.text('id');
 			t.boolean('status');
-			['gamesWins', 'streak', 'guesses', 'rank'].forEach((key) => {
+			['gameswins', 'gameswinsrank', 'streak', 'guesses', 'rank'].forEach((key) => {
 				t.specificType(key, 'integer[]');
 			});
 			t.specificType('guilds', 'text[]');
@@ -47,7 +50,7 @@ export async function getUserStatus(id: string): Promise<string> {
 
 export async function setPlayed(id: string, guesses: number): Promise<void> {
 	const user = (await db<User>('users').where('id', id).first()) as User;
-	const { gamesWins, gameswinsrank, streak, guesses: userGuesses, rank } = user;
+	const { gameswins, gameswinsrank, streak, guesses: userGuesses, rank } = user;
 	const won = guesses <= 6 ? true : false;
 
 	let [gDistribution, rDistribution] = [
@@ -77,8 +80,8 @@ export async function setPlayed(id: string, guesses: number): Promise<void> {
 	await db('users')
 		.update({
 			status: true,
-			gamesWins: gamesWins
-				? [gamesWins[0] + 1, gamesWins[1] + (won ? 1 : 0)]
+			gameswins: gameswins
+				? [gameswins[0] + 1, gameswins[1] + (won ? 1 : 0)]
 				: [1, won ? 1 : 0],
 			gameswinsrank: gameswinsrank
 				? [gameswinsrank[0] + 1, gameswinsrank[1] + (won ? 1 : 0)]

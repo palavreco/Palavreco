@@ -6,7 +6,7 @@ export interface Word {
 export interface User {
 	id: string;
 	status: boolean;
-	gamesWins: number[];
+	gameswins: number[];
 	gameswinsrank: number[];
 	streak: number[];
 	guesses: number[];
