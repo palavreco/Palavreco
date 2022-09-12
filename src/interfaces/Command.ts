@@ -1,5 +1,8 @@
 import { CommandInteraction, PermissionString } from 'discord.js';
-import { ApplicationCommandOptionType, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
+import {
+	ApplicationCommandOptionType,
+	RESTPostAPIChatInputApplicationCommandsJSONBody,
+} from 'discord-api-types/v10';
 
 export interface Command {
 	commandStructure: CommandData;

@@ -4,7 +4,7 @@ import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import dotenv from 'dotenv';
 import { knex } from 'knex';
-import { User, Word } from './interfaces/database';
+import { User, Word } from './interfaces';
 import { log } from './utils';
 dotenv.config();
 
@@ -18,9 +18,11 @@ export async function setUp(): Promise<void> {
 		await db.schema.createTable('users', (t) => {
 			t.text('id');
 			t.boolean('status');
-			['gameswins', 'gameswinsrank', 'streak', 'guesses', 'rank'].forEach((key) => {
-				t.specificType(key, 'integer[]');
-			});
+			['gameswins', 'gameswinsrank', 'streak', 'guesses', 'rank'].forEach(
+				(key) => {
+					t.specificType(key, 'integer[]');
+				},
+			);
 			t.specificType('guilds', 'text[]');
 		});
 	}

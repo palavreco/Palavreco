@@ -43,8 +43,14 @@ export default class Rank implements Command {
 			}
 		};
 
-		const reference: Record<string, number> = {
-			'0': 3, '1': 2, '2': 1, '3': 0.75, '4': 0.5, '5': 0.25, '6': 0,
+		const multipliers: Record<string, number> = {
+			'0': 3,
+			'1': 2,
+			'2': 1,
+			'3': 0.75,
+			'4': 0.5,
+			'5': 0.25,
+			'6': 0,
 		};
 
 		const scores = users()
@@ -53,7 +59,8 @@ export default class Rank implements Command {
 
 				if (!rank) return;
 				let points = Object.entries(rank).reduce(
-					(acc, [key, value]) => acc + value * reference[key], 0,
+					(acc, [key, value]) => acc + value * multipliers[key],
+					0,
 				);
 				if (points < 0) points = 0;
 

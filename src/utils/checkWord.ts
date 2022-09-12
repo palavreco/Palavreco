@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import readline from 'readline';
-import bisect from './bisect';
+import { bisect } from './bisect';
 
 const cache: string[] = [];
 

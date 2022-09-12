@@ -7,10 +7,10 @@ import {
 import { CommandInteraction, MessageAttachment } from 'discord.js';
 import QuickChart from 'quickchart-js';
 import { getUser } from '../database';
-import { rankTemplate } from '../dunno/assets.json';
 
-GlobalFonts.registerFromPath('src/utils/inter.ttf', 'inter');
+GlobalFonts.registerFromPath('src/assets/inter.ttf', 'inter');
 
+// Exact pixels ([x, y]) for the position numbers and nicknames
 const numberPixels: Record<number, number[]> = {
 	3: [77, 438],
 	4: [462, 438],
@@ -40,7 +40,7 @@ export async function makeRank(
 ): Promise<MessageAttachment> {
 	const canvas = createCanvas(1240, 750);
 	const ctx = canvas.getContext('2d');
-	ctx.drawImage(await loadImage(rankTemplate), 0, 0);
+	ctx.drawImage(await loadImage('src/assets/rank.png'), 0, 0);
 
 	newStyle(ctx, { font: '28px inter', fill: '#111111', align: 'start' });
 	if (isServer) {

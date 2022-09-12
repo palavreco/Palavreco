@@ -1,4 +1,4 @@
-import { letter } from '../dunno/assets.json';
+import { letter } from '../assets/emotes.json';
 
 export function toDefault(content: string) {
 	const arr = content

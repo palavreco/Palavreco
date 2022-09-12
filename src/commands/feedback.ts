@@ -10,7 +10,7 @@ import {
 	User,
 } from 'discord.js';
 import { Command, CommandData, OptionType } from '../interfaces';
-import { letter } from '../dunno/assets.json';
+import { letter } from '../assets/emotes.json';
 import { t } from '../utils';
 
 export default class FeedBack implements Command {

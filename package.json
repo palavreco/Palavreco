@@ -9,7 +9,7 @@
     "build": "tsc",
     "start": "node build/bot.js",
     "lint": "eslint src",
-    "prettier": "prettier src --write"
+    "format": "prettier src --write"
   },
   "keywords": [
     "discord",

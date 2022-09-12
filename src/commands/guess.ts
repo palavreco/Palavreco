@@ -10,8 +10,15 @@ import {
 	verifyWord,
 	getUser,
 } from '../database';
-import { t, runAtEndOf, awaitMessage, isValid, toDefault, toEmoji } from '../utils';
-import { square } from '../dunno/assets.json';
+import {
+	t,
+	runAtEndOf,
+	awaitMessage,
+	isValid,
+	toDefault,
+	toEmoji,
+} from '../utils';
+import { square } from '../assets/emotes.json';
 
 let usersTries: Record<string, { id: string; attempts: string[] }> = {};
 let activeGames: string[] = [];

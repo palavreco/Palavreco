@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import dotenv from 'dotenv';
 import { Client, Collection, Guild } from 'discord.js';
 import { Command } from './interfaces';
-import { verifyWord, newWord, setUp, setNewGuild } from './database';
+import { verifyWord, newWord, setUp, setNewGuild, resetRank } from './database';
 import {
 	checkPermissions,
 	runAtEndOf,
@@ -11,7 +11,7 @@ import {
 	setUpPresence,
 	notifyLogChannel,
 } from './utils';
-import { letter } from './dunno/assets.json';
+import { letter } from './assets/emotes.json';
 dotenv.config();
 
 const client = new Client({
@@ -71,11 +71,9 @@ client.on('interactionCreate', async (i) => {
 
 					return;
 				}
-
-				command.execute(i);
-			} else {
-				command.execute(i);
 			}
+
+			command.execute(i);
 		}
 	} else if (i.isButton()) {
 		if (i.customId === 'help_game') {
@@ -104,6 +102,6 @@ runAtEndOf('day', () => {
 	log('New word & users reseted!', 'DB', 'purple');
 });
 
-// runAtEndOf('month', () => {
-// 	resetRank();
-// });
+runAtEndOf('month', () => {
+	resetRank();
+});
