@@ -34,7 +34,7 @@ export default class Guess implements Command {
 
 	dev = false;
 
-	permissions: PermissionString[] = ['MANAGE_MESSAGES', 'VIEW_CHANNEL'];
+	permissions: PermissionString[] = ['MANAGE_MESSAGES', 'VIEW_CHANNEL', 'USE_EXTERNAL_EMOJIS'];
 
 	async execute(interaction: CommandInteraction) {
 		if (await verifyWord()) {
