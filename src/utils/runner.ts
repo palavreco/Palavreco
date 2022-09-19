@@ -10,7 +10,14 @@ export function runAtEndOf(endOf: 'day' | 'month', callback: () => void) {
 	const msUntilTime = time - +dayjs();
 	const maximum = 2147483647;
 
-	setTimeout(() => {
-		runAtEndOf(endOf, callback);
-	}, msUntilTime > maximum ? maximum : msUntilTime);
+	if (msUntilTime > maximum) {
+		setTimeout(() => {
+			runAtEndOf(endOf, callback);
+		}, maximum);
+	} else {
+		setTimeout(() => {
+			callback();
+			runAtEndOf(endOf, callback);
+		}, msUntilTime);
+	}
 }
