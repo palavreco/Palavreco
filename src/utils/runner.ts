@@ -8,9 +8,16 @@ dayjs.extend(timezone);
 export function runAtEndOf(endOf: 'day' | 'month', callback: () => void) {
 	const time = +dayjs().tz('America/Sao_Paulo').endOf(endOf) + 1;
 	const msUntilTime = time - +dayjs();
+	const maximum = 2147483647;
 
-	setTimeout(() => {
-		callback();
-		runAtEndOf(endOf, callback);
-	}, msUntilTime);
+	if (msUntilTime > maximum) {
+		setTimeout(() => {
+			runAtEndOf(endOf, callback);
+		}, maximum);
+	} else {
+		setTimeout(() => {
+			callback();
+			runAtEndOf(endOf, callback);
+		}, msUntilTime);
+	}
 }

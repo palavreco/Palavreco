@@ -1,6 +1,6 @@
 import templite, { Values } from 'templite';
 import { log } from './log';
-import messages from './messages.json';
+import messages from '../assets/messages.json';
 
 export function t(replyName: keyof typeof messages, values?: Values): string {
 	const reply: string = messages[replyName];

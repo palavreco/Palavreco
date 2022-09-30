@@ -1,21 +1,17 @@
-import { Command } from '../interfaces/Command';
 import { CommandInteraction, MessageEmbed, User } from 'discord.js';
-import {
-	ApplicationCommandOptionType,
-	RESTPostAPIChatInputApplicationCommandsJSONBody,
-} from 'discord-api-types/v10';
+import { Command, CommandData, OptionType } from '../interfaces';
 import { getUser } from '../database';
-import { makeStats } from '../utils/image';
+import { makeStats } from '../utils';
 
-export default class StatsC implements Command {
-	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
+export default class Stats implements Command {
+	commandStructure: CommandData = {
 		name: 'stats',
 		description: 'Mostra as estatísticas de um usuário',
 		options: [
 			{
 				name: 'user',
 				description: 'O usuário que deseja ver as estatísticas',
-				type: ApplicationCommandOptionType.User,
+				type: OptionType.User,
 				required: false,
 			},
 		],
@@ -57,7 +53,7 @@ export default class StatsC implements Command {
 		percentages.push(110);
 
 		const guessesDistribution = makeStats(percentages);
-		const hasStreak = currentStreak > 4 ? ' 🔥' : '';
+		const hasStreak = currentStreak >= 5 ? ' 🔥' : '';
 
 		return new MessageEmbed()
 			.setTitle(user.tag)

@@ -1,8 +1,6 @@
 import dayjs from 'dayjs';
 import { CommandInteraction, PermissionString } from 'discord.js';
-import { RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord-api-types/v10';
-import { Command } from '../interfaces/Command';
-import { t } from '../utils/replyHelper';
+import { Command, CommandData } from '../interfaces';
 import {
 	getUserStatus,
 	registerUser,
@@ -12,11 +10,15 @@ import {
 	verifyWord,
 	getUser,
 } from '../database';
-import { runAtEndOf } from '../utils/runner';
-import { awaitMessage } from '../utils/msgCollector';
-import { isValid } from '../utils/checkWord';
-import { toDefault, toEmoji } from '../utils/converters';
-import { square } from '../utils/assets.json';
+import {
+	t,
+	runAtEndOf,
+	awaitMessage,
+	isValid,
+	toDefault,
+	toEmoji,
+} from '../utils';
+import { square } from '../assets/emotes.json';
 
 let usersTries: Record<string, { id: string; attempts: string[] }> = {};
 let activeGames: string[] = [];
@@ -27,7 +29,7 @@ runAtEndOf('day', () => {
 });
 
 export default class Guess implements Command {
-	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
+	commandStructure: CommandData = {
 		name: 'adivinhar',
 		description: 'Tente adivinhar a palavra do dia!',
 	};

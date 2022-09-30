@@ -7,30 +7,30 @@ import {
 import { CommandInteraction, MessageAttachment } from 'discord.js';
 import QuickChart from 'quickchart-js';
 import { getUser } from '../database';
-import { rankTemplate } from '../utils/assets.json';
 
-GlobalFonts.registerFromPath('src/utils/inter.ttf', 'inter');
+GlobalFonts.registerFromPath('src/assets/inter.ttf', 'inter');
 
-const numberPixels = {
-	'3': [77, 438],
-	'4': [462, 438],
-	'5': [847, 438],
-	'6': [77, 552],
-	'7': [462, 552],
-	'8': [847, 552],
-	'9': [439, 671],
+// Exact pixels ([x, y]) for the position numbers and nicknames
+const numberPixels: Record<number, number[]> = {
+	3: [77, 438],
+	4: [462, 438],
+	5: [847, 438],
+	6: [77, 552],
+	7: [462, 552],
+	8: [847, 552],
+	9: [439, 671],
 };
-const namePixels = {
-	'0': [620, 253],
-	'1': [295, 305],
-	'2': [945, 305],
-	'3': [126, 427],
-	'4': [511, 427],
-	'5': [896, 427],
-	'6': [126, 541],
-	'7': [511, 541],
-	'8': [896, 541],
-	'9': [516, 659],
+const namePixels: typeof numberPixels = {
+	0: [620, 253],
+	1: [295, 305],
+	2: [945, 305],
+	3: [126, 427],
+	4: [511, 427],
+	5: [896, 427],
+	6: [126, 541],
+	7: [511, 541],
+	8: [896, 541],
+	9: [516, 659],
 };
 
 export async function makeRank(
@@ -40,7 +40,7 @@ export async function makeRank(
 ): Promise<MessageAttachment> {
 	const canvas = createCanvas(1240, 750);
 	const ctx = canvas.getContext('2d');
-	ctx.drawImage(await loadImage(rankTemplate), 0, 0);
+	ctx.drawImage(await loadImage('src/assets/rank.png'), 0, 0);
 
 	newStyle(ctx, { font: '28px inter', fill: '#111111', align: 'start' });
 	if (isServer) {
@@ -65,19 +65,17 @@ export async function makeRank(
 		ctx.fillText('RANK GLOBAL', 90, 48);
 	}
 
-	// @ts-ignore
-	const userPosition = scores.findIndex((s) => s.id === int.user.id) + 1 ?? '';
+	const userPosition = scores.findIndex((s) => s!.id === int.user.id) + 1 ?? '';
 	if (userPosition) {
 		newStyle(ctx, { font: '18px inter', fill: '#373737', align: 'start' });
 		ctx.fillText(`Sua posição: ${userPosition} de ${scores.length}`, 90, 73);
 	}
 
-	for (let j = 0; j < scores.length; j++) {
+	for (let j = 3; j < scores.length; j++) {
 		if (j > 9) break;
 
 		if (j > 2) {
 			newStyle(ctx, { font: '53px inter', fill: '#ffffff', align: 'start' });
-			// @ts-ignore
 			ctx.fillText(`${j + 1}`, numberPixels[j][0], numberPixels[j][1]);
 		}
 	}
@@ -89,6 +87,7 @@ export async function makeRank(
 			points: number;
 			games: number;
 		};
+
 		if (scores[i]) {
 			const { id, points } = scores[i]!;
 			const obj = await int.client.users.fetch(id);

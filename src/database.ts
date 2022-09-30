@@ -1,11 +1,14 @@
 import fs from 'node:fs';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 import dotenv from 'dotenv';
 import { knex } from 'knex';
-import { User, Word } from './interfaces/Database';
-import dayjs from 'dayjs';
-import timezone from 'dayjs/plugin/timezone';
-import { log } from './utils/log';
+import { User, Word } from './interfaces';
+import { log } from './utils';
 dotenv.config();
+
+dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const db = knex({ client: 'pg', connection: process.env.DATABASE_URL });
@@ -15,9 +18,11 @@ export async function setUp(): Promise<void> {
 		await db.schema.createTable('users', (t) => {
 			t.text('id');
 			t.boolean('status');
-			['gameswins', 'streak', 'guesses', 'rank'].forEach((key) => {
-				t.specificType(key, 'integer[]');
-			});
+			['gameswins', 'gameswinsrank', 'streak', 'guesses', 'rank'].forEach(
+				(key) => {
+					t.specificType(key, 'integer[]');
+				},
+			);
 			t.specificType('guilds', 'text[]');
 		});
 	}

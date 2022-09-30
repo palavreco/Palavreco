@@ -1,26 +1,22 @@
 import { CommandInteraction } from 'discord.js';
-import {
-	ApplicationCommandOptionType,
-	RESTPostAPIChatInputApplicationCommandsJSONBody,
-} from 'discord-api-types/v10';
-import { Command } from '../interfaces/Command';
+import { Command, CommandData, OptionType } from '../interfaces';
 import { getAllUsers } from '../database';
-import { makeRank } from '../utils/image';
+import { makeRank } from '../utils';
 
 export default class Rank implements Command {
-	commandStructure: RESTPostAPIChatInputApplicationCommandsJSONBody = {
+	commandStructure: CommandData = {
 		name: 'rank',
 		description: 'Mostra o rank dos usuários',
 		options: [
 			{
 				name: 'server',
 				description: 'Mostra o rank do servidor',
-				type: ApplicationCommandOptionType.Subcommand,
+				type: OptionType.Subcommand,
 			},
 			{
 				name: 'global',
 				description: 'Mostra o rank global',
-				type: ApplicationCommandOptionType.Subcommand,
+				type: OptionType.Subcommand,
 			},
 		],
 	};
@@ -47,7 +43,7 @@ export default class Rank implements Command {
 			}
 		};
 
-		const reference: Record<string, number> = {
+		const multipliers: Record<string, number> = {
 			'0': 3,
 			'1': 2,
 			'2': 1,
@@ -56,13 +52,14 @@ export default class Rank implements Command {
 			'5': 0.25,
 			'6': 0,
 		};
+
 		const scores = users()
 			.map((user) => {
 				const { id, rank } = user;
 
 				if (!rank) return;
 				let points = Object.entries(rank).reduce(
-					(acc, [key, value]) => acc + value * reference[key],
+					(acc, [key, value]) => acc + value * multipliers[key],
 					0,
 				);
 				if (points < 0) points = 0;
