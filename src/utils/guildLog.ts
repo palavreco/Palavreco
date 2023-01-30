@@ -44,5 +44,9 @@ export async function notifyLogChannel(
 	const channel = client.channels.cache.get(
 		process.env.GUILD_UPDATE_CHANNEL,
 	) as TextChannel;
-	channel.send({ embeds: [embed] });
+	try {
+		channel.send({ embeds: [embed] });
+	} catch {
+		console.log('Erro ao enviar log de entrada/saída.')
+	}
 }
